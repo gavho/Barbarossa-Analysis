@@ -1,3 +1,4 @@
 *.gdb.zip
-*.gdb/*.lock
+**/*.gdb/*.lock
+~$*
 __pycache__/
