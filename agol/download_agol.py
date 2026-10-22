@@ -113,8 +113,11 @@ def main(urls):
         expected = get_json(f"{layer_url}/query", where="1=1", returnCountOnly="true")["count"]
         gdf = read_layer(layer_url)
         name = gdb_name(title, used)
-        pyogrio.write_dataframe(gdf, GDB, layer=name, driver="OpenFileGDB", promote_to_multi=True,
-                                layer_options={"TARGET_ARCGIS_VERSION": "ARCGIS_PRO_3_2_OR_LATER"})
+        # Default (pre-Pro 3.2) GDB format so any Pro version opens it; it has no Int64 field type.
+        for col in gdf.select_dtypes("int64").columns:
+            fits = gdf[col].abs().max() < 2**31 if len(gdf) else True
+            gdf[col] = gdf[col].astype("int32" if fits else "float64")
+        pyogrio.write_dataframe(gdf, GDB, layer=name, driver="OpenFileGDB", promote_to_multi=True)
         flag = "" if len(gdf) == expected else "  <-- COUNT MISMATCH"
         print(f"  {name}: {len(gdf)}/{expected} features{flag}")
         if flag:

@@ -1,0 +1,157 @@
+@import "tailwindcss";
+@import "maplibre-gl/dist/maplibre-gl.css";
+
+/* Copied cult-ui / watermelon components use shadcn token names; both themes define them. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-popover: var(--card);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-header: var(--header);
+  --color-danger: var(--danger);
+  --color-ok: var(--ok);
+  --font-display: var(--font-display);
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+
+:root,
+[data-theme="tactical"] {
+  --background: #0a0a0b;
+  --card: #121315;
+  --muted: #1a1b1e;
+  --accent: #1b2733;
+  --border: #2a2b30;
+  --foreground: #e4e6e9;
+  --muted-foreground: #8b9099;
+  --primary: #69b9f8;
+  --primary-foreground: #04111c;
+  --header: #0d0e10;
+  --danger: #e5484d;
+  --ok: #46a758;
+  --grid: rgba(105, 185, 248, 0.05);
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --display-case: uppercase;
+  --display-tracking: 0.08em;
+  --radius: 4px;
+  color-scheme: dark;
+}
+
+[data-theme="period"] {
+  --background: #e6dcc4;
+  --card: #efe7d3;
+  --muted: #ddd1b4;
+  --accent: #d4c6a2;
+  --border: #b3a580;
+  --foreground: #2b2622;
+  --muted-foreground: #66594a;
+  --primary: #8b2e1f;
+  --primary-foreground: #f6efdf;
+  --header: #4c5441;
+  --danger: #8b2e1f;
+  --ok: #4c5d2f;
+  --grid: rgba(43, 38, 34, 0.05);
+  --font-display: "Saira Stencil One", "Impact", sans-serif;
+  --display-case: uppercase;
+  --display-tracking: 0.05em;
+  --radius: 2px;
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  overflow: hidden;
+}
+
+.display {
+  font-family: var(--font-display);
+  text-transform: var(--display-case);
+  letter-spacing: var(--display-tracking);
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+[data-theme="period"] .grid-bg {
+  background-image:
+    radial-gradient(rgba(80, 60, 30, 0.08) 1px, transparent 1px);
+  background-size: 6px 6px;
+}
+
+/* In the components layer so utilities (absolute, etc.) still override position. */
+@layer components {
+/* Tactical frame corners on panels; period uses a double rule. */
+.frame {
+  position: relative;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: var(--radius);
+}
+[data-theme="tactical"] .frame::before,
+[data-theme="tactical"] .frame::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-color: var(--primary);
+  border-style: solid;
+  pointer-events: none;
+}
+[data-theme="tactical"] .frame::before { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
+[data-theme="tactical"] .frame::after { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
+[data-theme="period"] .frame { box-shadow: inset 0 0 0 3px var(--card), inset 0 0 0 4px var(--border); }
+}
+
+.scroll-thin { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.maplibregl-ctrl-group { background: var(--card) !important; border: 1px solid var(--border); }
+.maplibregl-ctrl-group button + button { border-top-color: var(--border) !important; }
+[data-theme="tactical"] .maplibregl-ctrl-icon { filter: invert(1); }
+.maplibregl-ctrl-attrib { background: color-mix(in oklab, var(--card) 80%, transparent) !important; color: var(--muted-foreground); font-size: 10px; }
+.maplibregl-ctrl-attrib a { color: var(--muted-foreground) !important; }
+.maplibregl-ctrl-scale { background: transparent; color: var(--foreground); border-color: var(--foreground); font-family: "JetBrains Mono", monospace; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* Period header sits on feldgrau: re-scope tokens so every header control stays legible. */
+[data-theme="period"] header {
+  --foreground: #efe7d3;
+  --muted-foreground: #c3bba2;
+  --background: #3e4535;
+  --muted: #565e4a;
+  --border: #747c64;
+  --card: #4c5441;
+  --primary: #e0b25c;
+  --primary-foreground: #2b2622;
+}
