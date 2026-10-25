@@ -1,0 +1,281 @@
+Sorin Adam Matei
+0 minutes 3 seconds0:03
+Sorin Adam Matei 0 minutes 3 seconds
+Yeah, to capture this through facilitator, right? So, first of all, we discussed the general analytic methodology for the lines for comparing the lines of operations as intended with the lines of operations captured by our methodology.
+
+Gavin Broderic Ho
+0 minutes 3 seconds0:03
+Gavin Broderic Ho 0 minutes 3 seconds
+Okay.
+Gavin Broderic Ho 0 minutes 17 seconds
+Hum.
+
+Sorin Adam Matei
+0 minutes 22 seconds0:22
+Sorin Adam Matei 0 minutes 22 seconds
+And there we decided that we will compare them as much as possible pairwise, starting from the south especially. And we will first try to simplify the lines right into a series of linear vectors.
+
+Gavin Broderic Ho
+0 minutes 41 seconds0:41
+Gavin Broderic Ho 0 minutes 41 seconds
+Mm-hmm.
+
+Sorin Adam Matei
+0 minutes 41 seconds0:41
+Sorin Adam Matei 0 minutes 41 seconds
+Like, kind of using inflection points for changing directions, right? So, ideally, we would, you know, convert the sudden most intended line of operation into probably 3 vectors, right, with the two inflection points there and there, right? And the realized line of operations that will have...
+
+Gavin Broderic Ho
+0 minutes 45 seconds0:45
+Gavin Broderic Ho 0 minutes 45 seconds
+Yes.
+Gavin Broderic Ho 0 minutes 57 seconds
+Mhm.
+
+Sorin Adam Matei
+1 minute 3 seconds1:03
+Sorin Adam Matei 1 minute 3 seconds
+probably 3 lines too, you know, with the inflection point there and one there, right? And then we'll compare these collections of three vectors to each other, and we'll derive some sort of conclusions. You know, for the other lines of approach, well, lines of operations,
+Sorin Adam Matei 1 minute 22 seconds
+And intended and real, you know the problem will become a little bit more complicated, because you know they are more clustered together than they were intended to, and we need to give an account of that, and we need to talk about that, right? But the most important conclusion that probably we need to derive about the analysis for the third.
+Gavin Broderic Ho 28 minutes 25 seconds
+If I do this off of Esri, we can do this.
+
+Sorin Adam Matei
+28 minutes 25 seconds28:25
+Sorin Adam Matei 28 minutes 25 seconds
+But, listen.
+Sorin Adam Matei 28 minutes 29 seconds
+Yeah, but you know what? Let's not, you know, complicate your life at this point. Yeah. Let's just see what we need to do.
+
+Gavin Broderic Ho
+28 minutes 33 seconds28:33
+Gavin Broderic Ho 28 minutes 33 seconds
+Yeah.
+Gavin Broderic Ho 28 minutes 41 seconds
+Yeah.
+Gavin Broderic Ho 28 minutes 43 seconds
+Okay, I think I have, um...
+
+Sorin Adam Matei
+28 minutes 44 seconds28:44
+Sorin Adam Matei 28 minutes 44 seconds
+I.
+
+Gavin Broderic Ho
+28 minutes 47 seconds28:47
+Gavin Broderic Ho 28 minutes 47 seconds
+The direction.
+
+Sorin Adam Matei
+28 minutes 47 seconds28:47
+Sorin Adam Matei 28 minutes 47 seconds
+All right, Gavin, you're the best. Oh, one other thing. We need to generate 4 line charts for the paper with Hupy.
+
+Gavin Broderic Ho
+28 minutes 50 seconds28:50
+Gavin Broderic Ho 28 minutes 50 seconds
+Yes, thank you.
+Gavin Broderic Ho 28 minutes 59 seconds
+Oh yeah, he told me about that. What are they? They are...
+
+Sorin Adam Matei
+29 minutes 2 seconds29:02
+Sorin Adam Matei 29 minutes 2 seconds
+Oh.
+Sorin Adam Matei 29 minutes 3 seconds
+So it's basically the line maps that show posture.
+
+Gavin Broderic Ho
+29 minutes 7 seconds29:07
+Gavin Broderic Ho 29 minutes 7 seconds
+Okay.
+
+Sorin Adam Matei
+29 minutes 8 seconds29:08
+Sorin Adam Matei 29 minutes 8 seconds
+It's rather simple, to be honest, but it's one for each region.
+
+Gavin Broderic Ho
+29 minutes 12 seconds29:12
+Gavin Broderic Ho 29 minutes 12 seconds
+Just black and white.
+
+Sorin Adam Matei
+29 minutes 14 seconds29:14
+Sorin Adam Matei 29 minutes 14 seconds
+Yeah, just black and white line maps that show the posture, how the posture changes over time.
+
+Gavin Broderic Ho
+29 minutes 19 seconds29:19
+Gavin Broderic Ho 29 minutes 19 seconds
+Oh yeah, I can do that.
+
+Sorin Adam Matei
+29 minutes 21 seconds29:21
+Sorin Adam Matei 29 minutes 21 seconds
+That's really simple. I put notes in the text for you guys to see where I thought that should be. Yeah.
+
+Gavin Broderic Ho
+29 minutes 29 seconds29:29
+Gavin Broderic Ho 29 minutes 29 seconds
+Okay, yeah, I can do that.
+
+Sorin Adam Matei
+29 minutes 32 seconds29:32
+Sorin Adam Matei 29 minutes 32 seconds
+Yeah, it's really is like a 10 minute job, to be honest. I would rather, I mean, I can do it, but I use the screenshot method and it kind of drives me nuts. Now, now that you have this AI business set in place and all that, and if you have the interface rate, you can actually ask, you know, give me 10, you know, 4 line charts, one for each.
+Sorin Adam Matei 29 minutes 51 seconds
+area of operations, you know, showing posture. That's all we need. I make it black and white. Actually, black and white is better because, you know, these publications are black and white.
+
+Gavin Broderic Ho
+29 minutes 54 seconds29:54
+Gavin Broderic Ho 29 minutes 54 seconds
+Yeah, yeah, I, yeah.
+Gavin Broderic Ho 30 minutes 1 second
+Mhm.
+Gavin Broderic Ho 30 minutes 3 seconds
+Yeah.
+
+Sorin Adam Matei
+30 minutes 4 seconds30:04
+Sorin Adam Matei 30 minutes 4 seconds
+Right.
+Sorin Adam Matei 30 minutes 5 seconds
+Good. Thank you so very much, Gavin. You know, make sure you log the hours. You know, let's make sure that, you know, this is where it needs to be and you still need to get a master's degree at some point. Did you get a master's degree? No, you did get a master's degree.
+
+Gavin Broderic Ho
+30 minutes 18 seconds30:18
+Gavin Broderic Ho 30 minutes 18 seconds
+No, I did a graduate certificate.
+
+Sorin Adam Matei
+30 minutes 21 seconds30:21
+Sorin Adam Matei 30 minutes 21 seconds
+But you need to grab a master's degree. I mean, if you want, how many?
+
+Gavin Broderic Ho
+30 minutes 23 seconds30:23
+Gavin Broderic Ho 30 minutes 23 seconds
+Yeah, I just, I don't know what I would want to do. And I know my degree to begin with was really weird. So prerequisites are kind of.
+Gavin Broderic Ho 30 minutes 33 seconds
+Odd.
+Gavin Broderic Ho 30 minutes 36 seconds
+Like, I don't know if you have any suggestions on what I would be able to do.
+
+Sorin Adam Matei
+30 minutes 36 seconds30:36
+Sorin Adam Matei 30 minutes 36 seconds
+Yeah, when?
+Sorin Adam Matei 30 minutes 42 seconds
+I mean, if you want the master's degree, you know, from Purdue, right, then obviously you'll have to go back. But one thing I can probably do for you is to enroll you in the Masters of Science for Strategy for Defense Technologies, right, and give you credit for the courses you've completed. How many, three?
+
+Gavin Broderic Ho
+30 minutes 54 seconds30:54
+Gavin Broderic Ho 30 minutes 54 seconds
+Yeah.
+Gavin Broderic Ho 31 minutes
+Hum.
+Gavin Broderic Ho 31 minutes 2 seconds
+I think I have, I've done maybe four or five grad courses.
+
+Sorin Adam Matei
+31 minutes 8 seconds31:08
+Sorin Adam Matei 31 minutes 8 seconds
+Yeah, we'll try to transfer, you know, so you'll only have five or six courses, one of which will be tech war and strategy, one would be, and maybe 2 directed study, which will be the papers we've written already. I mean, I don't know, you know, you can get the degree with three, four more courses, I think.
+
+Gavin Broderic Ho
+31 minutes 20 seconds31:20
+Gavin Broderic Ho 31 minutes 20 seconds
+Yeah.
+
+Sorin Adam Matei
+31 minutes 28 seconds31:28
+Sorin Adam Matei 31 minutes 28 seconds
+If I can juggle it for you. If you want, listen, I mean, I'm not even, I'm not dragging into anything. Actually.
+
+Gavin Broderic Ho
+31 minutes 33 seconds31:33
+Gavin Broderic Ho 31 minutes 33 seconds
+No, I'm interested. I like want to learn more about it.
+
+Sorin Adam Matei
+31 minutes 37 seconds31:37
+Sorin Adam Matei 31 minutes 37 seconds
+Or, you know, or you know, let me put it this way: you should get a master's degree in some somewhere. You know, maybe you should get one in GIS, you know, maybe that's more valuable to you at this point. See if you can get it online somewhere, right?
+
+Gavin Broderic Ho
+31 minutes 49 seconds31:49
+Gavin Broderic Ho 31 minutes 49 seconds
+Yeah, I don't know. I don't even think.
+Gavin Broderic Ho 31 minutes 53 seconds
+I mean, GIS is just kind of a small discipline of like all data science. So like, I mean.
+
+Sorin Adam Matei
+32 minutes32:00
+Sorin Adam Matei 32 minutes
+Our data science, you know, you can join our data science degree at Purdue or the AI. We have a masters in AI, by the way. Yes, yes, it's online.
+
+Gavin Broderic Ho
+32 minutes 4 seconds32:04
+Gavin Broderic Ho 32 minutes 4 seconds
+Yeah.
+Gavin Broderic Ho 32 minutes 8 seconds
+Oh, do you?
+Gavin Broderic Ho 32 minutes 12 seconds
+Oh wow, okay.
+
+Sorin Adam Matei
+32 minutes 14 seconds32:14
+Sorin Adam Matei 32 minutes 14 seconds
+And we can try to convince them to work with you.
+
+Gavin Broderic Ho
+32 minutes 18 seconds32:18
+Gavin Broderic Ho 32 minutes 18 seconds
+Yeah, that would be interesting.
+
+Sorin Adam Matei
+32 minutes 24 seconds32:24
+Sorin Adam Matei 32 minutes 24 seconds
+Alright, good, gotta go.
+
+Gavin Broderic Ho
+32 minutes 26 seconds32:26
+Gavin Broderic Ho 32 minutes 26 seconds
+Okay, we will talk more.
+
+Sorin Adam Matei
+32 minutes 28 seconds32:28
+Sorin Adam Matei 32 minutes 28 seconds
+Yeah, well, let's meet in a week.
+
+Gavin Broderic Ho
+32 minutes 30 seconds32:30
+Gavin Broderic Ho 32 minutes 30 seconds
+Okay, sounds good.
+
+Sorin Adam Matei
+32 minutes 32 seconds32:32
+Sorin Adam Matei 32 minutes 32 seconds
+Yeah, I'll send you an invitation for a week at the same time, if you don't mind.
+
+Gavin Broderic Ho
+32 minutes 36 seconds32:36
+Gavin Broderic Ho 32 minutes 36 seconds
+Yep, that that works.
+
+Sorin Adam Matei
+32 minutes 38 seconds32:38
+Sorin Adam Matei 32 minutes 38 seconds
+Perfect. Thank you.
+
+Gavin Broderic Ho
+32 minutes 39 seconds32:39
+Gavin Broderic Ho 32 minutes 39 seconds
+Thank you, it was nice talking to you again.
+
+Sorin Adam Matei
+32 minutes 42 seconds32:42
+Sorin Adam Matei 32 minutes 42 seconds
+Same here, sir. Bye.
