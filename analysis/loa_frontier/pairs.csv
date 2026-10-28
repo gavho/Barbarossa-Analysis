@@ -1,0 +1,13 @@
+clustering,planned,cluster,common_km,planned_km,realized_km,frechet_km,hausdorff_km,mean_signed_offset_km,mean_abs_offset_km,max_abs_offset_km,share_beyond_noise_pct,realized_within_25km_pct,realized_within_50km_pct,planned_within_50km_pct,start_gap_km,end_gap_km,straight_bearing_diff,unit_best_cluster,membership_precision_pct,membership_recall_pct,cluster_unidentified_pct,membership_agrees
+DV,17A,2,433,460,433,67,67,-32.6,39.9,66,83,20,57,64,37,18,-7,2,69.0,69.0,0.0,True
+DV,PzGp1(-),3,548,599,548,68,68,-13.3,24.5,60,62,51,100,97,9,68,-7,3,43.0,86.0,7.0,True
+DV,III PzKo,0,411,411,424,43,43,-29.7,29.7,41,90,19,100,100,11,20,1,3,0.0,0.0,36.0,False
+DV,6A,4,295,295,338,44,44,-30.7,31.5,40,90,21,100,100,18,24,-8,0,33.0,27.0,33.0,False
+GEO,17A,0,150,190,150,145,138,-91.0,91.0,138,100,12,31,20,145,20,-43,1,0.0,0.0,0.0,False
+GEO,PzGp1(-),1,533,563,533,68,68,-49.0,49.0,67,89,13,44,47,30,4,-3,1,32.0,100.0,0.0,True
+GEO,III PzKo,2,411,411,421,52,53,-43.0,43.0,52,100,2,79,83,31,20,-1,1,0.0,0.0,38.0,False
+GEO,6A,4,273,273,325,32,32,-9.5,10.9,20,4,94,100,100,10,32,-5,2,50.0,27.0,33.0,False
+UNIT,17A,17A,411,460,411,75,75,1.7,29.8,75,70,52,93,83,21,72,-12,,,,,
+UNIT,PzGp1(-),PzGp1(-),575,599,575,42,42,-14.8,19.0,40,52,57,100,100,10,33,-4,,,,,
+UNIT,III PzKo,III PzKo,411,411,441,60,60,-4.0,14.0,40,29,87,93,100,21,60,11,,,,,
+UNIT,6A,6A,387,387,411,70,70,-50.4,50.4,68,100,7,24,33,22,47,4,,,,,
