@@ -1,0 +1,77 @@
+ACTION ITEMS - Gavin / Sorin meeting, 10-23-2026
+Sources: Meeting Transcripts/10-23-2026.txt, and the paper "From Paper to Pixels Chapter_V3_Sorincomments (1).docx" (comments, tracked changes, open placeholders; latest edit 10-26-2026).
+
+!! TRANSCRIPT IS INCOMPLETE. The file jumps from 1:22 to 28:25, so about 27 minutes are missing, and it also cuts off mid-sentence at 1:40 ("...analysis for the third."). Items below come only from the parts that exist. If you have the full transcript or the Teams recap, items may be missing.
+
+=====================================================================
+A. FROM THE MEETING
+=====================================================================
+
+1. [GAVIN] Four black-and-white line charts for the paper (with Hupy)
+   - One chart per region: Frontier Breakthrough, Smolensk Pocket, Leningrad Approach, Operation Typhoon.
+   - Content: how posture (move / reserve / attack / defend) changes over time. Same as the "Total posture over time" line chart on the dashboard.
+   - Black and white only, because the publication is printed in black and white (Sorin: "black and white is better").
+   - Sorin estimated about 10 minutes per chart and suggested generating them from code rather than screenshots (he finds the screenshot method "drives me nuts").
+   - Placement: Sorin left a note in the paper's Section 10, "What the data shows: tempo and stagnation", right after each region's paragraph. The notes read "Line chart from the dashboard needed" / "Line chart from Dashboard". Paper order: Frontier, Smolensk, Leningrad, Typhoon.
+   - Date windows the paper text gives: Frontier 45 days from 22 Jun; Smolensk 63 days; Leningrad same calendar period; Typhoon 16 days.
+   - The acknowledgments say "No figures were produced with generative AI", so build them from the data with code.
+   - Hupy also messaged about this. I have not seen his message, so check it for size, style or caption requirements.
+   - Not stated, my suggestion: lines must stay distinguishable without color (dashes, markers, direct labels), and check the Springer figure specs for size and resolution.
+
+2. [GAVIN] Compare intended vs. realized lines of operation (analysis method)
+   - Compare the two pairwise, starting with the south (Army Group South; the AGS milestones layers I built earlier are the "intended" side).
+   - First simplify each line into a few linear vectors using inflection points where direction changes. Example from Sorin: about 3 vectors for the intended line and about 3 for the realized line, with an inflection point between each.
+   - Then compare the two sets of vectors and derive conclusions.
+   - For the other lines of operation, the realized lines are more clustered together than intended. The paper needs to account for and discuss that.
+   - Tools: Gavin asked about doing this "off of Esri"; Sorin said not to complicate it ("Let's just see what we need to do"). So no specific tool was decided.
+   - Part of this discussion is missing from the transcript (see the warning above). It is unclear who owns it beyond Gavin doing the analysis.
+
+3. [GAVIN] Log your hours (Sorin reminded you).
+
+4. [SORIN] Look into enrolling Gavin in the Purdue MS in Strategy for Defense Technologies
+   - Gavin has a graduate certificate and has done about 4-5 grad courses; Sorin would try to transfer the credits.
+   - Sorin's estimate of what would remain: about 3-4 more courses, possibly including Tech War and Strategy and 2 directed-study credits for the papers already written.
+   - Sorin also floated alternatives: an online GIS master's, or Purdue's data science or online AI master's, and offered to try to get them to work with Gavin.
+   - Gavin said he is interested and wants to learn more.
+   - [GAVIN] Decide which route you want and tell Sorin; no date was set.
+
+5. [SORIN] Send a calendar invitation for next week, same time (about 10-30-2026 if the meeting was 10-23). Gavin confirmed this works.
+
+=====================================================================
+B. FROM THE PAPER'S COMMENTS (6 comments: 4 Hupy, 2 Sorin)
+=====================================================================
+
+OPEN
+1. [ALL AUTHORS, GAVIN to confirm] Hupy (10-21), on "Kirchubel" in the author list: "Please let me know if the order is OK." Current order: Hupy, Matei, Ho, Kirchubel.
+2. [SORIN] Hupy (10-21), on "USA" in the affiliation line: "This will vary for all of us... maybe Sorin could you find out how the best way to list is."
+3. [GAVIN and ROB] Hupy (10-21), on the .edu addresses: "Need best email for Gavin and Rob." Gavin to send his best email.
+
+DONE
+4. Sorin (10-22), on "...km by 447 km": "let us add this detail @Gavin". Gavin inserted 546 and 447 on 10-23, so the text now reads "546 km by 447 km". I did not check these numbers against the data.
+5. Hupy (10-21) asked about the funding statement per the Springer template; Sorin supplied the text (10-23) and Hupy inserted it on 10-26 (College of Liberal Arts and the Discovery Park Undergraduate Internship Program). Closed, though the comments are still in the file.
+
+=====================================================================
+C. OPEN PLACEHOLDERS IN THE PAPER (not in the comments, not assigned to anyone in the meeting)
+=====================================================================
+
+For Gavin to decide or fill in:
+- Acknowledgments: "[Add any other AI tools used in preparing earlier drafts.]" The text names only Perplexity. If you used other AI tools on drafts, scripts or the dashboard, this is where they would be disclosed. Your call, not mine.
+- Data availability: "available from XXX date" through the dashboard. Needs the real release date.
+- Figure numbering: "Fig. X.1" and "Fig. X.5" are placeholders, and "ESM X.1" is the animation in the Fig. 4 caption.
+- The dashboard link in the text is https://matei.org/url/barbdash. If the standalone Barbarossa.html should be offered too, the data availability paragraph would need to say so.
+
+For Rob (Kirchubel):
+- "[citation to be added]" for the Glantz maps used for Operation Typhoon
+- "(citation from ROB)" for the line of operations
+- Reference: "Trails of blood [Full citation to be provided by Rob]"
+
+Other:
+- Reference list: "Audacity and friction [Full title and details to be provided]" (Routledge)
+- Reference list: bracket tags such as [Atlas] and [Generalstab] look like leftover template text.
+
+=====================================================================
+D. QUESTIONS TO RESOLVE
+=====================================================================
+- Full transcript: can you get the missing 27 minutes?
+- Hupy's message about the graphics: what exactly did it ask for?
+- Who owns the vector comparison (item A2): is it Gavin alone, or Gavin with Sorin?

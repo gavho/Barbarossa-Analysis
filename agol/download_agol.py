@@ -1,6 +1,7 @@
 """Snapshot public ArcGIS Online layers into a dated File Geodatabase.
 
-Usage: python download_agol.py <url> [<url> ...]
+Usage: python download_agol.py [--export DIR] <url> [<url> ...]
+  --export DIR writes one GeoJSON per layer (CSV per table) into DIR instead of a dated File Geodatabase.
   <url> can be an AGOL group page (...group.html?id=<id>), an item page (...item.html?id=<id>),
   a web map viewer link (...?webmap=<id>), or a FeatureServer / FeatureServer/<n> REST URL.
 """
@@ -104,30 +105,45 @@ def gdb_name(title, used):
     return name
 
 
-def main(urls):
+def main(urls, export=None):
     layers = list(dict.fromkeys(l for u in urls for l in resolve(u)))  # dedupe, keep order
-    if GDB.exists():
+    if export:
+        export.mkdir(parents=True, exist_ok=True)
+    elif GDB.exists():
         shutil.rmtree(GDB)
     used, mismatches = set(), []
     for title, layer_url in layers:
-        expected = get_json(f"{layer_url}/query", where="1=1", returnCountOnly="true")["count"]
+        # returnCountOnly answers 0 for some hosted tables from a browser; the id list is reliable everywhere.
+        expected = len(get_json(f"{layer_url}/query", where="1=1", returnIdsOnly="true").get("objectIds") or [])
         gdf = read_layer(layer_url)
         name = gdb_name(title, used)
-        # Default (pre-Pro 3.2) GDB format so any Pro version opens it; it has no Int64 field type.
-        for col in gdf.select_dtypes("int64").columns:
-            fits = gdf[col].abs().max() < 2**31 if len(gdf) else True
-            gdf[col] = gdf[col].astype("int32" if fits else "float64")
-        pyogrio.write_dataframe(gdf, GDB, layer=name, driver="OpenFileGDB", promote_to_multi=True)
+        if export:
+            if hasattr(gdf, "geometry"):
+                gdf.to_file(export / f"{name}.geojson", driver="GeoJSON")
+            else:  # attribute-only table (domains, division_days)
+                gdf.to_csv(export / f"{name}.csv", index=False, encoding="utf-8")
+        else:
+            # Default (pre-Pro 3.2) GDB format so any Pro version opens it; it has no Int64 field type.
+            for col in gdf.select_dtypes("int64").columns:
+                fits = gdf[col].abs().max() < 2**31 if len(gdf) else True
+                gdf[col] = gdf[col].astype("int32" if fits else "float64")
+            pyogrio.write_dataframe(gdf, GDB, layer=name, driver="OpenFileGDB", promote_to_multi=True)
         flag = "" if len(gdf) == expected else "  <-- COUNT MISMATCH"
         print(f"  {name}: {len(gdf)}/{expected} features{flag}")
         if flag:
             mismatches.append(name)
-    print(f"Wrote {len(layers)} layers to {GDB}")
+    print(f"Wrote {len(layers)} layers to {export or GDB}")
     if mismatches:
         sys.exit(f"Incomplete download for: {', '.join(mismatches)}")
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
+    args = sys.argv[1:]
+    export = None
+    if "--export" in args:
+        i = args.index("--export")
+        export = Path(args[i + 1])
+        del args[i : i + 2]
+    if not args:
         sys.exit(__doc__)
-    main(sys.argv[1:])
+    main(args, export)

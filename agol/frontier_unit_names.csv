@@ -1,77 +1,77 @@
-﻿Nation,Branch,Number,Layer_Unit_Types,First,Last,Researched_Name,Group,Confidence,In_Your_CSV,Notes
-Wehrmacht,Infantry,1,Division,1941-07-02,1941-08-05,Not identified,,Not identified,Merged into Mountain row,No 1st Infantry Division in Army Group South; possibly 1st Mountain elements coded Infantry
-Wehrmacht,Mountain,1,Division,1941-06-22,1941-08-05,1. Gebirgs-Division,17th Army - XXXXIX Gebirgskorps,Sourced,Yes,
-Wehrmacht,Armored,2,Division,1941-07-10,1941-08-05,Not identified,,Not identified,No,Appears 10 Jul; no 2nd Panzer Division in the AGS sources checked
-Wehrmacht,Infantry,2,Division,1941-07-12,1941-08-05,Not identified,,Not identified,No,Appears 12 Jul
-Wehrmacht,Mountain,4,Division/Regiment,1941-06-22,1941-08-05,4. Gebirgs-Division,17th Army (corps not confirmed),Name only,Yes,"Not on the 22 Jun corps list; its article says it joined AGS after the start, but the layer has it from 22 Jun"
-Wehrmacht,Armored,9,Division,1941-06-22,1941-08-05,9. Panzer-Division,1st Panzer Group - XIV Panzerkorps (mot.),Sourced,Merged into Infantry row,
-Wehrmacht,Infantry,9,Division/Regiment,1941-06-22,1941-08-05,9. Infanterie-Division,6th Army - XXXXIV Armeekorps,Sourced,Yes,
-Wehrmacht,Armored,11,Division,1941-06-22,1941-08-05,11. Panzer-Division,1st Panzer Group - XXXXVIII Panzerkorps (mot.),Sourced,Yes,
-Wehrmacht,Armored,13,Division,1941-06-22,1941-08-05,13. Panzer-Division,1st Panzer Group - III Armeekorps (mot.),Sourced,Yes,
-Wehrmacht,Armored,14,Division,1941-06-22,1941-08-01,14. Panzer-Division,1st Panzer Group - III Armeekorps (mot.),Sourced,Yes,The Battle of Uman article groups it with XIV Korps; the June order of battle has it in III
-Wehrmacht,Armored,16,Division,1941-06-22,1941-07-31,16. Panzer-Division,1st Panzer Group - XXXXVIII Panzerkorps (mot.),Sourced,Yes,
-Wehrmacht,Motorized,16,Division,1941-06-23,1941-08-05,16. Infanterie-Division (mot.),1st Panzer Group - XXXXVIII Panzerkorps (mot.),Sourced,Merged into Armored row,
-Wehrmacht,Infantry,22,Division,1941-07-10,1941-07-29,22. Infanterie-Division (Luftlande),11th Army (directly under army HQ),Sourced,Yes,
-Wehrmacht,Infantry,24,Division,1941-06-22,1941-08-04,24. Infanterie-Division,17th Army - IV Armeekorps,Sourced,Yes,
-Wehrmacht,Motorized,25,Brigade/Division,1941-06-22,1941-08-05,25. Infanterie-Division (mot.),1st Panzer Group - III Armeekorps (mot.),Sourced,Yes,
-Wehrmacht,Infantry,44,Division,1941-06-22,1941-08-05,44. Infanterie-Division (Hoch- und Deutschmeister),6th Army - XXIX Armeekorps,Sourced,Yes,
-Wehrmacht,Infantry,56,Division/Regiment,1941-06-22,1941-08-05,56. Infanterie-Division,6th Army - XVII Armeekorps,Sourced,Yes,
-Wehrmacht,Infantry,57,Division,1941-06-22,1941-08-05,57. Infanterie-Division,6th Army - LV Armeekorps,Sourced,Yes,
-Wehrmacht,Motorized,60,Division,1941-07-02,1941-08-04,60. Infanterie-Division (mot.),1st Panzer Group (corps not confirmed),Name only,Yes,Joined AGS after the start (layer: 2 Jul)
-Wehrmacht,Infantry,62,Division,1941-06-22,1941-08-05,62. Infanterie-Division,6th Army - XVII Armeekorps,Sourced,Yes,
-Wehrmacht,Infantry,68,Division,1941-06-22,1941-08-05,68. Infanterie-Division,17th Army - XXXXIX Gebirgskorps,Sourced,Yes,
-Wehrmacht,Infantry,71,Division,1941-06-22,1941-08-05,71. Infanterie-Division,17th Army - IV Armeekorps,Sourced,Yes,
-Wehrmacht,Infantry,75,Division,1941-06-22,1941-08-05,75. Infanterie-Division,6th Army - LV Armeekorps,Sourced,Yes,
-Wehrmacht,Infantry,76,Division,1941-07-08,1941-07-29,76. Infanterie-Division,11th Army - XI Armeekorps,Sourced,Yes,
-Wehrmacht,Infantry,79,Division,1941-06-24,1941-08-05,79. Infanterie-Division,Army Group South (army/corps not confirmed),Name only,Yes,Assigned to AGS on 26 Jun
-Wehrmacht,Infantry,94,Division/Regiment,1941-07-04,1941-08-05,94. Infanterie-Division,Army Group South (army/corps not confirmed),Name only,Yes,
-Wehrmacht,Infantry,95,Division/Regiment,1941-06-28,1941-08-05,95. Infanterie-Division,Army Group South (army/corps not confirmed),Name only,Yes,
-Wehrmacht,Infantry,97,Division,1941-06-22,1941-08-05,97. leichte Infanterie-Division (later 97. Jaeger),17th Army - LII Armeekorps,Sourced,Yes,
-Wehrmacht,Infantry,98,Division,1941-07-05,1941-08-05,98. Infanterie-Division,Army Group South (army/corps not confirmed),Name only,Yes,
-Wehrmacht,Infantry,99,Division,1941-06-22,1941-08-05,99. leichte Infanterie-Division,Army Group South (army/corps not confirmed),Name only,Yes,
-Wehrmacht,Infantry,100,Division,1941-06-22,1941-08-05,100. leichte Infanterie-Division (later 100. Jaeger),17th Army - LII Armeekorps,Sourced,Yes,
-Wehrmacht,Infantry,101,Division,1941-06-22,1941-08-05,101. leichte Infanterie-Division (later 101. Jaeger),17th Army - LII Armeekorps,Sourced,Yes,
-Wehrmacht,Infantry,111,Division,1941-06-22,1941-08-05,111. Infanterie-Division,6th Army - XXIX Armeekorps,Sourced,Yes,
-Wehrmacht,Infantry,113,Division,1941-06-24,1941-08-05,113. Infanterie-Division,Army Group South (army/corps not confirmed),Name only,Yes,
-Wehrmacht,Infantry,125,Division/Regiment,1941-06-22,1941-08-05,125. Infanterie-Division,17th Army - XXXXIX Gebirgskorps (by late Jul),Name only,Yes,Per the Battle of Uman article; start-of-war assignment not confirmed
-Wehrmacht,Infantry,132,Division/Regiment,1941-06-28,1941-08-05,132. Infanterie-Division,Army Group South (army/corps not confirmed),Name only,Yes,Its article says held in reserve until 27 Jul; the layer shows attacks from 28 Jun
-Wehrmacht,Infantry,168,Division,1941-06-22,1941-08-05,168. Infanterie-Division,6th Army - LV Armeekorps,Sourced,Yes,
-Wehrmacht,Security,213,Division/Regiment,1941-06-22,1941-08-05,213. Sicherungs-Division,Army Group South Rear Area (von Roques),Sourced,Yes,
-Wehrmacht,Infantry,239,Division,1941-07-06,1941-07-20,239. Infanterie-Division,11th Army - XI Armeekorps,Sourced,Yes,
-Wehrmacht,Infantry,257,Division/Regiment,1941-06-22,1941-08-05,257. Infanterie-Division,17th Army - XXXXIX Gebirgskorps,Sourced,Yes,
-Wehrmacht,Infantry,262,Division/Regiment,1941-06-22,1941-08-05,262. Infanterie-Division,17th Army - IV Armeekorps,Sourced,Yes,
-Wehrmacht,Infantry,294,Division/Regiment,1941-07-10,1941-08-05,294. Infanterie-Division,Army Group South (army/corps not confirmed),Name only,Yes,
-Wehrmacht,Infantry,295,Division,1941-06-22,1941-08-05,295. Infanterie-Division,17th Army - IV Armeekorps,Sourced,Yes,
-Wehrmacht,Infantry,296,Division,1941-06-22,1941-08-05,296. Infanterie-Division,17th Army - IV Armeekorps,Sourced,Yes,
-Wehrmacht,Infantry,297,Division,1941-06-22,1941-08-04,297. Infanterie-Division,6th Army - XXXXIV Armeekorps,Sourced,Yes,
-Wehrmacht,Infantry,298,Division,1941-06-22,1941-08-05,298. Infanterie-Division,6th Army - LV Armeekorps,Sourced,Yes,
-Wehrmacht,Infantry,299,Division,1941-06-22,1941-08-05,299. Infanterie-Division,6th Army - XXIX Armeekorps,Sourced,Yes,
-Wehrmacht,Security,444,Division,1941-06-22,1941-08-05,444. Sicherungs-Division,Army Group South Rear Area (von Roques),Name only,Yes,Same command as the 213th by my recollection; not confirmed in the pages checked
-Wehrmacht,Security,454,Division,1941-06-22,1941-08-05,454. Sicherungs-Division,Army Group South Rear Area (von Roques),Name only,Yes,Same command as the 213th by my recollection; not confirmed in the pages checked
-SS,Armored,1,Division,1941-06-24,1941-08-05,SS-Division (mot.) Leibstandarte SS Adolf Hitler,1st Panzer Group - XIV Panzerkorps (mot.),Sourced,No,
-SS,Armored,5,Division/Regiment,1941-06-22,1941-08-05,SS-Division (mot.) Wiking,1st Panzer Group - XIV Panzerkorps (mot.),Sourced,Yes,Wikipedia order of battle lists it under XIV; not cross-checked
-Hungarian,Cavalry,1,Brigade,1941-07-05,1941-07-31,1st Cavalry Brigade,"Gyorshadtest (Rapid/Mobile Corps), under 17th Army from 1 Jul",Sourced,No,
-Hungarian,Infantry,1,Division,1941-06-30,1941-07-08,Not identified,,Not identified,No,No Hungarian formation with this number in the Carpathian Group sources
-Hungarian,Motorized,1,Brigade,1941-07-05,1941-07-29,1st Motorized Brigade,"Gyorshadtest (Rapid/Mobile Corps), under 17th Army from 1 Jul",Sourced,No,
-Hungarian,Mountain,1,Brigade,1941-07-03,1941-07-09,1st Mountain Brigade,Hungarian Carpathian Group (Szombathelyi),Sourced,No,
-Hungarian,Infantry,2,Division,1941-07-03,1941-07-06,Not identified,,Not identified,Yes,No Hungarian formation with this number in the Carpathian Group sources
-Hungarian,Motorized,2,Brigade,1941-07-05,1941-08-05,2nd Motorized Brigade,"Gyorshadtest (Rapid/Mobile Corps), under 17th Army from 1 Jul",Sourced,Merged into Infantry row,
-Hungarian,Mountain,2,Brigade/Division,1941-07-06,1941-07-11,Not identified,,Not identified,Merged into Infantry row,No Hungarian formation with this number in the Carpathian Group sources
-Hungarian,Cavalry,3,Division,1941-07-17,1941-07-27,Not identified,,Not identified,Yes,No Hungarian formation with this number in the Carpathian Group sources
-Hungarian,Mountain,3,Division,1941-07-19,1941-07-27,Not identified,,Not identified,Merged into Cavalry row,No Hungarian formation with this number in the Carpathian Group sources
-Hungarian,Mountain,4,Brigade,1941-07-06,1941-07-11,Not identified,,Not identified,No,No Hungarian formation with this number in the Carpathian Group sources
-Hungarian,Cavalry,5,Brigade,1941-07-07,1941-07-13,Not identified,,Not identified,No,No Hungarian formation with this number in the Carpathian Group sources
-Hungarian,Cavalry,6,Brigade/Division,1941-07-07,1941-07-12,Not identified,,Not identified,Yes,No Hungarian formation with this number in the Carpathian Group sources
-Hungarian,Infantry,6,Division,1941-07-13,1941-07-29,Not identified,,Not identified,Merged into Cavalry row,No Hungarian formation with this number in the Carpathian Group sources
-Hungarian,Infantry,7,Division,1941-07-11,1941-07-12,Not identified,,Not identified,Yes,No Hungarian formation with this number in the Carpathian Group sources
-Hungarian,Cavalry,8,Brigade/Division,1941-07-06,1941-07-07,8th Border Guard Brigade (probable),Hungarian Carpathian Group (Szombathelyi),Name only,Merged into Security row,Same unit number coded under four different branches
-Hungarian,Infantry,8,Brigade/Division,1941-07-05,1941-07-13,8th Border Guard Brigade (probable),Hungarian Carpathian Group (Szombathelyi),Name only,Merged into Security row,Same unit number coded under four different branches
-Hungarian,Mountain,8,Brigade,1941-07-04,1941-07-04,8th Border Guard Brigade (probable),Hungarian Carpathian Group (Szombathelyi),Name only,Merged into Security row,Same unit number coded under four different branches
-Hungarian,Security,8,Brigade,1941-07-03,1941-07-03,8th Border Guard Brigade (probable),Hungarian Carpathian Group (Szombathelyi),Name only,Yes,Same unit number coded under four different branches
-Hungarian,Armored,(unnumbered),Division,1941-07-08,1941-07-08,Not identified,,Not identified,No,No Hungarian formation with this number in the Carpathian Group sources
-Hungarian,Cavalry,(unnumbered),Division,1941-07-08,1941-07-29,Not identified,,Not identified,No,No Hungarian formation with this number in the Carpathian Group sources
-Hungarian,Infantry,(unnumbered),Division,1941-07-03,1941-08-05,Not identified,,Not identified,No,No Hungarian formation with this number in the Carpathian Group sources
-Hungarian,Mountain,(unnumbered),Code 4/Code 6/Division,1941-07-16,1941-07-29,Not identified,,Not identified,No,No Hungarian formation with this number in the Carpathian Group sources
-Slovak,Infantry,1,Division,1941-06-30,1941-08-04,Slovak 1st Infantry Division,"Slovak Expeditionary Army Group (Catlos), with 17th Army",Sourced,No,
-Slovak,Infantry,2,Division,1941-07-03,1941-08-04,Slovak 2nd Infantry Division,"Slovak Expeditionary Army Group (Catlos), with 17th Army",Sourced,No,
-Slovak,Motorized,(unnumbered),Brigade/Division,1941-06-26,1941-08-05,"Slovak Mobile Brigade (Pilfousek), became the Fast Division","Slovak Expeditionary Army Group (Catlos), with 17th Army",Sourced,Yes,9999 = unnumbered placeholder
+﻿Nation,Branch,Number,Layer_Unit_Types,First,Last,Division Name,Group,Confidence,In_Your_CSV,Notes
+Wehrmacht,Infantry,1,Division,7/2/1941,8/5/1941,Not identified,,Not identified,Merged into Mountain row,No 1st Infantry Division in Army Group South; possibly 1st Mountain elements coded Infantry
+Wehrmacht,Mountain,1,Division,6/22/1941,8/5/1941,1. Gebirgs-Division,17th Army - XXXXIX Gebirgskorps,Sourced,Yes,
+Wehrmacht,Armored,2,Division,7/10/1941,8/5/1941,Not identified,,Not identified,No,Appears 10 Jul; no 2nd Panzer Division in the AGS sources checked
+Wehrmacht,Infantry,2,Division,7/12/1941,8/5/1941,Not identified,,Not identified,No,Appears 12 Jul
+Wehrmacht,Mountain,4,Division/Regiment,6/22/1941,8/5/1941,4. Gebirgs-Division,17th Army (corps not confirmed),Name only,Yes,"Not on the 22 Jun corps list; its article says it joined AGS after the start, but the layer has it from 22 Jun"
+Wehrmacht,Armored,9,Division,6/22/1941,8/5/1941,9. Panzer-Division,1st Panzer Group - XIV Panzerkorps (mot.),Sourced,Merged into Infantry row,
+Wehrmacht,Infantry,9,Division/Regiment,6/22/1941,8/5/1941,9. Infanterie-Division,6th Army - XXXXIV Armeekorps,Sourced,Yes,
+Wehrmacht,Armored,11,Division,6/22/1941,8/5/1941,11. Panzer-Division,1st Panzer Group - XXXXVIII Panzerkorps (mot.),Sourced,Yes,
+Wehrmacht,Armored,13,Division,6/22/1941,8/5/1941,13. Panzer-Division,1st Panzer Group - III Armeekorps (mot.),Sourced,Yes,
+Wehrmacht,Armored,14,Division,6/22/1941,8/1/1941,14. Panzer-Division,1st Panzer Group - III Armeekorps (mot.),Sourced,Yes,The Battle of Uman article groups it with XIV Korps; the June order of battle has it in III
+Wehrmacht,Armored,16,Division,6/22/1941,7/31/1941,16. Panzer-Division,1st Panzer Group - XXXXVIII Panzerkorps (mot.),Sourced,Yes,
+Wehrmacht,Motorized,16,Division,6/23/1941,8/5/1941,16. Infanterie-Division (mot.),1st Panzer Group - XXXXVIII Panzerkorps (mot.),Sourced,Merged into Armored row,
+Wehrmacht,Infantry,22,Division,7/10/1941,7/29/1941,22. Infanterie-Division (Luftlande),11th Army (directly under army HQ),Sourced,Yes,
+Wehrmacht,Infantry,24,Division,6/22/1941,8/4/1941,24. Infanterie-Division,17th Army - IV Armeekorps,Sourced,Yes,
+Wehrmacht,Motorized,25,Brigade/Division,6/22/1941,8/5/1941,25. Infanterie-Division (mot.),1st Panzer Group - III Armeekorps (mot.),Sourced,Yes,
+Wehrmacht,Infantry,44,Division,6/22/1941,8/5/1941,44. Infanterie-Division (Hoch- und Deutschmeister),6th Army - XXIX Armeekorps,Sourced,Yes,
+Wehrmacht,Infantry,56,Division/Regiment,6/22/1941,8/5/1941,56. Infanterie-Division,6th Army - XVII Armeekorps,Sourced,Yes,
+Wehrmacht,Infantry,57,Division,6/22/1941,8/5/1941,57. Infanterie-Division,6th Army - LV Armeekorps,Sourced,Yes,
+Wehrmacht,Motorized,60,Division,7/2/1941,8/4/1941,60. Infanterie-Division (mot.),1st Panzer Group (corps not confirmed),Name only,Yes,Joined AGS after the start (layer: 2 Jul)
+Wehrmacht,Infantry,62,Division,6/22/1941,8/5/1941,62. Infanterie-Division,6th Army - XVII Armeekorps,Sourced,Yes,
+Wehrmacht,Infantry,68,Division,6/22/1941,8/5/1941,68. Infanterie-Division,17th Army - XXXXIX Gebirgskorps,Sourced,Yes,
+Wehrmacht,Infantry,71,Division,6/22/1941,8/5/1941,71. Infanterie-Division,17th Army - IV Armeekorps,Sourced,Yes,
+Wehrmacht,Infantry,75,Division,6/22/1941,8/5/1941,75. Infanterie-Division,6th Army - LV Armeekorps,Sourced,Yes,
+Wehrmacht,Infantry,76,Division,7/8/1941,7/29/1941,76. Infanterie-Division,11th Army - XI Armeekorps,Sourced,Yes,
+Wehrmacht,Infantry,79,Division,6/24/1941,8/5/1941,79. Infanterie-Division,Army Group South (army/corps not confirmed),Name only,Yes,Assigned to AGS on 26 Jun
+Wehrmacht,Infantry,94,Division/Regiment,7/4/1941,8/5/1941,94. Infanterie-Division,Army Group South (army/corps not confirmed),Name only,Yes,
+Wehrmacht,Infantry,95,Division/Regiment,6/28/1941,8/5/1941,95. Infanterie-Division,Army Group South (army/corps not confirmed),Name only,Yes,
+Wehrmacht,Infantry,97,Division,6/22/1941,8/5/1941,97. leichte Infanterie-Division (later 97. Jaeger),17th Army - LII Armeekorps,Sourced,Yes,
+Wehrmacht,Infantry,98,Division,7/5/1941,8/5/1941,98. Infanterie-Division,Army Group South (army/corps not confirmed),Name only,Yes,
+Wehrmacht,Infantry,99,Division,6/22/1941,8/5/1941,99. leichte Infanterie-Division,Army Group South (army/corps not confirmed),Name only,Yes,
+Wehrmacht,Infantry,100,Division,6/22/1941,8/5/1941,100. leichte Infanterie-Division (later 100. Jaeger),17th Army - LII Armeekorps,Sourced,Yes,
+Wehrmacht,Infantry,101,Division,6/22/1941,8/5/1941,101. leichte Infanterie-Division (later 101. Jaeger),17th Army - LII Armeekorps,Sourced,Yes,
+Wehrmacht,Infantry,111,Division,6/22/1941,8/5/1941,111. Infanterie-Division,6th Army - XXIX Armeekorps,Sourced,Yes,
+Wehrmacht,Infantry,113,Division,6/24/1941,8/5/1941,113. Infanterie-Division,Army Group South (army/corps not confirmed),Name only,Yes,
+Wehrmacht,Infantry,125,Division/Regiment,6/22/1941,8/5/1941,125. Infanterie-Division,17th Army - XXXXIX Gebirgskorps (by late Jul),Name only,Yes,Per the Battle of Uman article; start-of-war assignment not confirmed
+Wehrmacht,Infantry,132,Division/Regiment,6/28/1941,8/5/1941,132. Infanterie-Division,Army Group South (army/corps not confirmed),Name only,Yes,Its article says held in reserve until 27 Jul; the layer shows attacks from 28 Jun
+Wehrmacht,Infantry,168,Division,6/22/1941,8/5/1941,168. Infanterie-Division,6th Army - LV Armeekorps,Sourced,Yes,
+Wehrmacht,Security,213,Division/Regiment,6/22/1941,8/5/1941,213. Sicherungs-Division,Army Group South Rear Area (von Roques),Sourced,Yes,
+Wehrmacht,Infantry,239,Division,7/6/1941,7/20/1941,239. Infanterie-Division,11th Army - XI Armeekorps,Sourced,Yes,
+Wehrmacht,Infantry,257,Division/Regiment,6/22/1941,8/5/1941,257. Infanterie-Division,17th Army - XXXXIX Gebirgskorps,Sourced,Yes,
+Wehrmacht,Infantry,262,Division/Regiment,6/22/1941,8/5/1941,262. Infanterie-Division,17th Army - IV Armeekorps,Sourced,Yes,
+Wehrmacht,Infantry,294,Division/Regiment,7/10/1941,8/5/1941,294. Infanterie-Division,Army Group South (army/corps not confirmed),Name only,Yes,
+Wehrmacht,Infantry,295,Division,6/22/1941,8/5/1941,295. Infanterie-Division,17th Army - IV Armeekorps,Sourced,Yes,
+Wehrmacht,Infantry,296,Division,6/22/1941,8/5/1941,296. Infanterie-Division,17th Army - IV Armeekorps,Sourced,Yes,
+Wehrmacht,Infantry,297,Division,6/22/1941,8/4/1941,297. Infanterie-Division,6th Army - XXXXIV Armeekorps,Sourced,Yes,
+Wehrmacht,Infantry,298,Division,6/22/1941,8/5/1941,298. Infanterie-Division,6th Army - LV Armeekorps,Sourced,Yes,
+Wehrmacht,Infantry,299,Division,6/22/1941,8/5/1941,299. Infanterie-Division,6th Army - XXIX Armeekorps,Sourced,Yes,
+Wehrmacht,Security,444,Division,6/22/1941,8/5/1941,444. Sicherungs-Division,Army Group South Rear Area (von Roques),Name only,Yes,Same command as the 213th by my recollection; not confirmed in the pages checked
+Wehrmacht,Security,454,Division,6/22/1941,8/5/1941,454. Sicherungs-Division,Army Group South Rear Area (von Roques),Name only,Yes,Same command as the 213th by my recollection; not confirmed in the pages checked
+SS,Armored,1,Division,6/24/1941,8/5/1941,SS-Division (mot.) Leibstandarte SS Adolf Hitler,1st Panzer Group - XIV Panzerkorps (mot.),Sourced,No,
+SS,Armored,5,Division/Regiment,6/22/1941,8/5/1941,SS-Division (mot.) Wiking,1st Panzer Group - XIV Panzerkorps (mot.),Sourced,Yes,Wikipedia order of battle lists it under XIV; not cross-checked
+Hungarian,Cavalry,1,Brigade,7/5/1941,7/31/1941,1st Cavalry Brigade,"Gyorshadtest (Rapid/Mobile Corps), under 17th Army from 1 Jul",Sourced,No,
+Hungarian,Infantry,1,Division,6/30/1941,7/8/1941,Not identified,,Not identified,No,No Hungarian formation with this number in the Carpathian Group sources
+Hungarian,Motorized,1,Brigade,7/5/1941,7/29/1941,1st Motorized Brigade,"Gyorshadtest (Rapid/Mobile Corps), under 17th Army from 1 Jul",Sourced,No,
+Hungarian,Mountain,1,Brigade,7/3/1941,7/9/1941,1st Mountain Brigade,Hungarian Carpathian Group (Szombathelyi),Sourced,No,
+Hungarian,Infantry,2,Division,7/3/1941,7/6/1941,Not identified,,Not identified,Yes,No Hungarian formation with this number in the Carpathian Group sources
+Hungarian,Motorized,2,Brigade,7/5/1941,8/5/1941,2nd Motorized Brigade,"Gyorshadtest (Rapid/Mobile Corps), under 17th Army from 1 Jul",Sourced,Merged into Infantry row,
+Hungarian,Mountain,2,Brigade/Division,7/6/1941,7/11/1941,Not identified,,Not identified,Merged into Infantry row,No Hungarian formation with this number in the Carpathian Group sources
+Hungarian,Cavalry,3,Division,7/17/1941,7/27/1941,Not identified,,Not identified,Yes,No Hungarian formation with this number in the Carpathian Group sources
+Hungarian,Mountain,3,Division,7/19/1941,7/27/1941,Not identified,,Not identified,Merged into Cavalry row,No Hungarian formation with this number in the Carpathian Group sources
+Hungarian,Mountain,4,Brigade,7/6/1941,7/11/1941,Not identified,,Not identified,No,No Hungarian formation with this number in the Carpathian Group sources
+Hungarian,Cavalry,5,Brigade,7/7/1941,7/13/1941,Not identified,,Not identified,No,No Hungarian formation with this number in the Carpathian Group sources
+Hungarian,Cavalry,6,Brigade/Division,7/7/1941,7/12/1941,Not identified,,Not identified,Yes,No Hungarian formation with this number in the Carpathian Group sources
+Hungarian,Infantry,6,Division,7/13/1941,7/29/1941,Not identified,,Not identified,Merged into Cavalry row,No Hungarian formation with this number in the Carpathian Group sources
+Hungarian,Infantry,7,Division,7/11/1941,7/12/1941,Not identified,,Not identified,Yes,No Hungarian formation with this number in the Carpathian Group sources
+Hungarian,Cavalry,8,Brigade/Division,7/6/1941,7/7/1941,8th Border Guard Brigade (probable),Hungarian Carpathian Group (Szombathelyi),Name only,Merged into Security row,Same unit number coded under four different branches
+Hungarian,Infantry,8,Brigade/Division,7/5/1941,7/13/1941,8th Border Guard Brigade (probable),Hungarian Carpathian Group (Szombathelyi),Name only,Merged into Security row,Same unit number coded under four different branches
+Hungarian,Mountain,8,Brigade,7/4/1941,7/4/1941,8th Border Guard Brigade (probable),Hungarian Carpathian Group (Szombathelyi),Name only,Merged into Security row,Same unit number coded under four different branches
+Hungarian,Security,8,Brigade,7/3/1941,7/3/1941,8th Border Guard Brigade (probable),Hungarian Carpathian Group (Szombathelyi),Name only,Yes,Same unit number coded under four different branches
+Hungarian,Armored,(unnumbered),Division,7/8/1941,7/8/1941,Not identified,,Not identified,No,No Hungarian formation with this number in the Carpathian Group sources
+Hungarian,Cavalry,(unnumbered),Division,7/8/1941,7/29/1941,Not identified,,Not identified,No,No Hungarian formation with this number in the Carpathian Group sources
+Hungarian,Infantry,(unnumbered),Division,7/3/1941,8/5/1941,Not identified,,Not identified,No,No Hungarian formation with this number in the Carpathian Group sources
+Hungarian,Mountain,(unnumbered),Code 4/Code 6/Division,7/16/1941,7/29/1941,Not identified,,Not identified,No,No Hungarian formation with this number in the Carpathian Group sources
+Slovak,Infantry,1,Division,6/30/1941,8/4/1941,Slovak 1st Infantry Division,"Slovak Expeditionary Army Group (Catlos), with 17th Army",Sourced,No,
+Slovak,Infantry,2,Division,7/3/1941,8/4/1941,Slovak 2nd Infantry Division,"Slovak Expeditionary Army Group (Catlos), with 17th Army",Sourced,No,
+Slovak,Motorized,(unnumbered),Brigade/Division,6/26/1941,8/5/1941,"Slovak Mobile Brigade (Pilfousek), became the Fast Division","Slovak Expeditionary Army Group (Catlos), with 17th Army",Sourced,Yes,9999 = unnumbered placeholder
