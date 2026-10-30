@@ -1,0 +1,286 @@
+Sorin Adam Matei
+0 minutes 3 seconds0:03
+Sorin Adam Matei 0 minutes 3 seconds
+things here. So our analytic strategy here is to compare pairs of lines, specifically the lines proposed by Rob as ideal lines of operations, and the lines of operations as
+Sorin Adam Matei 0 minutes 22 seconds
+revealed by our analysis. The lines are simplified a little bit so that we can compare their length and bearing, more or less, and the distance between them, right? So for each pair, we need to report, A, the average distance between them,
+
+Gavin Broderic Ho
+0 minutes 32 seconds0:32
+Gavin Broderic Ho 0 minutes 32 seconds
+Mhm.
+
+Sorin Adam Matei
+0 minutes 40 seconds0:40
+Sorin Adam Matei 0 minutes 40 seconds
+And then report, you know, kind of the variance and bearing, basically.
+
+Gavin Broderic Ho
+0 minutes 46 seconds0:46
+Gavin Broderic Ho 0 minutes 46 seconds
+Yeah, so okay, I do have that.
+
+Sorin Adam Matei
+0 minutes 49 seconds0:49
+Sorin Adam Matei 0 minutes 49 seconds
+Yeah, now for some, uh...
+Sorin Adam Matei 0 minutes 54 seconds
+For, sorry.
+Sorin Adam Matei 0 minutes 58 seconds
+Do you hear me?
+
+Gavin Broderic Ho
+0 minutes 59 seconds0:59
+Gavin Broderic Ho 0 minutes 59 seconds
+Yeah.
+Gavin Broderic Ho 1 minute 1 second
+Can you hear me?
+
+Gavin Broderic Ho
+14 minutes 41 seconds14:41
+Gavin Broderic Ho 14 minutes 41 seconds
+Hum.
+
+Sorin Adam Matei
+14 minutes 50 seconds14:50
+Sorin Adam Matei 14 minutes 50 seconds
+Yeah, so two things here. One very simple, you know, just simple reporting a proportion of troops that were within 10 kilometers or more.
+Sorin Adam Matei 15 minutes 7 seconds
+Past the phase line.
+
+Gavin Broderic Ho
+15 minutes 10 seconds15:10
+Gavin Broderic Ho 15 minutes 10 seconds
+Yeah.
+
+Sorin Adam Matei
+15 minutes 11 seconds15:11
+Sorin Adam Matei 15 minutes 11 seconds
+Very simple.
+Sorin Adam Matei 15 minutes 13 seconds
+20%, 60%, and you have some numbers here, 70%, right, on the date, right?
+
+Gavin Broderic Ho
+15 minutes 19 seconds15:19
+Gavin Broderic Ho 15 minutes 19 seconds
+Yeah, so for the groups are, I am good with that.
+Gavin Broderic Ho 15 minutes 27 seconds
+Like the divisions and groups that I found, I know that wasn't like checked yet.
+
+Sorin Adam Matei
+15 minutes 33 seconds15:33
+Sorin Adam Matei 15 minutes 33 seconds
+Yeah, work with what you have for now. You know, we'll change things if need be.
+
+Gavin Broderic Ho
+15 minutes 36 seconds15:36
+Gavin Broderic Ho 15 minutes 36 seconds
+Okay.
+Gavin Broderic Ho 15 minutes 40 seconds
+Yeah, okay.
+
+Sorin Adam Matei
+15 minutes 41 seconds15:41
+Sorin Adam Matei 15 minutes 41 seconds
+I will send Rob an e-mail today and I'll say, you know, Rob, can you kind of check this list and tell us if you agree with it? You know, Gavin used, you used Wikipedia or you...
+
+Gavin Broderic Ho
+15 minutes 52 seconds15:52
+Gavin Broderic Ho 15 minutes 52 seconds
+Yeah, because yeah, Wikipedia had like, for the groups it had like a composition breakdowns of what divisions were in those groups.
+
+Sorin Adam Matei
+16 minutes16:00
+Sorin Adam Matei 16 minutes
+Yeah.
+Sorin Adam Matei 16 minutes 2 seconds
+Okay, you're good, good.
+Sorin Adam Matei 16 minutes 5 seconds
+Right. So, but to finish my thought, because I have to move on to another meeting. So, for the phase analysis, we need 2 analyses. One is the simple thing, and then the second will be natural change analysis. Yeah, makes sense. Now, we could do another thing and kind of think a little bit.
+
+Gavin Broderic Ho
+16 minutes 17 seconds16:17
+Gavin Broderic Ho 16 minutes 17 seconds
+Hum.
+Gavin Broderic Ho 16 minutes 18 seconds
+Yeah.
+
+Sorin Adam Matei
+16 minutes 24 seconds16:24
+Sorin Adam Matei 16 minutes 24 seconds
+You know, between phase lines, we have these stretches of operational lines, right now.
+
+Gavin Broderic Ho
+16 minutes 32 seconds16:32
+Gavin Broderic Ho 16 minutes 32 seconds
+Mhm.
+
+Sorin Adam Matei
+16 minutes 34 seconds16:34
+Sorin Adam Matei 16 minutes 34 seconds
+Well, actually, no. Between these lines, we have operations, right? I'm wondering if we couldn't and should not actually try to generate some clusters for the operations between phase lines. So rather than estimate the clusters globally,
+
+Gavin Broderic Ho
+16 minutes 39 seconds16:39
+Gavin Broderic Ho 16 minutes 39 seconds
+Mhm.
+
+Sorin Adam Matei
+16 minutes 55 seconds16:55
+Sorin Adam Matei 16 minutes 55 seconds
+Could we easily, and without much cost of energy and time, identify clusters within each?
+Sorin Adam Matei 17 minutes 6 seconds
+interval.
+Sorin Adam Matei 17 minutes 8 seconds
+Right, locally.
+
+Gavin Broderic Ho
+17 minutes 9 seconds17:09
+Gavin Broderic Ho 17 minutes 9 seconds
+So using like regrouping the divisions between the lines into new clusters. Okay.
+
+Sorin Adam Matei
+17 minutes 14 seconds17:14
+Sorin Adam Matei 17 minutes 14 seconds
+They exactly enter new cluster in path clusters, right?
+
+Gavin Broderic Ho
+17 minutes 18 seconds17:18
+Gavin Broderic Ho 17 minutes 18 seconds
+Yeah.
+
+Sorin Adam Matei
+17 minutes 19 seconds17:19
+Sorin Adam Matei 17 minutes 19 seconds
+Because that will kind of show you how the battle, you know, that's another level of resolution, right?
+
+Gavin Broderic Ho
+17 minutes 26 seconds17:26
+Gavin Broderic Ho 17 minutes 26 seconds
+Yeah.
+
+Sorin Adam Matei
+17 minutes 26 seconds17:26
+Sorin Adam Matei 17 minutes 26 seconds
+Because you know, you know, you know, these average paths that we derive, they are global, you know, they're just going to look at everything. It's like, well, this was at one continuous flow, right? But it wasn't actually, right? The battle was fought in these phases. And if it's so, actually it would make more sense to look at each phase.
+
+Gavin Broderic Ho
+17 minutes 31 seconds17:31
+Gavin Broderic Ho 17 minutes 31 seconds
+Mhm.
+Gavin Broderic Ho 17 minutes 38 seconds
+Yeah.
+
+Sorin Adam Matei
+17 minutes 46 seconds17:46
+Sorin Adam Matei 17 minutes 46 seconds
+and see how the paths arrange themselves at each flow. And actually, we can reconstruct the flow of the battle, looking at these segments and trying to connect them if possible.
+
+Gavin Broderic Ho
+17 minutes 51 seconds17:51
+Gavin Broderic Ho 17 minutes 51 seconds
+Yeah.
+Gavin Broderic Ho 17 minutes 58 seconds
+Yeah.
+
+Sorin Adam Matei
+18 minutes18:00
+Sorin Adam Matei 18 minutes
+Now, first of all, think a little bit about the difficulty of creating paths for intervals and, you know, how much energy that requires, right? After you finish the things that we discuss. And then, you know, if that makes sense, we might want to test that idea.
+
+Gavin Broderic Ho
+18 minutes 8 seconds18:08
+Gavin Broderic Ho 18 minutes 8 seconds
+Hum.
+Gavin Broderic Ho 18 minutes 16 seconds
+Yeah, I will. I'll look over, figure out.
+Gavin Broderic Ho 18 minutes 21 seconds
+how feasible that is. It should be, and I think we'll then be able to like, if we're making new groups per phase, we might be able to identify what divisions split off from their groups in different phases of.
+
+Sorin Adam Matei
+18 minutes 21 seconds18:21
+Sorin Adam Matei 18 minutes 21 seconds
+Okh.
+Sorin Adam Matei 18 minutes 23 seconds
+Yeah.
+Sorin Adam Matei 18 minutes 33 seconds
+Ohh.
+
+Gavin Broderic Ho
+18 minutes 36 seconds18:36
+Gavin Broderic Ho 18 minutes 36 seconds
+the operation compared to the lines of advance. I think that's a...
+
+Sorin Adam Matei
+18 minutes 40 seconds18:40
+Sorin Adam Matei 18 minutes 40 seconds
+Yeah.
+
+Gavin Broderic Ho
+18 minutes 42 seconds18:42
+Gavin Broderic Ho 18 minutes 42 seconds
+Good. I will look into that and I'll it should be pretty feasible.
+
+Sorin Adam Matei
+18 minutes 45 seconds18:45
+Sorin Adam Matei 18 minutes 45 seconds
+Perfect. And final, final big favor to ask of you. I don't know, can you put these things that you have created in some folder or can you, are they in GitHub? Can I see them in GitHub?
+
+Gavin Broderic Ho
+18 minutes 57 seconds18:57
+Gavin Broderic Ho 18 minutes 57 seconds
+Yeah, they're in, they're in GitHub.
+
+Sorin Adam Matei
+19 minutes 1 second19:01
+Sorin Adam Matei 19 minutes 1 second
+Well, then I should be able to see them at GitHub.io. You know what I mean? If you go to gafho GitHub.io forward slash Barbara's Analysis, all the results should be visible there. And if they are,
+
+Gavin Broderic Ho
+19 minutes 12 seconds19:12
+Gavin Broderic Ho 19 minutes 12 seconds
+Oh.
+
+Sorin Adam Matei
+19 minutes 20 seconds19:20
+Sorin Adam Matei 19 minutes 20 seconds
+Then add me to the project as a collaborator.
+
+Gavin Broderic Ho
+19 minutes 22 seconds19:22
+Gavin Broderic Ho 19 minutes 22 seconds
+I don't think I enabled this as a page yet, but I can. No, I know what you mean. I can do that for you. I didn't set that up yet, but...
+
+Sorin Adam Matei
+19 minutes 29 seconds19:29
+Sorin Adam Matei 19 minutes 29 seconds
+Yeah, yeah, there it does pages and they make it private and add me as a user idea monger so that I can see and play with these things, yeah.
+
+Gavin Broderic Ho
+19 minutes 37 seconds19:37
+Gavin Broderic Ho 19 minutes 37 seconds
+Mhm.
+Gavin Broderic Ho 19 minutes 39 seconds
+Yeah, yeah, I can do that for you.
+
+Sorin Adam Matei
+19 minutes 41 seconds19:41
+Sorin Adam Matei 19 minutes 41 seconds
+Perfect. Now I have to go because I'm late already for the next meeting. Thank you very much, sir.
+
+Gavin Broderic Ho
+19 minutes 43 seconds19:43
+Gavin Broderic Ho 19 minutes 43 seconds
+Yeah, no worries.
+Gavin Broderic Ho 19 minutes 46 seconds
+Thank you.
+
+Sorin Adam Matei
+19 minutes 48 seconds19:48
+Sorin Adam Matei 19 minutes 48 seconds
+Take care, bye-bye.
+
+Gavin Broderic Ho
+19 minutes 50 seconds19:50
+Gavin Broderic Ho 19 minutes 50 seconds
+Bye.
