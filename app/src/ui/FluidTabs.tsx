@@ -17,7 +17,7 @@ export function FluidTabs<T extends string>({ tabs, active, onChange, layoutId =
         const on = active === tab.id;
         return (
           <button key={tab.id} role="tab" aria-selected={on} title={tab.label} onClick={() => onChange(tab.id)}
-            className="group relative flex-1 rounded-[var(--radius)] px-2 py-1.5 outline-none">
+            className="group relative min-w-0 flex-1 rounded-[var(--radius)] px-2 py-1.5 outline-none">
             {on && (
               <motion.div layoutId={layoutId} transition={{ type: "spring", stiffness: 280, damping: 25, mass: 0.8 }}
                 className="absolute inset-0 rounded-[var(--radius)] border border-primary/50 bg-primary/15" />
@@ -28,7 +28,7 @@ export function FluidTabs<T extends string>({ tabs, active, onChange, layoutId =
               className={cn("relative z-10 flex items-center justify-center gap-1.5", on ? "text-foreground" : "text-muted-foreground group-hover:text-foreground")}
             >
               {tab.icon}
-              <span className="display hidden text-[12px] xl:inline">{tab.label}</span>
+              {on && <span className="display whitespace-nowrap text-[12px]">{tab.label}</span>}
             </motion.div>
           </button>
         );

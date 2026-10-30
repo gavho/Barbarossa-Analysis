@@ -3,7 +3,7 @@ import type { PageId } from "./regions";
 export type Mode = "instant" | "progressive";
 export type LayerKind = "circle" | "line" | "fill" | "heatmap";
 export type LayerId =
-  | "areas" | "ellipses" | "heat" | "geo" | "dv" | "paths" | "points"
+  | "areas" | "ellipses" | "heat" | "geo" | "dv" | "geovec" | "dvvec" | "paths" | "points"
   | "plan_phase" | "plan_advance" | "plan_pocket";
 
 /** How the timeline filters a layer: by mode (day), always one day (exact), a start..end span, started-by, or not at all. */
@@ -42,11 +42,16 @@ export interface LayerStyle {
 
 const CLUSTER_FIELDS = ["Cluster_ID", "Day_Index", "Date", "Start_Date", "End_Date", "Speed_km_day", "Cumulative_Distance_km", "CID_div_total"];
 
+const VEC_FIELDS = ["Cluster_ID", "Members", "Vectors", "V1_Bearing", "V1_km", "V2_Bearing", "V2_km", "V3_Bearing", "V3_km", "Turn1", "Turn2",
+  "Fit_RMS_km", "Stable", "LOO_Bearing", "LOO_km", "Directness"];
+
 export const REGION_LAYERS: LayerDef[] = [
   { id: "ellipses", title: "Center of Mass Ellipses", kind: "fill", time: "exact", cluster: "none", fields: ["Date"] },
   { id: "heat", title: "Division Heatmap", kind: "heatmap", time: "day", cluster: "members", fields: ["Frac_Unit"] },
   { id: "geo", title: "Geometric Cluster Paths", kind: "line", time: "start", cluster: "geo", fields: CLUSTER_FIELDS },
   { id: "dv", title: "Directional Vector Cluster Paths", kind: "line", time: "start", cluster: "dv", fields: CLUSTER_FIELDS },
+  { id: "geovec", title: "Geometric Cluster Vectors", kind: "line", time: "none", cluster: "geo", fields: VEC_FIELDS },
+  { id: "dvvec", title: "Directional Vector Cluster Vectors", kind: "line", time: "none", cluster: "dv", fields: VEC_FIELDS },
   { id: "paths", title: "Division Paths", kind: "line", time: "span", cluster: "members",
     fields: ["Num_Name", "Branch", "Nation", "Start_Date", "End_Date", "Duration_Days", "Distance_KM", "Avg_Speed_KM_Day", "Geo_ClusterID", "DV_ClusterID"] },
   { id: "points", title: "Division Locations", kind: "circle", time: "day", cluster: "members",
@@ -136,6 +141,9 @@ export function preset(page: PageId, mode: Mode, id: LayerId): LayerStyle {
       return { ...base, visible: true, color: "#00c2a8", size: [2.5, 2.5], labels: true }; // teal: distinct from every unit color
     case "plan_advance":
       return { ...base, visible: true, colorMode: "category", colorField: "color", categories: ADVANCE_COLORS, size: [3.5, 3.5] };
+    case "geovec":
+    case "dvvec":
+      return { ...base, colorMode: "category", colorField: "Cluster_ID", categories: CLUSTER_COLORS, size: [3.4, 3.4], labels: true };
     case "plan_pocket":
       return { ...base, visible: true, color: "#1c1c1c", size: [2.5, 2.5], dash: true };
   }

@@ -8,7 +8,8 @@ import { get, set, toast } from "@/state/store";
 const PORTAL = "https://purdueuniversity.maps.arcgis.com/sharing/rest";
 const GROUP = "3c03d7fd9e3c4384bd282062b2430906";
 const NATION_SHORT: Record<number, string> = { 1: "Wehrmacht", 2: "SS", 3: "Hungarian", 4: "Slovak", 5: "Finnish", 6: "Italian", 7: "Romanian" };
-const REGION_SERVICES: Record<RegionId, Record<keyof RegionData, string>> = {
+type ServiceKey = Exclude<keyof RegionData, "dvvec" | "geovec">; // vectors are derived offline, not downloaded
+const REGION_SERVICES: Record<RegionId, Record<ServiceKey, string>> = {
   frontier: { points: "Frontier_Points", paths: "Frontier_Paths", ellipses: "Frontier_Ellipses", dv: "DirectionalVector_Cluster_Avg_Paths", geo: "Geometric_Cluster_avg_paths", days: "frontier_division_days" },
   leningrad: { points: "Leningrad_Points", paths: "Leningrad_Paths", ellipses: "Leningrad_Ellipses", dv: "Leningrad_DV_Cluster_Avg_Paths", geo: "Leningrad_Geo_Cluster_Avg_Paths", days: "leningrad_division_days" },
   smolensk: { points: "Smolensk_Points", paths: "Smolensk_Paths", ellipses: "Smolensk_Ellipses", dv: "Smolensk_DV_Cluster_Avg_Paths", geo: "Smolensk_Geo_Cluster_Avg_Paths", days: "smolensk_division_days" },
@@ -90,7 +91,7 @@ export async function refreshFromAgol(progress: (msg: string) => void): Promise<
   const decode = { Branch_Type, Unit_Type, Posture, Nation: NATION_SHORT };
 
   const regions = {} as Record<RegionId, RegionData>;
-  for (const [region, L] of Object.entries(REGION_SERVICES) as [RegionId, Record<keyof RegionData, string>][]) {
+  for (const [region, L] of Object.entries(REGION_SERVICES) as [RegionId, Record<ServiceKey, string>][]) {
     progress(`Downloading ${region}`);
     const [pts, paths, dv, geo, ell, days] = await Promise.all([
       fetchAll(need(L.points), true), fetchAll(need(L.paths), true), fetchAll(need(L.dv), true),
@@ -102,6 +103,9 @@ export async function refreshFromAgol(progress: (msg: string) => void): Promise<
       dv: normalize(dv.feats, CLUSTER_FIELDS),
       geo: normalize(geo.feats, CLUSTER_FIELDS),
       ellipses: normalize(ell.feats, ["Date"]),
+      // Vectors are derived offline from the snapshot; keep the embedded ones.
+      dvvec: EMBEDDED.regions[region].dvvec,
+      geovec: EMBEDDED.regions[region].geovec,
       days: days.rows.map(({ Division, Nation, Branch, Days_Active, Move_Days, Reserve_Days, Attack_Days, Defend_Days }) =>
         ({ Division, Nation, Branch, Days_Active, Move_Days, Reserve_Days, Attack_Days, Defend_Days }) as unknown as DivisionDays),
     };

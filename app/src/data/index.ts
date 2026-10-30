@@ -29,6 +29,10 @@ import typhoon_dv from "./typhoon_dv.json";
 import typhoon_geo from "./typhoon_geo.json";
 import typhoon_ellipses from "./typhoon_ellipses.json";
 import typhoon_days from "./typhoon_days.json";
+import frontier_vectors from "./frontier_vectors.json";
+import leningrad_vectors from "./leningrad_vectors.json";
+import smolensk_vectors from "./smolensk_vectors.json";
+import typhoon_vectors from "./typhoon_vectors.json";
 
 export type FC = FeatureCollection;
 
@@ -48,6 +52,9 @@ export interface RegionData {
   paths: FC;
   dv: FC;
   geo: FC;
+  /** Vectorized cluster average paths, computed offline by analysis/export_vectors.py (not refreshed from AGOL). */
+  dvvec: FC;
+  geovec: FC;
   ellipses: FC;
   days: DivisionDays[];
 }
@@ -65,15 +72,16 @@ export const MILESTONES = milestones as unknown as Record<"AGS_PhaseLines" | "AG
 
 const fc = (x: unknown) => x as FC;
 const days = (x: unknown) => x as DivisionDays[];
+const vec = (x: unknown) => ({ dvvec: (x as { dv: FC }).dv, geovec: (x as { geo: FC }).geo });
 
 export const EMBEDDED: Dataset = {
   source: { kind: "embedded", date: meta.snapshot },
   overview: fc(overview_points),
   areas: fc(areas),
   regions: {
-    frontier: { points: fc(frontier_points), paths: fc(frontier_paths), dv: fc(frontier_dv), geo: fc(frontier_geo), ellipses: fc(frontier_ellipses), days: days(frontier_days) },
-    leningrad: { points: fc(leningrad_points), paths: fc(leningrad_paths), dv: fc(leningrad_dv), geo: fc(leningrad_geo), ellipses: fc(leningrad_ellipses), days: days(leningrad_days) },
-    smolensk: { points: fc(smolensk_points), paths: fc(smolensk_paths), dv: fc(smolensk_dv), geo: fc(smolensk_geo), ellipses: fc(smolensk_ellipses), days: days(smolensk_days) },
-    typhoon: { points: fc(typhoon_points), paths: fc(typhoon_paths), dv: fc(typhoon_dv), geo: fc(typhoon_geo), ellipses: fc(typhoon_ellipses), days: days(typhoon_days) },
+    frontier: { points: fc(frontier_points), paths: fc(frontier_paths), dv: fc(frontier_dv), geo: fc(frontier_geo), ellipses: fc(frontier_ellipses), days: days(frontier_days), ...vec(frontier_vectors) },
+    leningrad: { points: fc(leningrad_points), paths: fc(leningrad_paths), dv: fc(leningrad_dv), geo: fc(leningrad_geo), ellipses: fc(leningrad_ellipses), days: days(leningrad_days), ...vec(leningrad_vectors) },
+    smolensk: { points: fc(smolensk_points), paths: fc(smolensk_paths), dv: fc(smolensk_dv), geo: fc(smolensk_geo), ellipses: fc(smolensk_ellipses), days: days(smolensk_days), ...vec(smolensk_vectors) },
+    typhoon: { points: fc(typhoon_points), paths: fc(typhoon_paths), dv: fc(typhoon_dv), geo: fc(typhoon_geo), ellipses: fc(typhoon_ellipses), days: days(typhoon_days), ...vec(typhoon_vectors) },
   },
 };

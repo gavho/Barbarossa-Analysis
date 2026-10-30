@@ -3,6 +3,7 @@ import { POSTURE_COLORS } from "@/config/presets";
 import { set, unitKey, unitLabel, useStore } from "@/state/store";
 import { Segmented } from "@/ui/Segmented";
 import { cn } from "@/lib/utils";
+import { Help } from "@/ui/Help";
 
 type SortKey = "Days_Active" | "Attack_Days" | "Defend_Days" | "Move_Days" | "Reserve_Days";
 const PARTS = [["Move_Days", "Move"], ["Reserve_Days", "Reserve"], ["Attack_Days", "Attack"], ["Defend_Days", "Defend"]] as const;
@@ -36,7 +37,7 @@ export function DivisionDays() {
         <Select label="Sort" value={sort} options={["Days_Active", "Attack_Days", "Defend_Days", "Move_Days", "Reserve_Days"]} onChange={(v) => setSort(v as SortKey)} />
       </div>
       <div className="flex items-center justify-between">
-        <span className="font-mono text-[11px] text-muted-foreground">{rows.length} divisions</span>
+        <span className="flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">{rows.length} divisions <Help id="divisionDays" /></span>
         <Segmented size="sm" value={share} onChange={setShare} items={[{ value: "days", label: "Days" }, { value: "share", label: "% of active" }]} />
       </div>
       <div className="frame p-2">

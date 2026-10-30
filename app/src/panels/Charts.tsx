@@ -9,6 +9,7 @@ import { addDays, daysBetween, fmtShort } from "@/lib/dates";
 import { exportChartPng } from "@/io/export";
 import { set, useStore, type State } from "@/state/store";
 import { RollingNumber } from "@/ui/RollingNumber";
+import { Help } from "@/ui/Help";
 
 const POSTURES = Object.keys(POSTURE_COLORS);
 const BRANCH_ORDER = BRANCH_COLORS.map((b) => String(b.value));
@@ -55,7 +56,7 @@ function RegionCharts({ s }: { s: State }) {
         <Kpi label="Records to date" value={toDate.length} />
       </div>
 
-      <ChartCard title="Total branch composition" note="Units on the selected day · click a bar to filter" name="branch_composition">
+      <ChartCard help="branchChart" title="Total branch composition" note="Units on the selected day · click a bar to filter" name="branch_composition">
         <ResponsiveContainer width="100%" height={170}>
           <BarChart data={branches} margin={{ top: 4, right: 8, left: -18, bottom: 0 }}>
             <CartesianGrid stroke="var(--border)" vertical={false} />
@@ -69,7 +70,7 @@ function RegionCharts({ s }: { s: State }) {
         </ResponsiveContainer>
       </ChartCard>
 
-      <ChartCard title="Total posture over time" note="Records per day · click a legend item to filter" name="posture_over_time">
+      <ChartCard help="postureChart" title="Total posture over time" note="Records per day · click a legend item to filter" name="posture_over_time">
         <ResponsiveContainer width="100%" height={190}>
           <LineChart data={series} margin={{ top: 4, right: 8, left: -18, bottom: 0 }}>
             <CartesianGrid stroke="var(--border)" vertical={false} />
@@ -83,7 +84,7 @@ function RegionCharts({ s }: { s: State }) {
         </ResponsiveContainer>
       </ChartCard>
 
-      <ChartCard title="Division days by posture" note="Left: selected day · Right: total to date" name="division_days">
+      <ChartCard help="postureDays" title="Division days by posture" note="Left: selected day · Right: total to date" name="division_days">
         <div className="grid grid-cols-2">
           {[postureDaily, postureTotal].map((data, i) => (
             <ResponsiveContainer key={i} width="100%" height={150}>
@@ -141,13 +142,13 @@ function Kpi({ label, value }: { label: string; value: number }) {
   );
 }
 
-function ChartCard({ title, note, name, children }: { title: string; note?: string; name: string; children: React.ReactNode }) {
+function ChartCard({ title, note, name, help, children }: { title: string; note?: string; name: string; help?: string; children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   return (
     <section className="frame p-2" ref={ref} aria-label={title}>
       <div className="mb-1 flex items-start justify-between gap-2">
         <div>
-          <h3 className="display text-[13px]">{title}</h3>
+          <h3 className="display flex items-center gap-1.5 text-[13px]">{title}{help && <Help id={help} />}</h3>
           {note && <p className="text-[10px] text-muted-foreground">{note}</p>}
         </div>
         <button aria-label={`Download ${title} as PNG`} title="Download PNG" onClick={() => exportChartPng(ref.current, name)} className="text-muted-foreground hover:text-foreground"><Download size={13} /></button>

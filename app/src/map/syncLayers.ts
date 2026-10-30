@@ -12,7 +12,7 @@ export function sourceData(s: State, id: LayerId): FC | null {
   if (id === "plan_pocket") return MILESTONES.AGS_SmallPocketCOA;
   if (s.page === "home") return id === "areas" ? s.data.areas : id === "heat" ? s.data.overview : null;
   const r = s.data.regions[s.page];
-  return id === "heat" ? r.points : (r[id as "points" | "paths" | "dv" | "geo" | "ellipses"] ?? null);
+  return id === "heat" ? r.points : (r[id as "points" | "paths" | "dv" | "geo" | "dvvec" | "geovec" | "ellipses"] ?? null);
 }
 
 const cssVar = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -61,7 +61,8 @@ function specs(def: LayerDef, st: LayerStyle, s: State, src: string): LayerSpeci
   const label = labelText(def.id);
   if (label && st.labels !== false && (st.labels || def.id === "areas")) {
     out.push({ ...base, id: `${def.id}-labels`, type: "symbol",
-      layout: { ...layout, "symbol-placement": "line", "text-field": label as never, "text-font": FONT, "text-size": 11, "text-letter-spacing": 0.05 },
+      layout: { ...layout, "symbol-placement": "line", "text-field": label as never, "text-font": FONT, "text-size": 11, "text-letter-spacing": 0.05,
+        ...(def.id.endsWith("vec") ? { "text-size": 22, "symbol-spacing": 70, "text-keep-upright": false, "text-allow-overlap": true } : {}) },
       paint: { "text-color": cssVar("--foreground"), "text-halo-color": cssVar("--background"), "text-halo-width": 1.5 } });
   }
   return out;
@@ -73,6 +74,7 @@ function labelText(id: LayerId): unknown {
   if (id === "dv" || id === "geo") return ["case", ["==", ["%", ["to-number", ["get", "Day_Index"], 0], 7], 1], ["slice", ["to-string", ["get", "Date"]], 5], ""];
   if (id === "plan_phase") return ["concat", "LINE ", ["upcase", ["get", "line_id"]]];
   if (id === "areas") return ["upcase", ["get", "Region"]];
+  if (id === "dvvec" || id === "geovec") return "›"; // arrowheads show the direction of travel
   return null;
 }
 
@@ -193,6 +195,6 @@ export function syncLayers(map: MLMap, s: State) {
 
 /** Layer ids that respond to clicks, top-most first. */
 export function clickableLayers(map: MLMap): string[] {
-  const ids = ["unit-points", "points", "paths", "dv", "geo", "ellipses", "plan_phase", "plan_advance", "plan_pocket", "areas"];
+  const ids = ["unit-points", "points", "paths", "dvvec", "geovec", "dv", "geo", "ellipses", "plan_phase", "plan_advance", "plan_pocket", "areas"];
   return ids.filter((id) => map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== "none");
 }

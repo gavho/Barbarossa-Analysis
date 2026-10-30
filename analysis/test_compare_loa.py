@@ -59,6 +59,22 @@ def test_pairing_prefers_the_closer_line():
     assert pairing == {"north": 8, "south": 7}
 
 
+def test_vector_stats_geodesic_bearings_and_turns():
+    import export_vectors as ev
+    az, km, turns = ev.vector_stats([(0, 0), (1, 0), (1, 1)])  # east along the equator, then north
+    assert abs(az[0] - 90) < 0.1 and abs(az[1] - 0) < 0.1
+    assert abs(km[0] - 111.3) < 0.5  # one degree of longitude at the equator
+    assert abs(turns[0] + 90) < 0.1  # a left turn is negative
+
+
+def test_fit_uses_fewest_vectors_within_tolerance():
+    import export_vectors as ev
+    V, rms = ev.fit(LineString([(0, 0), (300, 4), (600, 0)]))  # gentle 4 km bow: one vector is enough
+    assert len(V) == 2 and rms <= ev.FIT_TOL_KM
+    V, _ = ev.fit(three_leg())  # a real 30-degree dog-leg needs more than one
+    assert len(V) >= 3
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

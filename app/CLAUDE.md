@@ -7,6 +7,8 @@ self-contained file: `npm run build` → `../Barbarossa.html` (open by double-cl
 ## Commands
 - `python scripts/export_data.py` (from repo root: `python app/scripts/export_data.py`) — regenerate `src/data/*.json`
   from the newest `agol/AGOL_snapshot_*.gdb` + `milestones/AGS_Milestones.gdb`. Run after `agol/download_agol.py`.
+- `python analysis/compare_loa.py` then `python analysis/export_vectors.py` — cluster vectors and their statistics
+  (`src/data/<region>_vectors.json`, shown in the Vectors tab). Explanations behind every "?" live in `src/config/help.ts`.
 - `npm run build` — type-check, build, copy to repo root. `npm test` — vitest. `npm run preview` — serve `dist/` on :4173.
 
 ## Rules

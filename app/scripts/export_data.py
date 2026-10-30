@@ -113,6 +113,8 @@ def points(layer, d, keep=None):
 
 def lines(layer, props, dates):
     df = read(layer)
+    # Services disagree on case (CID_div_total vs CID_Div_Total); match field names case-insensitively.
+    df = df.rename(columns={col: p for col in df.columns for p in props if col.lower() == p.lower() and col != p})
     for f in dates:
         df[f] = day(df[f])
     for f in set(props) - set(df.columns):

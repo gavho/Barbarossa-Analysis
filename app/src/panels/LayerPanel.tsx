@@ -6,6 +6,8 @@ import { sourceData } from "@/map/syncLayers";
 import { colorExpr } from "@/map/expressions";
 import { cn } from "@/lib/utils";
 import { StyleEditor } from "./StyleEditor";
+import { Help } from "@/ui/Help";
+import { HELP } from "@/config/help";
 
 export function LayerPanel() {
   const s = useStore();
@@ -52,6 +54,7 @@ function LayerRow({ def, style, expanded, onToggle, onChange, onReset, features,
         <button onClick={onToggle} className={cn("min-w-0 flex-1 truncate text-left text-[13px]", !style.visible && "text-muted-foreground")} aria-expanded={expanded}>
           {def.title}
         </button>
+        {HELP[def.id.endsWith("vec") ? "vectors" : def.id] && <Help id={def.id.endsWith("vec") ? "vectors" : def.id} />}
         <input type="range" min={0} max={1} step={0.05} value={style.opacity} aria-label={`${def.title} opacity`}
           onChange={(e) => onChange({ opacity: Number(e.target.value) })} className="w-14 accent-[var(--primary)]" />
         {onRemove && <button aria-label={`Remove ${def.title}`} onClick={onRemove} className="text-muted-foreground hover:text-danger"><Trash2 size={13} /></button>}

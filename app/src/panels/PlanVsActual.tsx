@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { MILESTONES } from "@/data";
-import { crossings } from "@/lib/crossing";
+import { crossings, REACH_KM } from "@/lib/crossing";
 import { fmtShort } from "@/lib/dates";
 import { set, useStore } from "@/state/store";
 import { cn } from "@/lib/utils";
+import { Help } from "@/ui/Help";
 
 const ADVANCE: Record<string, string> = { purple: "#8e44ad", blue: "#2e86de", orange: "#e67e22", black: "#9aa0a6" };
 
@@ -13,9 +14,10 @@ export function PlanVsActual() {
   const data = useStore((s) => s.data);
   const date = useStore((s) => s.date);
   const showPlan = useStore((s) => s.showPlan);
+  const [reach, setReach] = useState(REACH_KM);
   const rows = useMemo(
-    () => (page === "frontier" ? crossings(MILESTONES.AGS_PhaseLines.features, data.regions.frontier.points.features, date) : []),
-    [page, data, date],
+    () => (page === "frontier" ? crossings(MILESTONES.AGS_PhaseLines.features, data.regions.frontier.points.features, date, reach) : []),
+    [page, data, date, reach],
   );
   if (page !== "frontier") return <p className="p-4 text-muted-foreground">The AGS milestones cover the Frontier theater.</p>;
 
@@ -27,9 +29,17 @@ export function PlanVsActual() {
         </button>
       )}
       <p className="text-[12px] leading-relaxed text-muted-foreground">
-        Phase lines a–e and lines of advance are the historian's pre-war estimates (Sorin's milestones). <b>Lead</b> is the first day any
-        division point within a line's latitude band lay beyond it; <b>Main body</b> is the first day at least half did.
+        <Help id="planVsActual" className="mr-1" />Phase lines a–e and lines of advance are the historian's pre-war estimates (Sorin's milestones). A division
+        point within a line's latitude band has <b>reached</b> it when it is beyond the line or no more than {reach} km short of it. <b>Lead</b> is the first day any
+        had reached it; <b>Main body</b> is the first day at least half had.
       </p>
+      <label className="flex items-center gap-2 text-[12px]">
+        <span className="shrink-0 text-muted-foreground">Counts as reached within</span>
+        <input type="range" min={0} max={50} step={5} value={reach} onChange={(e) => setReach(Number(e.target.value))}
+          aria-label="Distance short of a phase line that still counts as reaching it" className="min-w-0 flex-1 accent-[var(--primary)]" />
+        <span className="w-12 shrink-0 text-right font-mono">{reach} km</span>
+        <Help id="reach" />
+      </label>
       <div className="flex flex-col gap-1.5">
         {rows.map((r) => {
           const active = MILESTONES.AGS_PhaseLines.features.find((f) => f.properties?.line_id === r.lineId)?.properties;
@@ -53,7 +63,7 @@ export function PlanVsActual() {
               {r.shareToday !== null && (
                 <div className="mt-1.5">
                   <div className="h-1.5 overflow-hidden rounded-sm bg-muted"><div className="h-full bg-primary" style={{ width: `${r.shareToday * 100}%` }} /></div>
-                  <div className="mt-0.5 text-[10px] text-muted-foreground">{Math.round(r.shareToday * 100)}% of units in band beyond the line on {fmtShort(date)}</div>
+                  <div className="mt-0.5 text-[10px] text-muted-foreground">{Math.round(r.shareToday * 100)}% of units in band had reached the line (beyond it or within {reach} km) on {fmtShort(date)}</div>
                 </div>
               )}
             </div>

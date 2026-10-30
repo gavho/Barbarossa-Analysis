@@ -6,7 +6,7 @@ import { timeWindow, type PageId, type RegionId } from "@/config/regions";
 import type { Filters } from "@/map/expressions";
 
 export type Theme = "tactical" | "period";
-export type RightTab = "charts" | "table" | "info" | "days" | "plan" | "oob";
+export type RightTab = "charts" | "table" | "info" | "days" | "plan" | "oob" | "vectors";
 
 export interface View { center: [number, number]; zoom: number; bearing: number; pitch: number }
 export interface Step { title: string; caption: string; date: string; mode: Mode; view: View | null }

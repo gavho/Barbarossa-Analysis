@@ -50,8 +50,9 @@ CITIES = {"Lviv": (49.84, 24.03), "Rivne": (50.62, 26.25), "Zhytomyr": (50.25, 2
 
 
 # ---------------------------------------------------------------- geometry helpers
-def to_km(geom):
-    return ops.transform(_to_km.transform, geom)
+def to_km(geom, tr=None):
+    """Project lon/lat to km; `tr` swaps in another region's equidistant projection."""
+    return ops.transform((tr or _to_km).transform, geom)
 
 
 def merge_line(geom):
@@ -177,18 +178,18 @@ def planned_lines():
     return {r.unit: orient_east(merge_line(to_km(r.geometry))) for r in adv.itertuples()}
 
 
-def cluster_lines(name):
+def cluster_lines(name, tr=None):
     d = gpd.read_file(DATA / f"{name}.geojson").sort_values(["Cluster_ID", "Day_Index"])
     out = {}
     for cid, g in d.groupby("Cluster_ID"):
         pts = []
         for geom in g.geometry:
-            geom = to_km(geom)
+            geom = to_km(geom, tr)
             for part in getattr(geom, "geoms", [geom]):
                 for c in part.coords:
                     if not pts or math.dist(pts[-1], c) > 1e-6:
                         pts.append(c)
-        out[int(cid)] = orient_east(LineString(pts))
+        out[int(cid)] = LineString(pts)  # Day_Index order is the direction of travel; only planned lines need orienting
     return out
 
 
@@ -230,20 +231,20 @@ def formations():
     return f
 
 
-def formation_lines():
+def formation_lines(layer="Frontier_Paths", tr=None):
     """Each formation's full path (its dated segments joined in order), oriented west to east."""
-    paths = gpd.read_file(DATA / "Frontier_Paths.geojson").sort_values(["Nation", "Branch", "Num_Name", "Start_Date"])
+    paths = gpd.read_file(DATA / f"{layer}.geojson").sort_values(["Nation", "Branch", "Num_Name", "Start_Date"])
     out = {}
     for key, g in paths.groupby(["Nation", "Branch", "Num_Name"]):
         pts = []
         for geom in g.geometry:
-            km = to_km(geom)
+            km = to_km(geom, tr)
             for part in getattr(km, "geoms", [km]):
                 for q in part.coords:
                     if not pts or math.dist(pts[-1], q) > 1e-6:
                         pts.append(q)
         if len(pts) > 1:
-            out[key] = orient_east(LineString(pts))
+            out[key] = LineString(pts)  # Start_Date order is the direction of travel
     return out
 
 

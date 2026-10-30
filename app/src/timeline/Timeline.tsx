@@ -7,6 +7,7 @@ import { set, useStore } from "@/state/store";
 import { timeWindow } from "@/config/regions";
 import { addDays, daysBetween, fmtDate, fmtShort } from "@/lib/dates";
 import { Segmented } from "@/ui/Segmented";
+import { Help } from "@/ui/Help";
 import type { Mode } from "@/config/presets";
 
 const SPRING = { stiffness: 260, damping: 28 };
@@ -74,8 +75,11 @@ export function Timeline() {
   return (
     <div className="frame flex items-center gap-3 px-3 py-2">
       <div className="flex shrink-0 flex-col gap-1.5">
-        <Segmented<Mode> size="sm" value={mode} onChange={(m) => set({ mode: m })}
-          items={[{ value: "instant", label: "Instant", title: "Only units on the selected day" }, { value: "progressive", label: "Progressive", title: "Everything up to the selected day" }]} />
+        <div className="flex items-center gap-1.5">
+          <Segmented<Mode> size="sm" value={mode} onChange={(m) => set({ mode: m })}
+            items={[{ value: "instant", label: "Instant", title: "Only units on the selected day" }, { value: "progressive", label: "Progressive", title: "Everything up to the selected day" }]} />
+          <Help id="mode" />
+        </div>
         <div className="flex items-center gap-0.5">
           <IconBtn label="Back to start" onClick={() => set({ date: start, playing: false })}><SkipBack size={14} /></IconBtn>
           <IconBtn label="Previous day" onClick={() => stepBy(-1)}><ChevronLeft size={14} /></IconBtn>

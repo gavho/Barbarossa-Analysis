@@ -5,6 +5,7 @@ import { CLUSTER_COLORS } from "@/config/presets";
 import { goTo, set, useStore } from "@/state/store";
 import { FilterDisclosure } from "@/ui/FilterDisclosure";
 import { LayerPanel } from "./LayerPanel";
+import { Help } from "@/ui/Help";
 
 const clusterOptions = [{ id: "all", label: "All clusters" }, ...CLUSTER_COLORS.map((c) => ({ id: String(c.value), label: `Cluster ${c.value}`, swatch: c.color }))];
 
@@ -61,7 +62,7 @@ function RegionIntro() {
         </div>
       </div>
       <section aria-label="Cluster filters" className="flex flex-col gap-1.5">
-        <h2 className="display text-[13px] text-muted-foreground">Cluster filters</h2>
+        <h2 className="display flex items-center gap-1.5 text-[13px] text-muted-foreground">Cluster filters <Help id="clusterFilters" /></h2>
         <FilterDisclosure id="geo" label="Geometric clustering groups" options={clusterOptions} value={filters.geo === null ? "all" : String(filters.geo)}
           onChange={(v) => set({ filters: { ...filters, geo: v === "all" ? null : Number(v) } })} />
         <FilterDisclosure id="dv" label="Directional vector clustering groups" options={clusterOptions} value={filters.dv === null ? "all" : String(filters.dv)}

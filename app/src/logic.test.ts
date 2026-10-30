@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import type { Feature } from "geojson";
 import { layerFilter, matches, timeFilter } from "@/map/expressions";
-import { crossings } from "@/lib/crossing";
+import { crossings, distanceToLineKm } from "@/lib/crossing";
 import { addDays, daysBetween } from "@/lib/dates";
 import { csvToPoints, parseCsv } from "@/io/dropLoad";
 import { toCsv } from "@/io/export";
@@ -65,6 +65,13 @@ describe("phase-line crossings", () => {
     expect(c.main).toBe("1941-07-03");
     expect(c.delay).toBe(2);
     expect(c.shareToday).toBeCloseTo(2 / 3);
+  });
+  it("counts a unit within the reach distance short of the line as having reached it", () => {
+    // 0.15 deg of longitude at 50N is ~10.7 km west of the line at lon 25
+    const near = [pt(24.85, 50, { Date: "1941-06-28" }), pt(24, 50, { Date: "1941-06-28" })];
+    expect(distanceToLineKm([24.85, 50], [[25, 51], [25, 49]])).toBeCloseTo(10.7, 0);
+    expect(crossings([line], near, "1941-06-28", 20)[0]).toMatchObject({ lead: "1941-06-28", main: "1941-06-28", shareToday: 0.5 });
+    expect(crossings([line], near, "1941-06-28", 0)[0]).toMatchObject({ lead: null, main: null, shareToday: 0 });
   });
 });
 
