@@ -35,6 +35,13 @@ def test_clusters_are_numbered_north_to_south():
         assert list(labels) == [0, 0, 1, 1, 2, 2, 3, 3]
 
 
+def test_follow_groups_keeps_ids_with_their_divisions():
+    # Previous stretch: a,b in group 2 and c,d in group 0. This stretch clustered them as 0 and 1.
+    prev = {"a": 2, "b": 2, "c": 0, "d": 0, "e": 1, "f": 3}
+    labels = pc.follow_groups(np.array([0, 0, 1, 1, 2, 3]), list("abcdef"), prev)
+    assert list(labels) == [2, 2, 0, 0, 1, 3]
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

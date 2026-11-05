@@ -7,6 +7,7 @@ import { set, setStyle, styleOf, useStore } from "@/state/store";
 import { Help } from "@/ui/Help";
 import { Segmented } from "@/ui/Segmented";
 import { cn } from "@/lib/utils";
+import { PlanMatch } from "./PlanMatch";
 
 type Kind = "dv" | "geo";
 const COMPASS = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
@@ -34,6 +35,7 @@ export function Vectors() {
 
   return (
     <div className="flex flex-col gap-2.5">
+      {s.page === "frontier" && <><PlanMatch /><h3 className="display mt-2 text-[15px]">Cluster vectors</h3></>}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-1.5">
           <Segmented<Kind> size="sm" value={kind} onChange={setKind}

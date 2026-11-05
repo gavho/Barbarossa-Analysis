@@ -34,6 +34,10 @@ import leningrad_vectors from "./leningrad_vectors.json";
 import smolensk_vectors from "./smolensk_vectors.json";
 import typhoon_vectors from "./typhoon_vectors.json";
 import phase_clusters from "./phase_clusters.json";
+import phase_distributions from "./phase_distributions.json";
+import phase_checkpoints from "./phase_checkpoints.json";
+import phase_profiles from "./phase_profiles.json";
+import plan_match from "./plan_match.json";
 
 export type FC = FeatureCollection;
 
@@ -75,6 +79,38 @@ export interface PhaseSplit {
 }
 /** Clusters per stretch between AGS phase lines (analysis/phase_clusters.py); splits are those both methods find. */
 export const PHASES = phase_clusters as unknown as { stretches: string[]; average_paths: FC; pieces: FC; splits: PhaseSplit[] };
+/** How the divisions' spread along the front changed past each phase line (analysis/phase_distributions.py). */
+export const PHASE_SHIFTS = phase_distributions as {
+  from: string; to: string; sentence: string; shift_km: number; hist_r: number; order_rho: number; wasserstein_km: number;
+  ks_D: number; ks_p: number;
+}[];
+export interface CheckGroup { line: string; group: number; divisions: number; sector: string; first: string; median: string; last: string;
+  lonlat: [number, number]; members: string }
+export interface CheckFlow { from_line: string; from_group: number; to_line: string; to_group: number | null; divisions: number;
+  major: boolean; members: string }
+/** Phase lines as checkpoints: who crossed each line together, where and when (analysis/phase_checkpoints.py). */
+export const PHASE_CHECKS = phase_checkpoints as unknown as {
+  lines: string[]; info: Record<string, { k: number; silhouette: number }>; groups: CheckGroup[]; flows: CheckFlow[];
+  splits: { from_line: string; to_line: string; division: string; from_group: number; division_went_to: number }[];
+  ribbons: FC; crossings: FC;
+};
+/** Where along the front (north-south km) the divisions were per stretch, with Jenks natural breaks (phase_distributions.py). */
+export const PHASE_PROFILES = phase_profiles as unknown as {
+  bin_km: number; bins_from_km: number; towns: { name: string; km: number }[];
+  profiles: { stretch: string; share: number[]; mean_km: number; breaks_km: number[]; gvf: number;
+    sectors: { sector: string; share: number; divisions: number; from_km: number; to_km: number }[] }[];
+  positions: { division: string; stretch: string; km: number }[];
+  zones: FC;
+};
+export interface PlanPair { planned: string; name: string; cluster: number; divisions: number; badge: "on plan" | "near plan" | "off plan";
+  sentence: string; mean_offset_km: number; mean_gap_km: number; within50_pct: number; end_gap_km: number; bearing_diff: number;
+  membership_agrees: boolean; profile: [number, number][]; planned_line: [number, number][]; realized_line: [number, number][] }
+export type PlanClustering = "DV" | "DV4";
+/** Planned AGS lines of advance vs the matched realized groups, published 5 clusters (DV) or 4 groups of advancing
+ * divisions (DV4), from analysis/compare_loa.py. */
+export const PLAN_MATCH = plan_match as unknown as Record<PlanClustering, { pairs: PlanPair[]; unmatched: number[]; lines: FC }> & {
+  stayed_behind: string[]; towns: Record<string, [number, number]>;
+};
 export const MILESTONES = milestones as unknown as Record<"AGS_PhaseLines" | "AGS_AdvanceLines" | "AGS_SmallPocketCOA", FC>;
 
 const fc = (x: unknown) => x as FC;

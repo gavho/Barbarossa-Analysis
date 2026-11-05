@@ -5,7 +5,8 @@ is cut where it crosses each phase line (a-e), and the pieces in each stretch ar
 methods as the original OP-Barbarossa scripts (github.com/gavho/OP-Barbarossa):
   geometric: symmetric Hausdorff distance between paths -> average-linkage agglomerative clustering
   DV:        k-means on [end x, end y, centroid x, centroid y]   (random_state=42, as the original)
-Clusters are then linked stretch to stretch by the divisions they share, which shows groups forming, merging and splitting.
+Clusters are then linked stretch to stretch by the divisions they share, which shows groups forming, merging and splitting;
+each cluster keeps the id (and map colour) of the previous stretch's cluster it shares most divisions with.
 
 Settings: 4 clusters per stretch, Wehrmacht and SS divisions only, pieces shorter than MIN_PIECE_KM dropped.
 Usage: python analysis/phase_clusters.py        (writes analysis/phase_clusters/*)
@@ -19,6 +20,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from pyproj import Transformer
+from scipy.optimize import linear_sum_assignment
 from scipy.spatial.distance import directed_hausdorff
 from shapely.geometry import LineString, Point, Polygon
 from sklearn.cluster import AgglomerativeClustering, KMeans
@@ -119,6 +121,28 @@ def north_to_south(labels, paths):
     return np.array([remap[l] for l in labels])
 
 
+def follow_groups(labels, keys, prev):
+    """Renumber so each cluster takes the id of the previous stretch's cluster it shares most divisions with (one-to-one,
+    Hungarian assignment). The same id, and so the same colour, then follows one group of divisions across stretches.
+    prev: {division key: cluster id in the previous stretch}; empty for the first stretch, which stays north to south.
+    The two stretches may have different numbers of clusters. A cluster sharing no division with any earlier one gets an
+    id the previous stretch did not use where possible, so a colour never claims a continuity that is not there."""
+    if not prev:
+        return labels
+    n = int(max(labels.max(), max(prev.values()))) + 1
+    overlap = np.zeros((n, n))
+    for lab, k in zip(labels, keys):
+        if k in prev:
+            overlap[lab, prev[k]] += 1
+    rows, cols = linear_sum_assignment(-overlap)
+    remap = {r: c for r, c in zip(rows, cols) if overlap[r, c] > 0}
+    used, before = set(remap.values()), set(prev.values())
+    free = [i for i in range(n) if i not in used and i not in before] + [i for i in range(n) if i not in used and i in before]
+    for lab in sorted(set(labels) - set(remap)):
+        remap[lab] = free.pop(0)
+    return np.array([remap[l] for l in labels])
+
+
 # ---------------------------------------------------------------- checks against the published clusters
 def validation(flines, f):
     """Re-run the original whole-path clustering (k=5, raw vertices) and compare with the published cluster ids."""
@@ -184,6 +208,8 @@ def main():
         for method, fn in METHODS.items():
             labels, sil = fn(paths, K)
             labels = north_to_south(labels, paths)
+            labels = follow_groups(labels, [pieces[i][0] for i in idx],
+                                   {k: v for (m, zz, k), v in assign.items() if m == method and zz == z - 1})
             for i, lab in zip(idx, labels):
                 assign[(method, z, pieces[i][0])] = int(lab)
             for lab in range(K):

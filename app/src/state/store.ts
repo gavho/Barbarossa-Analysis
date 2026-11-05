@@ -45,6 +45,9 @@ export interface State {
   userLayers: UserLayer[];
   data: Dataset;
   phase: PhaseView;
+  phaseStep: string; // Phases tab stepper: "all" or a phase line letter
+  planMatch: "DV" | "DV4"; // Vectors tab: published 5 clusters or 4 groups of advancing divisions
+  planFocus: string | null; // planned line shown alone on the map, or all
   view: View | null;
   toasts: Toast[];
 }
@@ -74,6 +77,9 @@ export const initialState: State = {
   userLayers: [],
   data: EMBEDDED,
   phase: { method: "DV", stretch: "all" },
+  phaseStep: "all",
+  planMatch: "DV4",
+  planFocus: null,
   view: null,
   toasts: [],
 };

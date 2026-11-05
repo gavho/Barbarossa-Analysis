@@ -3,7 +3,7 @@ import type { PageId } from "./regions";
 export type Mode = "instant" | "progressive";
 export type LayerKind = "circle" | "line" | "fill" | "heatmap";
 export type LayerId =
-  | "areas" | "ellipses" | "heat" | "geo" | "dv" | "geovec" | "dvvec" | "phaseavg" | "phasepieces" | "paths" | "points"
+  | "areas" | "ellipses" | "heat" | "geo" | "dv" | "geovec" | "dvvec" | "phaseavg" | "phasepieces" | "checklines" | "checkpaths" | "checkdots" | "naturalzones" | "matchplan" | "matchreal" | "paths" | "points"
   | "plan_phase" | "plan_advance" | "plan_pocket";
 
 /** How the timeline filters a layer: by mode (day), always one day (exact), a start..end span, started-by, or not at all. */
@@ -72,8 +72,15 @@ export const PLAN_LAYERS: LayerDef[] = [
 
 export const PHASE_LAYERS: LayerDef[] = [
   { id: "phasepieces", title: "Phase · Division Pieces", kind: "line", time: "none", cluster: "none", fields: ["division", "nation", "stretch", "km", "cluster"] },
-  { id: "phaseavg", title: "Phase · Cluster Paths", kind: "line", time: "none", cluster: "none",
+  { id: "phaseavg", title: "Phase · Group Paths", kind: "line", time: "none", cluster: "none",
     fields: ["method", "stretch", "cluster", "divisions", "silhouette", "bearing", "loo_km", "directness"] },
+  { id: "matchplan", title: "Plan vs Actual · Planned Lines", kind: "line", time: "none", cluster: "none", fields: ["name", "badge"] },
+  { id: "matchreal", title: "Plan vs Actual · Matched Groups", kind: "line", time: "none", cluster: "none", fields: ["name", "cluster", "badge"] },
+  { id: "naturalzones", title: "Natural Breaks · Front Sectors", kind: "fill", time: "none", cluster: "none",
+    fields: ["stretch", "sector", "share", "divisions", "from_km", "to_km"] },
+  { id: "checklines", title: "Checkpoint · Phase Lines", kind: "line", time: "none", cluster: "none", fields: ["line_id", "name", "planned_date"] },
+  { id: "checkpaths", title: "Checkpoint · Group Paths", kind: "line", time: "none", cluster: "none", fields: ["group", "from_line", "to_line", "divisions"] },
+  { id: "checkdots", title: "Checkpoint · Crossings", kind: "circle", time: "none", cluster: "none", fields: ["division", "line", "date", "group"] },
 ];
 
 export const layersFor = (page: PageId, plan: boolean): LayerDef[] =>
@@ -155,6 +162,19 @@ export function preset(page: PageId, mode: Mode, id: LayerId): LayerStyle {
       return { ...base, colorMode: "category", colorField: "cluster", categories: CLUSTER_COLORS, size: [3.4, 3.4], labels: true };
     case "phasepieces":
       return { ...base, opacity: 0.55, colorMode: "category", colorField: "cluster", categories: CLUSTER_COLORS, size: [1.2, 1.2] };
+    case "matchplan":
+      return { ...base, color: "#e6e6e6", size: [2.6, 2.6], dash: true };
+    case "matchreal":
+      return { ...base, colorMode: "category", colorField: "cluster", categories: CLUSTER_COLORS, size: [3.6, 3.6], labels: true };
+    case "naturalzones":
+      return { ...base, opacity: 0.55, colorMode: "ramp", colorField: "share", ramp: [[20, "#1f2a36"], [35, "#6b5a24"], [50, "#e0b52b"], [60, "#ffe27a"]],
+        outline: "#e0b52b" };
+    case "checklines":
+      return { ...base, color: "#00c2a8", size: [2, 2], labels: true, dash: true };
+    case "checkpaths":
+      return { ...base, colorMode: "category", colorField: "group", categories: CLUSTER_COLORS, size: [4, 4], labels: true };
+    case "checkdots":
+      return { ...base, colorMode: "category", colorField: "group", categories: CLUSTER_COLORS, size: [4.5, 4.5], outline: "rgba(0,0,0,0.6)" };
     case "plan_pocket":
       return { ...base, visible: true, color: "#1c1c1c", size: [2.5, 2.5], dash: true };
   }

@@ -142,7 +142,7 @@ function Kpi({ label, value }: { label: string; value: number }) {
   );
 }
 
-function ChartCard({ title, note, name, help, children }: { title: string; note?: string; name: string; help?: string; children: React.ReactNode }) {
+export function ChartCard({ title, note, name, help, children }: { title: string; note?: string; name: string; help?: string; children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   return (
     <section className="frame p-2" ref={ref} aria-label={title}>

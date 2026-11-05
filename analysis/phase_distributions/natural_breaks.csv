@@ -1,0 +1,15 @@
+stretch,classes,gvf,sector,share,divisions,from_km,to_km
+Frontier-A,3,0.84,northern,33,24,77,180
+Frontier-A,3,0.84,central,43,34,8,77
+Frontier-A,3,0.84,southern,24,17,-76,7
+A-B,3,0.86,northern,47,23,43,185
+A-B,3,0.86,central,29,24,-33,42
+A-B,3,0.86,southern,24,17,-182,-34
+B-C,3,0.84,northern,43,16,44,144
+B-C,3,0.84,central,34,27,-16,42
+B-C,3,0.84,southern,23,24,-115,-17
+C-D,2,0.8,northern,58,32,-43,123
+C-D,2,0.8,southern,42,19,-193,-45
+D-E,3,0.85,northern,22,15,-46,30
+D-E,3,0.85,central,46,19,-111,-48
+D-E,3,0.85,southern,31,17,-199,-113

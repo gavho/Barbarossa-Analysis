@@ -45,6 +45,8 @@ NOISE_OFFSET_KM = 20  # differences below this are within digitizing + georefere
 NOISE_BEARING_DEG = 10
 MIN_COMMON_KM = 100  # pairs sharing less than this are not comparable
 CLUSTERINGS = {"DV": "DirectionalVector_Cluster_Avg_Paths", "GEO": "Geometric_Cluster_avg_paths"}
+STAYED_BEHIND_KM = 200  # start-to-end; most divisions moved 400-750 km, the 7 below this barely left the frontier zone
+ADV_K = 4  # one group per planned line; balanced (7/11/12/14) once the stayed-behind divisions are set aside
 CITIES = {"Lviv": (49.84, 24.03), "Rivne": (50.62, 26.25), "Zhytomyr": (50.25, 28.66), "Kyiv": (50.45, 30.52),
           "Vinnytsia": (49.23, 28.47), "Uman": (48.75, 30.22)}
 
@@ -283,6 +285,156 @@ def reconstruction_check(f, flines, clusters, clustering):
     return pd.DataFrame(rows)
 
 
+def displacement(line):
+    return math.dist(line.coords[0], line.coords[-1])
+
+
+def advancing_clusters(f, flines, k=ADV_K):
+    """The recommended alternative to the published 5 clusters: set aside divisions whose start-to-end displacement is
+    under STAYED_BEHIND_KM, then the original DV method (phase_clusters.cluster_dv: k-means on end point + centroid,
+    random_state=42) on the rest, in km. Numbers groups north to south by end point and sets f["DV4"] (NaN = stayed
+    behind). Returns ({group: average path}, [stayed-behind keys])."""
+    import phase_clusters as pc  # imported here: phase_clusters imports this module
+
+    keys = [key for key, l in flines.items() if displacement(l) >= STAYED_BEHIND_KM]
+    behind = [key for key in flines if key not in keys]
+    labels, _ = pc.cluster_dv([dense(flines[key]) for key in keys], k)
+    order = sorted(set(labels), key=lambda g: -np.mean([flines[keys[i]].coords[-1][1] for i in np.where(labels == g)[0]]))
+    group = {key: order.index(g) for key, g in zip(keys, labels)}
+    f["DV4"] = [group.get(key, np.nan) for key in zip(f.Nation, f.Branch, f.Num_Name)]
+    return {g: average_line([flines[key] for key in keys if group[key] == g]) for g in range(k)}, behind
+
+
+def cluster_count(flines):
+    """Evidence for the number of clusters: silhouette and group sizes for k = 2-6, with every division and with the
+    stayed-behind divisions set aside, for both methods."""
+    import phase_clusters as pc
+    from sklearn.cluster import AgglomerativeClustering
+    from sklearn.metrics import silhouette_score
+
+    rows = []
+    for scope in ("all divisions", f"moved >= {STAYED_BEHIND_KM} km"):
+        paths = [dense(l) for l in flines.values() if scope == "all divisions" or displacement(l) >= STAYED_BEHIND_KM]
+        X = np.array([[*p[-1], *p.mean(axis=0)] for p in paths])
+        D = pc.hausdorff_matrix(paths)
+        for k in range(2, 7):
+            dv, _ = pc.cluster_dv(paths, k)
+            geo = AgglomerativeClustering(n_clusters=k, metric="precomputed", linkage="average").fit_predict(D)
+            rows.append({"divisions": scope, "n": len(paths), "k": k,
+                         "DV_silhouette": round(float(silhouette_score(X, dv)), 2), "DV_sizes": "/".join(map(str, sorted(np.bincount(dv)))),
+                         "GEO_silhouette": round(float(silhouette_score(D, geo, metric="precomputed")), 2),
+                         "GEO_sizes": "/".join(map(str, sorted(np.bincount(geo))))})
+    return pd.DataFrame(rows)
+
+
+PLANNED_NAMES = {"6A": "6th Army", "III PzKo": "III Panzer Corps", "PzGp1(-)": "Panzer Group 1 (less III Corps)", "17A": "17th Army"}
+
+
+def verdict(r):
+    """Badge and one plain sentence for a planned-vs-realized pair (a row of compare()'s pairs table)."""
+    signed, gap = r["mean_signed_offset_km"], r["mean_abs_offset_km"]
+    badge = "on plan" if gap <= NOISE_OFFSET_KM else "near plan" if gap <= 50 else "off plan"
+    if gap <= NOISE_OFFSET_KM:
+        ran = f"stayed within mapping error of the plan (on average {round(gap)} km off)"
+    elif abs(signed) >= 0.6 * gap:  # mostly on one side
+        ran = f"ran on average {round(abs(signed))} km {'north' if signed > 0 else 'south'} of the plan"
+    else:
+        ran = f"wove on average {round(gap)} km either side of the plan"
+    bd = r["straight_bearing_diff"]
+    heading = "heading the same way" if abs(bd) <= NOISE_BEARING_DEG else f"heading {abs(bd)}° further {'south' if bd > 0 else 'north'}"
+    who = ("Most of its divisions belong to that formation." if r["membership_agrees"]
+           else f"Most of {PLANNED_NAMES[r['planned']]}'s own divisions ended up in another group.")
+    return badge, (f"{PLANNED_NAMES[r['planned']]}: the matched group {ran}, inside the 50 km corridor for "
+                   f"{r['realized_within_50km_pct']}% of the way, ended {r['end_gap_km']} km from the planned end point, {heading}. {who}")
+
+
+def plan_match_export(runs_out, behind, names):
+    """app/src/data/plan_match.json: per clustering, each planned line with its matched group, verdict, both lines in
+    lon/lat and the signed-offset profile."""
+    import phase_clusters as pc
+
+    inv = Transformer.from_crs(AEQD, 4326, always_xy=True)
+    ll = lambda line: [[round(v, 4) for v in inv.transform(x, y)] for x, y in line.coords]
+    out = {}
+    for clustering, (planned, clusters, pairs, profiles, members) in runs_out.items():
+        rows, feats = [], []
+        for r in pairs.to_dict("records"):
+            badge, text = verdict(r)
+            s, off, cid = profiles[r["planned"]]
+            size = int(members.loc[members.cluster == cid, "formations"].iloc[0])
+            rows.append({"planned": r["planned"], "name": PLANNED_NAMES[r["planned"]], "cluster": int(cid), "divisions": size,
+                         "badge": badge, "sentence": text, "mean_offset_km": r["mean_signed_offset_km"], "mean_gap_km": r["mean_abs_offset_km"],
+                         "within50_pct": r["realized_within_50km_pct"], "end_gap_km": r["end_gap_km"], "bearing_diff": r["straight_bearing_diff"],
+                         "membership_agrees": bool(r["membership_agrees"]), "profile": [[int(a), round(float(b))] for a, b in zip(s, off)],
+                         "planned_line": ll(planned[r["planned"]]), "realized_line": ll(clusters[cid])})
+            for kind, line in (("planned", planned[r["planned"]]), ("realized", clusters[cid])):
+                feats.append({"type": "Feature", "id": len(feats), "properties": {"kind": kind, "planned": r["planned"], "name": PLANNED_NAMES[r["planned"]],
+                              "cluster": int(cid), "badge": badge}, "geometry": {"type": "LineString", "coordinates": ll(line)}})
+        out[clustering] = {"pairs": rows, "unmatched": sorted(int(c) for c in set(clusters) - set(pairs.cluster)),
+                           "lines": {"type": "FeatureCollection", "features": feats}}
+    out["stayed_behind"] = sorted(pc.label(k, names) for k in behind)
+    out["towns"] = {n: [lon, lat] for n, (lat, lon) in CITIES.items()}
+    (ROOT / "app" / "src" / "data" / "plan_match.json").write_text(__import__("json").dumps(out, separators=(",", ":")), encoding="utf8")
+
+
+def draw_plan_maps(planned, clusters, pairs, profiles, path, title):
+    """Paper figure, black and white: one panel per planned line (south to north) with the 50 km corridor around it
+    (grey), the planned line (black, dashed), its matched group's path (black, solid), and underneath how far north (+)
+    or south (-) the group ran along the way, with the +-20 km mapping-error band."""
+    import textwrap
+
+    plt.rcParams.update({"font.family": ["Arial", "DejaVu Sans"], "font.size": 8, "pdf.fonttype": 42})
+    rows = pairs.to_dict("records")
+    xs = [c[0] for l in [*planned.values(), *clusters.values()] for c in l.coords]
+    ys = [c[1] for l in [*planned.values(), *clusters.values()] for c in l.coords]
+    city_xy = {n: _to_km.transform(lon, lat) for n, (lat, lon) in CITIES.items()}
+    # Lay out in inches so the equal-aspect map, its caption and its strip stack without gaps or overlaps.
+    W, panel_w = 10.0, 4.4
+    map_h = panel_w * (max(ys) - min(ys) + 40) / (max(xs) - min(xs) + 40)
+    title_h, caption_h, strip_h, label_h, top, bottom = 0.3, 0.5, 0.55, 0.45, 0.45, 0.4
+    row_h = title_h + map_h + caption_h + strip_h + label_h
+    H = top + 2 * row_h + bottom
+    fig = plt.figure(figsize=(W, H))
+    for i, r in enumerate(rows):
+        col, row = i % 2, i // 2
+        left = (0.4 + col * (panel_w + 0.8)) / W
+        map_top = H - top - row * row_h - title_h
+        ax = fig.add_axes([left, (map_top - map_h) / H, panel_w / W, map_h / H])
+        bx = fig.add_axes([left, (map_top - map_h - caption_h - strip_h) / H, panel_w / W, strip_h / H])
+        p, cid = planned[r["planned"]], clusters[r["cluster"]]
+        corridor = p.buffer(50)
+        for poly in getattr(corridor, "geoms", [corridor]):
+            ax.fill(*poly.exterior.xy, color="0.88", lw=0)
+        ax.plot(*p.xy, color="black", lw=2, ls=(0, (5, 2)))
+        ax.plot(*cid.xy, color="black", lw=1.6)
+        for n, (x, y) in city_xy.items():
+            ax.plot(x, y, "o", color="0.5", ms=2)
+            ax.text(x + 5, y + 5, n, fontsize=6.5, color="0.35", style="italic")
+        ax.set(xlim=(min(xs) - 20, max(xs) + 20), ylim=(min(ys) - 20, max(ys) + 20), aspect="equal", xticks=[], yticks=[])
+        badge, text = verdict(r)
+        ax.set_title(f"{PLANNED_NAMES[r['planned']]} — {badge}", fontsize=9, fontweight="bold", loc="left")
+        caption = text.split(": ", 1)[1]
+        ax.text(0, -0.02, "\n".join(textwrap.wrap(caption[0].upper() + caption[1:], 95)), transform=ax.transAxes, fontsize=6.5, va="top")
+        s, off, _ = profiles[r["planned"]]
+        bx.axhspan(-NOISE_OFFSET_KM, NOISE_OFFSET_KM, color="0.88", lw=0)
+        bx.axhline(0, color="black", lw=0.6)
+        bx.plot(s, off, color="black", lw=1.2)
+        bx.set_ylim(-110, 110)
+        bx.set_yticks([-100, 0, 100], ["100 S", "0", "100 N"], fontsize=6)
+        bx.tick_params(axis="x", labelsize=6)
+        bx.set_xlabel("km along the planned line", fontsize=6.5, labelpad=1)
+    from matplotlib.lines import Line2D
+    from matplotlib.patches import Patch
+    fig.legend(handles=[Line2D([], [], color="black", lw=2, ls=(0, (5, 2)), label="Planned line of advance"),
+                        Line2D([], [], color="black", lw=1.6, label="Matched group's average path"),
+                        Patch(color="0.88", label="Within 50 km of the plan (map) / ±20 km mapping error (strip)")],
+               loc="lower center", ncol=3, frameon=False, fontsize=7.5)
+    fig.suptitle(title, fontsize=10)
+    fig.savefig(path.with_suffix(".pdf"))
+    fig.savefig(path.with_suffix(".png"), dpi=200)
+    plt.close(fig)
+
+
 # ---------------------------------------------------------------- analysis
 def membership_table(f, clustering):
     rows = []
@@ -507,7 +659,11 @@ def main():
     all_pairs, all_segs, all_members, all_spacing, all_costs, all_checks = [], [], [], [], [], []
     cols = ["planned", "cluster", "common_km", "frechet_km", "mean_signed_offset_km", "mean_abs_offset_km",
             "realized_within_50km_pct", "start_gap_km", "end_gap_km", "straight_bearing_diff", "unit_best_cluster", "membership_agrees"]
-    runs = [(k, cluster_lines(n)) for k, n in CLUSTERINGS.items()] + [("UNIT", None)]
+    dv4, behind = advancing_clusters(f, flines)
+    runs = [(k, cluster_lines(n)) for k, n in CLUSTERINGS.items()] + [("DV4", dv4), ("UNIT", None)]
+    runs_out = {}
+    titles = {"DV": "Planned lines of advance vs the published clusters (5, directional vector)",
+              "DV4": f"Planned lines of advance vs 4 groups of advancing divisions ({len(behind)} that moved under {STAYED_BEHIND_KM} km set aside)"}
     for clustering, clusters in runs:
         if clustering == "UNIT":
             clusters, counts = unit_lines(f, flines)
@@ -515,9 +671,10 @@ def main():
             print(f"\nformations behind each unit line: {counts}")
         else:
             members, pairing = membership_table(f, clustering), None
-            check = reconstruction_check(f, flines, clusters, clustering)
-            all_checks.append(check)
-            assert check.mean_point_gap_km.max() < NOISE_OFFSET_KM, f"{clustering}: member paths no longer reproduce the stored average paths\n{check}"
+            if clustering != "DV4":  # DV4 is built here from its members, so there is no stored path to reproduce
+                check = reconstruction_check(f, flines, clusters, clustering)
+                all_checks.append(check)
+                assert check.mean_point_gap_km.max() < NOISE_OFFSET_KM, f"{clustering}: member paths no longer reproduce the stored average paths\n{check}"
             all_members.append(members)
         pairing, cost, pairs, segs, profiles, fits = compare(planned, clusters, members, clustering, pairing)
         all_pairs.append(pairs)
@@ -525,6 +682,9 @@ def main():
         if cost is not None:
             all_costs.append(cost.round(0).assign(clustering=clustering).reset_index().rename(columns={"index": "planned"}))
         all_spacing.append(spacing(planned, clusters, pairing).assign(clustering=clustering))
+        if clustering in titles:
+            runs_out[clustering] = (planned, clusters, pairs, profiles, members)
+            draw_plan_maps(planned, clusters, pairs, profiles, OUT / f"plan_vs_actual_{clustering}", titles[clustering])
         if clustering in ("DV", "UNIT"):
             stem = "frontier_loa_comparison" if clustering == "DV" else "frontier_loa_units"
             draw(planned, clusters, pairing, profiles, fits, OUT / stem, clustering)
@@ -536,6 +696,11 @@ def main():
     pd.concat(all_spacing).to_csv(OUT / "spacing.csv", index=False)
     pd.concat(all_costs).to_csv(OUT / "frechet_matrix.csv", index=False)
     pd.concat(all_checks).to_csv(OUT / "reconstruction_check.csv", index=False)
+    import phase_clusters as pc
+    plan_match_export(runs_out, behind, pc.unit_names())
+    counts = cluster_count(flines)
+    counts.to_csv(OUT / "cluster_count.csv", index=False)
+    print("\nHow many clusters?\n" + counts.to_string(index=False))
     print(f"\nWrote {OUT}")
 
 

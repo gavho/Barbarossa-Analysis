@@ -13,7 +13,8 @@ paths separately within each stretch between the AGS phase lines and connect the
 3. The pieces in each stretch are clustered into 4 groups, using the two methods of the original OP-Barbarossa scripts:
    - geometric: symmetric Hausdorff distance, average-linkage agglomerative clustering
    - directional vector (DV): k-means on end point + centroid, `random_state=42`
-   Clusters are numbered 0–3 from north to south, so ids read alike in every stretch.
+   Clusters in the first stretch are numbered 0–3 from north to south; in each later stretch a cluster takes the number of
+   the previous stretch's cluster it shares most divisions with, so one number (and map colour) follows one group.
 4. Each cluster gets an average path (the paper's 50-point average), a start→end bearing and length, and its directness.
 5. Stretches are linked by the divisions they share (`transitions.csv`). A *split* is a division that did not follow the
    majority of its cluster into the next stretch. `in_both_methods` marks splits that both clusterings find; trust those.
