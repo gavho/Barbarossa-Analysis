@@ -33,6 +33,7 @@ import frontier_vectors from "./frontier_vectors.json";
 import leningrad_vectors from "./leningrad_vectors.json";
 import smolensk_vectors from "./smolensk_vectors.json";
 import typhoon_vectors from "./typhoon_vectors.json";
+import phase_clusters from "./phase_clusters.json";
 
 export type FC = FeatureCollection;
 
@@ -68,6 +69,12 @@ export interface Dataset {
 
 /** Static layers that never come from AGOL refresh. */
 export const COUNTRIES = countries as unknown as FC;
+export interface PhaseSplit {
+  method: "DV" | "GEO"; from_stretch: string; from_cluster: number; group_went_to: number; division_went_to: number;
+  division: string; group_size: number;
+}
+/** Clusters per stretch between AGS phase lines (analysis/phase_clusters.py); splits are those both methods find. */
+export const PHASES = phase_clusters as unknown as { stretches: string[]; average_paths: FC; pieces: FC; splits: PhaseSplit[] };
 export const MILESTONES = milestones as unknown as Record<"AGS_PhaseLines" | "AGS_AdvanceLines" | "AGS_SmallPocketCOA", FC>;
 
 const fc = (x: unknown) => x as FC;

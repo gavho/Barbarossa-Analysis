@@ -4,6 +4,8 @@ import { set, unitKey, useStore } from "@/state/store";
 
 const TITLES: Record<string, (p: Record<string, unknown>) => string> = {
   points: (p) => `${p.Num_Name} ${p.Branch_Type ?? ""} ${p.Unit_Type ?? ""}`,
+  phaseavg: (p) => `${p.method} cluster ${p.cluster} · ${p.stretch} · ${p.divisions} divisions`,
+  phasepieces: (p) => `${p.division} · ${p.stretch}`,
   dvvec: (p) => `DV cluster ${p.Cluster_ID}: ${p.Vectors} vector(s)`,
   geovec: (p) => `Geometric cluster ${p.Cluster_ID}: ${p.Vectors} vector(s)`,
   paths: (p) => `${p.Nation} ${p.Num_Name} ${p.Branch ?? ""} · ${p.Start_Date} → ${p.End_Date}`,

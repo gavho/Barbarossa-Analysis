@@ -6,7 +6,8 @@ import { timeWindow, type PageId, type RegionId } from "@/config/regions";
 import type { Filters } from "@/map/expressions";
 
 export type Theme = "tactical" | "period";
-export type RightTab = "charts" | "table" | "info" | "days" | "plan" | "oob" | "vectors";
+export type RightTab = "charts" | "table" | "info" | "days" | "plan" | "oob" | "vectors" | "phases";
+export interface PhaseView { method: "DV" | "GEO"; stretch: string } // stretch "all" or a name like "A-B"
 
 export interface View { center: [number, number]; zoom: number; bearing: number; pitch: number }
 export interface Step { title: string; caption: string; date: string; mode: Mode; view: View | null }
@@ -43,6 +44,7 @@ export interface State {
   presenting: { region: RegionId; step: number } | null;
   userLayers: UserLayer[];
   data: Dataset;
+  phase: PhaseView;
   view: View | null;
   toasts: Toast[];
 }
@@ -71,6 +73,7 @@ export const initialState: State = {
   presenting: null,
   userLayers: [],
   data: EMBEDDED,
+  phase: { method: "DV", stretch: "all" },
   view: null,
   toasts: [],
 };

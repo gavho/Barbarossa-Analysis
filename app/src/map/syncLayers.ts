@@ -1,12 +1,31 @@
 import type { GeoJSONSource, LayerSpecification, Map as MLMap } from "maplibre-gl";
-import { COUNTRIES, MILESTONES, type FC } from "@/data";
+import { COUNTRIES, MILESTONES, PHASES, type FC } from "@/data";
 import { HEAT_RAMP, layersFor, type LayerDef, type LayerId, type LayerStyle } from "@/config/presets";
 import { styleOf, type State } from "@/state/store";
 import { BASEMAPS, FONT } from "./basemaps";
 import { colorExpr, layerFilter, sizeExpr } from "./expressions";
 
 /** Source data for each app layer on the current page. */
+const phaseCache = new Map<string, FC>();
+/** Phase layers for the chosen method and stretch; pieces take that method's cluster id as `cluster`. Cached so the map
+ * only gets new data when the choice changes. */
+function phaseData(s: State, id: "phaseavg" | "phasepieces"): FC {
+  const { method, stretch } = s.phase;
+  const key = `${id}|${method}|${stretch}`;
+  if (!phaseCache.has(key)) {
+    const src = id === "phaseavg" ? PHASES.average_paths : PHASES.pieces;
+    const features = src.features
+      .filter((f) => stretch === "all" || f.properties?.stretch === stretch)
+      .filter((f) => id === "phasepieces" || f.properties?.method === method)
+      .map((f) => (id === "phasepieces" ? { ...f, properties: { ...f.properties, cluster: f.properties?.[`${method}_cluster`] } } : f))
+      .filter((f) => f.properties?.cluster !== null && f.properties?.cluster !== undefined);
+    phaseCache.set(key, { type: "FeatureCollection", features });
+  }
+  return phaseCache.get(key)!;
+}
+
 export function sourceData(s: State, id: LayerId): FC | null {
+  if (id === "phaseavg" || id === "phasepieces") return phaseData(s, id);
   if (id === "plan_phase") return MILESTONES.AGS_PhaseLines;
   if (id === "plan_advance") return MILESTONES.AGS_AdvanceLines;
   if (id === "plan_pocket") return MILESTONES.AGS_SmallPocketCOA;
@@ -62,7 +81,7 @@ function specs(def: LayerDef, st: LayerStyle, s: State, src: string): LayerSpeci
   if (label && st.labels !== false && (st.labels || def.id === "areas")) {
     out.push({ ...base, id: `${def.id}-labels`, type: "symbol",
       layout: { ...layout, "symbol-placement": "line", "text-field": label as never, "text-font": FONT, "text-size": 11, "text-letter-spacing": 0.05,
-        ...(def.id.endsWith("vec") ? { "text-size": 22, "symbol-spacing": 70, "text-keep-upright": false, "text-allow-overlap": true } : {}) },
+        ...(def.id.endsWith("vec") || def.id === "phaseavg" ? { "text-size": 22, "symbol-spacing": 70, "text-keep-upright": false, "text-allow-overlap": true } : {}) },
       paint: { "text-color": cssVar("--foreground"), "text-halo-color": cssVar("--background"), "text-halo-width": 1.5 } });
   }
   return out;
@@ -74,7 +93,7 @@ function labelText(id: LayerId): unknown {
   if (id === "dv" || id === "geo") return ["case", ["==", ["%", ["to-number", ["get", "Day_Index"], 0], 7], 1], ["slice", ["to-string", ["get", "Date"]], 5], ""];
   if (id === "plan_phase") return ["concat", "LINE ", ["upcase", ["get", "line_id"]]];
   if (id === "areas") return ["upcase", ["get", "Region"]];
-  if (id === "dvvec" || id === "geovec") return "›"; // arrowheads show the direction of travel
+  if (id === "dvvec" || id === "geovec" || id === "phaseavg") return "›"; // arrowheads show the direction of travel
   return null;
 }
 
@@ -195,6 +214,6 @@ export function syncLayers(map: MLMap, s: State) {
 
 /** Layer ids that respond to clicks, top-most first. */
 export function clickableLayers(map: MLMap): string[] {
-  const ids = ["unit-points", "points", "paths", "dvvec", "geovec", "dv", "geo", "ellipses", "plan_phase", "plan_advance", "plan_pocket", "areas"];
+  const ids = ["unit-points", "points", "paths", "phaseavg", "phasepieces", "dvvec", "geovec", "dv", "geo", "ellipses", "plan_phase", "plan_advance", "plan_pocket", "areas"];
   return ids.filter((id) => map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== "none");
 }

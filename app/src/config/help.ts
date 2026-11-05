@@ -109,6 +109,26 @@ export const HELP: Record<string, { title: string; body: string }> = {
     title: "Division days",
     body: "Days each division was recorded active, split by posture, from the project's division_days tables on ArcGIS Online. A recount from the current points layer (October 2026) does not reproduce these totals, so treat them as provisional.",
   },
+  phaseClusters: {
+    title: "Clusters per phase stretch",
+    body: "Each Wehrmacht/SS division path is cut where it crosses each AGS phase line (lines extended straight north and south), giving one piece per stretch: Frontier–A, A–B, B–C, C–D, D–E. Pieces under 25 km are dropped. The pieces in each stretch are clustered into 4 groups with the same two methods as the whole-period clusters, then the stretches are linked by the divisions they share. Clusters are numbered 0–3 from north to south in every stretch.",
+  },
+  phaseavg: {
+    title: "Phase cluster paths",
+    body: "The average path of each cluster within one stretch between phase lines (each member piece resampled to 50 points, averaged point by point), with arrows in the direction of travel. Colour = cluster number, 0 northernmost.",
+  },
+  phasepieces: {
+    title: "Division pieces",
+    body: "Each division's path between two consecutive phase lines, coloured by the cluster it falls in for the chosen method.",
+  },
+  silhouette: {
+    title: "Silhouette",
+    body: "How distinct the clusters in this stretch are, from −1 to 1: for each piece, how much closer it is to its own cluster than to the next one, averaged. 0.25–0.5 is moderately distinct; above 0.5 well separated. The whole-period clusters score 0.28–0.46.",
+  },
+  split: {
+    title: "Splits",
+    body: "A division that did not go on with most of its cluster into the next stretch. Only splits that both clustering methods find are listed; a split found by one method alone may just be a division near a group boundary switching sides.",
+  },
   planVsActual: {
     title: "Phase-line crossings",
     body: "For each planned phase line, only division points within the line's north–south extent are used. A point has reached the line when it lies east of it or no more than the reach distance (default 20 km) short of it. Lead = first day any of them had reached it; main body = first day at least half of that day's points had. Late/early compares the main-body day with the end of the planned window.",

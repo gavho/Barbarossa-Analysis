@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { HELP } from "@/config/help";
-import { REGION_LAYERS } from "@/config/presets";
+import { PHASE_LAYERS, REGION_LAYERS } from "@/config/presets";
 
 // Every component source as text (Vite feature; no Node types needed).
 const sources = import.meta.glob("./**/*.tsx", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
@@ -12,7 +12,7 @@ describe("help popovers", () => {
     expect(ids.filter((id) => !HELP[id])).toEqual([]);
   });
   it("every region layer and the Vectors panel's dynamic ids are explained", () => {
-    const layerIds = REGION_LAYERS.map((d) => (d.id.endsWith("vec") ? "vectors" : d.id));
+    const layerIds = [...REGION_LAYERS, ...PHASE_LAYERS].map((d) => (d.id.endsWith("vec") ? "vectors" : d.id));
     expect(layerIds.filter((id) => !HELP[id])).toEqual([]);
     for (const id of ["dv", "geo", "avgPath", "vectors"]) expect(HELP[id]).toBeTruthy();
   });

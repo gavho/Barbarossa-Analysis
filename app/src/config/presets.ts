@@ -3,7 +3,7 @@ import type { PageId } from "./regions";
 export type Mode = "instant" | "progressive";
 export type LayerKind = "circle" | "line" | "fill" | "heatmap";
 export type LayerId =
-  | "areas" | "ellipses" | "heat" | "geo" | "dv" | "geovec" | "dvvec" | "paths" | "points"
+  | "areas" | "ellipses" | "heat" | "geo" | "dv" | "geovec" | "dvvec" | "phaseavg" | "phasepieces" | "paths" | "points"
   | "plan_phase" | "plan_advance" | "plan_pocket";
 
 /** How the timeline filters a layer: by mode (day), always one day (exact), a start..end span, started-by, or not at all. */
@@ -70,8 +70,15 @@ export const PLAN_LAYERS: LayerDef[] = [
     fields: ["line_id", "name", "towns", "planned_date", "date_start", "date_end", "units", "notes"] },
 ];
 
+export const PHASE_LAYERS: LayerDef[] = [
+  { id: "phasepieces", title: "Phase · Division Pieces", kind: "line", time: "none", cluster: "none", fields: ["division", "nation", "stretch", "km", "cluster"] },
+  { id: "phaseavg", title: "Phase · Cluster Paths", kind: "line", time: "none", cluster: "none",
+    fields: ["method", "stretch", "cluster", "divisions", "silhouette", "bearing", "loo_km", "directness"] },
+];
+
 export const layersFor = (page: PageId, plan: boolean): LayerDef[] =>
-  page === "home" ? HOME_LAYERS : [...REGION_LAYERS, ...(page === "frontier" && plan ? PLAN_LAYERS : [])];
+  page === "home" ? HOME_LAYERS
+    : [...REGION_LAYERS, ...(page === "frontier" ? PHASE_LAYERS : []), ...(page === "frontier" && plan ? PLAN_LAYERS : [])];
 
 export const BRANCH_COLORS: Category[] = [
   { value: "Armored", color: "#B55454" },
@@ -144,6 +151,10 @@ export function preset(page: PageId, mode: Mode, id: LayerId): LayerStyle {
     case "geovec":
     case "dvvec":
       return { ...base, colorMode: "category", colorField: "Cluster_ID", categories: CLUSTER_COLORS, size: [3.4, 3.4], labels: true };
+    case "phaseavg":
+      return { ...base, colorMode: "category", colorField: "cluster", categories: CLUSTER_COLORS, size: [3.4, 3.4], labels: true };
+    case "phasepieces":
+      return { ...base, opacity: 0.55, colorMode: "category", colorField: "cluster", categories: CLUSTER_COLORS, size: [1.2, 1.2] };
     case "plan_pocket":
       return { ...base, visible: true, color: "#1c1c1c", size: [2.5, 2.5], dash: true };
   }

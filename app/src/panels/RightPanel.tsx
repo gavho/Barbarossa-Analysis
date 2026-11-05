@@ -1,4 +1,4 @@
-import { BarChart3, CalendarDays, Info, Network, Route, Spline, Table2 } from "lucide-react";
+import { BarChart3, CalendarDays, GitBranch, Info, Network, Route, Spline, Table2 } from "lucide-react";
 import { set, useStore, type RightTab } from "@/state/store";
 import { FluidTabs, type TabItem } from "@/ui/FluidTabs";
 import { AttrTable } from "./AttrTable";
@@ -8,6 +8,7 @@ import { FeatureInfo } from "./FeatureInfo";
 import { Oob } from "./Oob";
 import { PlanVsActual } from "./PlanVsActual";
 import { Vectors } from "./Vectors";
+import { Phases } from "./Phases";
 
 export function RightPanel() {
   const page = useStore((s) => s.page);
@@ -21,7 +22,10 @@ export function RightPanel() {
       { id: "oob" as const, label: "Units", icon: <Network size={15} /> },
       { id: "vectors" as const, label: "Vectors", icon: <Spline size={15} /> },
     ] : []),
-    ...(page === "frontier" ? [{ id: "plan" as const, label: "Plan", icon: <Route size={15} /> }] : []),
+    ...(page === "frontier" ? [
+      { id: "plan" as const, label: "Plan", icon: <Route size={15} /> },
+      { id: "phases" as const, label: "Phases", icon: <GitBranch size={15} /> },
+    ] : []),
   ];
   const active = tabs.some((t) => t.id === tab) ? tab : "charts";
 
@@ -36,6 +40,7 @@ export function RightPanel() {
         {active === "oob" && <Oob />}
         {active === "plan" && <PlanVsActual />}
         {active === "vectors" && <Vectors />}
+        {active === "phases" && <Phases />}
       </div>
     </div>
   );

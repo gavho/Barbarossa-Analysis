@@ -241,6 +241,13 @@ def main():
     check.to_csv(OUT / "validation.csv", index=False)
     for nm, feats in (("pieces", piece_feats), ("average_paths", avg_feats)):
         (OUT / f"{nm}.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": feats}, separators=(",", ":")), encoding="utf8")
+    # Compact copy for the app's Phases tab: average paths with their members, the pieces, and the corroborated splits.
+    app = {"stretches": [s for s in stretches if any(f["properties"]["stretch"] == s for f in avg_feats)],
+           "average_paths": {"type": "FeatureCollection", "features": [
+               {**f, "id": i, "properties": {**f["properties"], "members": r["members"]}} for i, (f, r) in enumerate(zip(avg_feats, cluster_rows))]},
+           "pieces": {"type": "FeatureCollection", "features": [{**f, "id": i} for i, f in enumerate(piece_feats)]},
+           "splits": json.loads(sp[sp.in_both_methods].to_json(orient="records")) if len(sp) else []}
+    (ROOT / "app" / "src" / "data" / "phase_clusters.json").write_text(json.dumps(app, separators=(",", ":")), encoding="utf8")
     draw(pieces, assign, stretches, lines, avg_feats)
     print(f"\nWrote {OUT}")
 

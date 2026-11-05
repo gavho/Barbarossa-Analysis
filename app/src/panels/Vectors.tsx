@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 
 type Kind = "dv" | "geo";
 const COMPASS = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
-const compass = (d: number) => COMPASS[Math.round(d / 22.5) % 16];
+export const compass = (d: number) => COMPASS[Math.round(d / 22.5) % 16];
 const color = (cid: number) => CLUSTER_COLORS.find((c) => c.value === cid)?.color ?? "#888";
 const signed = (n: number) => (n > 0 ? `+${n}` : `${n}`);
 
