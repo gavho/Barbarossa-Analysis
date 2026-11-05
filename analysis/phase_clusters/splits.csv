@@ -1,0 +1,92 @@
+method,from_stretch,from_cluster,group_went_to,division_went_to,division,group_size,in_both_methods
+DV,Frontier-A,0,0,1,111. Infanterie-Division,16,True
+DV,Frontier-A,1,1,0,11. Panzer-Division,10,False
+DV,Frontier-A,1,1,0,113. Infanterie-Division,10,False
+DV,Frontier-A,1,1,0,168. Infanterie-Division,10,False
+DV,Frontier-A,1,1,0,16. Infanterie-Division (mot.),10,False
+DV,Frontier-A,2,1,2,SS-Division (mot.) Wiking,11,True
+DV,Frontier-A,2,1,2,97. leichte Infanterie-Division (later 97. Jaeger),11,False
+DV,Frontier-A,2,1,2,125. Infanterie-Division,11,False
+DV,Frontier-A,2,1,0,60. Infanterie-Division (mot.),11,True
+DV,Frontier-A,3,2,1,454. Sicherungs-Division,9,False
+DV,A-B,0,1,2,11. Panzer-Division,19,True
+DV,A-B,0,1,0,56. Infanterie-Division,19,False
+DV,A-B,0,1,0,62. Infanterie-Division,19,False
+DV,A-B,0,1,0,79. Infanterie-Division,19,False
+DV,A-B,0,1,0,298. Infanterie-Division,19,False
+DV,A-B,0,1,2,16. Infanterie-Division (mot.),19,True
+DV,A-B,0,1,2,60. Infanterie-Division (mot.),19,True
+DV,A-B,1,2,1,71. Infanterie-Division,15,False
+DV,A-B,1,2,1,111. Infanterie-Division,15,False
+DV,A-B,1,2,1,262. Infanterie-Division,15,False
+DV,A-B,1,2,1,296. Infanterie-Division,15,False
+DV,A-B,2,3,2,SS-Division (mot.) Wiking,9,False
+DV,B-C,1,1,0,98. Infanterie-Division,16,False
+DV,B-C,1,1,0,111. Infanterie-Division,16,True
+DV,B-C,1,1,0,113. Infanterie-Division,16,False
+DV,B-C,1,1,0,168. Infanterie-Division,16,False
+DV,B-C,1,1,0,262. Infanterie-Division,16,True
+DV,B-C,1,1,0,294. Infanterie-Division,16,False
+DV,B-C,1,1,0,296. Infanterie-Division,16,True
+DV,B-C,2,2,1,SS-Division (mot.) Wiking,15,True
+DV,B-C,2,2,1,9. Panzer-Division,15,True
+DV,B-C,2,2,1,75. Infanterie-Division,15,True
+DV,B-C,2,2,1,132. Infanterie-Division,15,True
+DV,B-C,2,2,1,60. Infanterie-Division (mot.),15,True
+DV,B-C,3,3,2,94. Infanterie-Division,9,False
+DV,B-C,3,3,2,97. leichte Infanterie-Division (later 97. Jaeger),9,False
+DV,C-D,1,1,2,SS-Division (mot.) Leibstandarte SS Adolf Hitler,9,True
+DV,C-D,1,1,2,9. Panzer-Division,9,True
+DV,C-D,1,1,0,95. Infanterie-Division,9,True
+DV,C-D,1,1,0,132. Infanterie-Division,9,True
+DV,C-D,1,1,2,25. Infanterie-Division (mot.),9,False
+DV,C-D,2,3,2,11. Panzer-Division,11,False
+DV,C-D,2,3,2,16. Panzer-Division,11,False
+DV,C-D,2,3,0,9. Infanterie-Division,11,True
+DV,C-D,2,3,0,57. Infanterie-Division,11,True
+DV,C-D,2,3,0,68. Infanterie-Division,11,True
+DV,C-D,2,3,0,94. Infanterie-Division,11,True
+GEO,Frontier-A,1,0,1,SS-Division (mot.) Wiking,13,True
+GEO,Frontier-A,1,0,1,9. Panzer-Division,13,False
+GEO,Frontier-A,1,0,1,16. Panzer-Division,13,False
+GEO,Frontier-A,2,0,1,9. Infanterie-Division,14,False
+GEO,Frontier-A,2,0,1,57. Infanterie-Division,14,False
+GEO,Frontier-A,2,0,1,75. Infanterie-Division,14,False
+GEO,Frontier-A,2,0,1,111. Infanterie-Division,14,True
+GEO,Frontier-A,2,0,1,262. Infanterie-Division,14,False
+GEO,Frontier-A,2,0,1,297. Infanterie-Division,14,False
+GEO,Frontier-A,3,1,2,Wehrmacht 2 Infantry,18,False
+GEO,Frontier-A,3,1,0,60. Infanterie-Division (mot.),18,True
+GEO,Frontier-A,3,1,2,444. Sicherungs-Division,18,False
+GEO,A-B,0,0,1,11. Panzer-Division,19,True
+GEO,A-B,0,0,1,16. Infanterie-Division (mot.),19,True
+GEO,A-B,0,0,1,60. Infanterie-Division (mot.),19,True
+GEO,A-B,1,1,2,94. Infanterie-Division,24,False
+GEO,A-B,1,1,2,97. leichte Infanterie-Division (later 97. Jaeger),24,False
+GEO,A-B,1,1,2,100. leichte Infanterie-Division (later 100. Jaeger),24,False
+GEO,A-B,1,1,2,101. leichte Infanterie-Division (later 101. Jaeger),24,False
+GEO,A-B,1,1,2,125. Infanterie-Division,24,False
+GEO,A-B,1,1,2,257. Infanterie-Division,24,False
+GEO,A-B,1,1,2,1. Gebirgs-Division,24,False
+GEO,A-B,1,1,2,4. Gebirgs-Division,24,False
+GEO,B-C,1,1,0,SS-Division (mot.) Wiking,19,True
+GEO,B-C,1,1,0,9. Panzer-Division,19,True
+GEO,B-C,1,1,0,71. Infanterie-Division,19,False
+GEO,B-C,1,1,0,75. Infanterie-Division,19,True
+GEO,B-C,1,1,0,111. Infanterie-Division,19,True
+GEO,B-C,1,1,0,132. Infanterie-Division,19,True
+GEO,B-C,1,1,0,262. Infanterie-Division,19,True
+GEO,B-C,1,1,0,296. Infanterie-Division,19,True
+GEO,B-C,1,1,0,60. Infanterie-Division (mot.),19,True
+GEO,B-C,2,1,2,100. leichte Infanterie-Division (later 100. Jaeger),8,False
+GEO,B-C,2,1,2,101. leichte Infanterie-Division (later 101. Jaeger),8,False
+GEO,B-C,2,1,2,257. Infanterie-Division,8,False
+GEO,B-C,2,1,2,1. Gebirgs-Division,8,False
+GEO,C-D,0,1,2,SS-Division (mot.) Leibstandarte SS Adolf Hitler,9,True
+GEO,C-D,0,1,2,9. Panzer-Division,9,True
+GEO,C-D,0,1,0,95. Infanterie-Division,9,True
+GEO,C-D,0,1,0,132. Infanterie-Division,9,True
+GEO,C-D,1,2,0,9. Infanterie-Division,13,True
+GEO,C-D,1,2,0,57. Infanterie-Division,13,True
+GEO,C-D,1,2,0,68. Infanterie-Division,13,True
+GEO,C-D,1,2,0,94. Infanterie-Division,13,True

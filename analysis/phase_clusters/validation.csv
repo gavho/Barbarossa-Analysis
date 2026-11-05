@@ -1,0 +1,5 @@
+method,crs,formations,adjusted_rand_index
+DV,equidistant km,51,0.84
+GEO,equidistant km,51,0.68
+DV,Web Mercator,51,0.84
+GEO,Web Mercator,51,0.83
