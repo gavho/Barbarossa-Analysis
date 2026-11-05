@@ -25,8 +25,9 @@ A. ACTION ITEMS
 2. [GAVIN] Phase lines, simple analysis: share of troops within 10 km of each phase line or past it, on the planned date
    - Sorin: "simple reporting a proportion of troops that were within 10 kilometers or more past the phase line", giving
      numbers like 20%, 60%, 70% "on the date".
-   - Change needed: the app's reach distance defaults to 20 km; Sorin asked for 10 km. Make 10 km the default (or report
-     both), and produce a table of the share on each phase line's planned date, not just the day picked on the timeline.
+   - 10 km is already available: set the Plan tab's reach slider to 10 km (it resets to 20 km on reload).
+   - Still to do: read off the share on each phase line's planned date (pick that date on the timeline) and put the five
+     numbers in a table for the paper.
 
 3. [GAVIN] Phase lines, second analysis: "natural change analysis" (UNCLEAR)
    - Sorin said there should be two phase analyses, "the simple thing" and a "natural change analysis". It is unclear
@@ -71,6 +72,5 @@ B. STATUS OF ITEMS FROM 10-23-2026
 C. QUESTIONS TO RESOLVE
 =====================================================================
 - What is the "natural change analysis" (item A3)?
-- Is 10 km the threshold Sorin wants as the default, replacing 20 km?
 - Sorin's exact GitHub username, and whether a public Pages site is acceptable.
 - When is the next meeting? (Not in the surviving part of the transcript.)
