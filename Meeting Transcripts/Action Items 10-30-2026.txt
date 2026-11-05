@@ -1,0 +1,76 @@
+ACTION ITEMS - Gavin / Sorin meeting, 10-30-2026
+Source: Meeting Transcripts/10-30-2026.txt
+
+!! TRANSCRIPT IS INCOMPLETE. It jumps from 1:01 to 14:41, so about 13.5 minutes are missing. The analysis discussion
+before 14:41 may contain more items.
+
+=====================================================================
+A. ACTION ITEMS
+=====================================================================
+
+1. [GAVIN] Report, for each pair of lines: the average distance between them and the variance in bearing
+   - The pairs are Rob's ideal lines of operation vs the lines of operation our analysis reveals, both simplified to
+     straight vectors so their length, bearing and separation can be compared.
+   - Sorin asked for two numbers per pair: (A) the average distance between the lines, and (B) "kind of the variance and
+     bearing". Gavin said he has these.
+   - Where they already exist (analysis/loa_frontier/):
+       (A) average distance = mean_abs_offset_km in pairs.csv (the mean absolute gap every 10 km along the planned line).
+           Fréchet distance is the worst-case gap, not the average, so report it only as a supplement.
+       (B) bearing = bearing_diff per vector in segments.csv. Still to do: one summary per pair (mean and spread of the
+           bearing differences) in a single paper-ready table. The planned lines have only 3 vectors, so with this few
+           values the spread is a range, not a statistic; say so.
+   - Note: Sorin calls these Rob's lines, so the planned lines come from Rob (Kirchubel). Check the attribution in the
+     paper and README text that calls them "Sorin's milestones".
+
+2. [GAVIN] Phase lines, simple analysis: share of troops within 10 km of each phase line or past it, on the planned date
+   - Sorin: "simple reporting a proportion of troops that were within 10 kilometers or more past the phase line", giving
+     numbers like 20%, 60%, 70% "on the date".
+   - Change needed: the app's reach distance defaults to 20 km; Sorin asked for 10 km. Make 10 km the default (or report
+     both), and produce a table of the share on each phase line's planned date, not just the day picked on the timeline.
+
+3. [GAVIN] Phase lines, second analysis: "natural change analysis" (UNCLEAR)
+   - Sorin said there should be two phase analyses, "the simple thing" and a "natural change analysis". It is unclear
+     what the second one is (possibly the rate of change over time, i.e. how fast the share of units reaching each line
+     grew day by day). Confirm with Sorin before building.
+
+4. [SORIN] Email Rob to check the unit roster (divisions and their groups/corps)
+   - Gavin built it from Wikipedia's order-of-battle breakdowns; it hasn't been checked yet. Sorin: "work with what you
+     have for now, we'll change things if need be."
+   - The roster is agol/frontier_unit_names.csv.
+
+5. [GAVIN] Assess the feasibility of clustering each stretch between phase lines (do after items 1-3)
+   - Sorin's idea: instead of global clusters for the whole period, re-cluster the division paths separately within each
+     interval between phase lines. That gives a finer resolution and lets you reconstruct the flow of the battle phase by
+     phase, connecting the segments where possible.
+   - Gavin added that this could show which divisions split off from their groups in different phases.
+   - First estimate the effort ("how much energy that requires"), then test it if it makes sense.
+   - Note: this only works where phase lines exist (Frontier/AGS today), and each interval has fewer days, so a fixed
+     5 clusters may not suit every phase.
+
+6. [GAVIN] Publish the results on GitHub Pages and add Sorin as a collaborator
+   - Sorin wants to view and play with everything at gavho.github.io/Barbarossa-Analysis, kept private, with himself
+     added as a user. He spelled the username as "idea monger"; confirm the exact GitHub username.
+   - Caveat on "private": a GitHub Pages site can only be access-restricted on GitHub Enterprise Cloud. On a free or Pro
+     account the site is public even when the repository is private. Options: (a) keep the repo private and add Sorin as
+     a collaborator so he can download and open Barbarossa.html locally; (b) publish Pages publicly; (c) use an
+     Enterprise organization or another private host.
+   - Pages also needs an entry page: the app is Barbarossa.html at the repo root, so either add an index.html that links
+     to it or rename/copy it.
+
+=====================================================================
+B. STATUS OF ITEMS FROM 10-23-2026
+=====================================================================
+- Four black-and-white posture line charts: built (figures/posture/). They still need Hupy's/Sorin's review.
+- Intended vs realized lines of operation comparison: built (analysis/compare_loa.py, analysis/loa_frontier/), plus the
+  cluster vectors and explanations in the app (Vectors tab).
+- Unit roster: built; awaiting Rob's check (item A4).
+- Paper comments (author order, affiliation format, emails for Gavin and Rob): not covered in this transcript; check
+  whether they are still open.
+
+=====================================================================
+C. QUESTIONS TO RESOLVE
+=====================================================================
+- What is the "natural change analysis" (item A3)?
+- Is 10 km the threshold Sorin wants as the default, replacing 20 km?
+- Sorin's exact GitHub username, and whether a public Pages site is acceptable.
+- When is the next meeting? (Not in the surviving part of the transcript.)
