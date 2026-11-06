@@ -15,10 +15,10 @@ const STOPPED = "var(--muted-foreground)";
 const northFirst = (a: CheckGroup, b: CheckGroup) => b.lonlat[1] - a.lonlat[1];
 const coords = (c: unknown): number[][] => (typeof (c as unknown[])[0] === "number" ? [c as number[]] : (c as unknown[]).flatMap(coords));
 
-/** "northern 33% · central 43% · southern 24%" for the stretch whose name matches. */
+/** "near A 28% · midway 30% · near B 42%" for the stretch whose name matches. */
 function bunched(match: (stretch: string) => boolean) {
   const p = PHASE_PROFILES.profiles.find((x) => match(x.stretch));
-  return p ? p.sectors.map((x) => `${x.sector} ${x.share}%`).join(" · ") : null;
+  return p ? p.bands.map((x) => `${x.band} ${x.share}%`).join(" · ") : null;
 }
 
 interface FlowNode { name: string; fill: string }
@@ -66,12 +66,13 @@ export function Checkpoints() {
   const show = (on: boolean) => LAYERS.forEach((id) => setStyle(id, { visible: on }));
   const lines = s.phaseStep === "all" ? PHASE_CHECKS.lines : [s.phaseStep];
 
-  // One line at a time: the map keeps only that line, its crossings and its natural counterpart (syncLayers stepData).
+  // One line at a time: the map keeps only that line, its crossings and the natural-break bands either side (syncLayers stepData).
   const step = (L: string) => {
     set({ phaseStep: L });
     if (L === "all") return;
-    [...LAYERS, "naturallines" as const].forEach((id) => setStyle(id, { visible: true }));
-    const pts = [...PHASE_CHECKS.crossings.features.filter((f) => f.properties?.line === L), ...PHASE_PROFILES.natural_lines.features.filter((f) => f.properties?.planned === L)]
+    [...LAYERS, "naturalzones" as const].forEach((id) => setStyle(id, { visible: true }));
+    const pts = PHASE_PROFILES.zones.features
+      .filter((f) => String(f.properties?.stretch).split("-").includes(L))
       .flatMap((f) => coords((f.geometry as { coordinates: unknown }).coordinates));
     const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
     mapRef?.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: 40, duration: 800 });

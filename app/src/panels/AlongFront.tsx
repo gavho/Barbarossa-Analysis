@@ -30,17 +30,17 @@ const TownsNote = () => (
   <p className="mt-1 text-[10px] text-muted-foreground">{towns.filter((t) => t.name.includes("(")).map((t) => t.name).join(" · ")}</p>
 );
 
-/** One panel per stretch: where the division-days were along the front, the previous stretch dashed, natural breaks dotted. */
+/** One panel per stretch: where the division-days were along the front, the previous stretch dashed. */
 export function FrontProfile() {
   const s = useStore();
-  const onMap = styleOf(s, "naturallines").visible;
+  const onMap = styleOf(s, "naturalzones").visible;
   const peak = Math.max(...profiles.flatMap((p) => p.share));
   const outline = (share: number[], x0: number) => {
     const pts = share.map((v, j) => `${x0 + (v / peak) * (colW - 8)},${yOf(lo + bin_km * (j + 0.5))}`);
     return `${x0},${yOf(lo + bin_km * 0.5)} ${pts.join(" ")} ${x0},${yOf(lo + bin_km * (share.length - 0.5))}`;
   };
   return (
-    <ChartCard title="Where along the front" note="Share of division-days, north at top · dotted = natural breaks" help="frontProfile" name="front_profile">
+    <ChartCard title="Where along the front" note="Share of division-days, north at top" help="frontProfile" name="front_profile">
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Front profile per stretch between phase lines">
         <Axis />
         {profiles.map((p, i) => {
@@ -50,15 +50,14 @@ export function FrontProfile() {
               <polygon points={outline(p.share, x0)} fill="var(--primary)" fillOpacity={0.55} />
               {i > 0 && <polyline points={outline(profiles[i - 1].share, x0)} fill="none" stroke="var(--foreground)" strokeOpacity={0.5} strokeWidth={0.8} strokeDasharray="2 2" />}
               <line x1={x0} x2={x0 + colW - 6} y1={yOf(p.mean_km)} y2={yOf(p.mean_km)} stroke="var(--foreground)" strokeWidth={1.4} />
-              {p.breaks_km.map((b) => <line key={b} x1={x0} x2={x0 + colW - 6} y1={yOf(b)} y2={yOf(b)} stroke="var(--foreground)" strokeWidth={0.8} strokeDasharray="1 2" />)}
             </g>
           );
         })}
       </svg>
       <TownsNote />
-      <button onClick={() => { setStyle("naturallines", { visible: !onMap }); setStyle("checklines", { visible: !onMap }); }} aria-pressed={onMap}
+      <button onClick={() => { setStyle("naturalzones", { visible: !onMap }); setStyle("checklines", { visible: !onMap }); }} aria-pressed={onMap}
         className={cn("mt-1.5 flex items-center gap-1 rounded-[var(--radius)] border px-2 py-1 text-[11px]", onMap ? "border-primary bg-primary/15" : "border-border hover:bg-muted")}>
-        <MapIcon size={12} /> {onMap ? "Natural phase lines on map" : "Show natural phase lines on map"}
+        <MapIcon size={12} /> {onMap ? "Natural breaks on map" : "Show natural breaks on map"}
       </button>
     </ChartCard>
   );

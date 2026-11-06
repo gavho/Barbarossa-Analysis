@@ -141,17 +141,13 @@ export const HELP: Record<string, { title: string; body: string }> = {
     title: "Matched groups",
     body: "The average path of the realized group paired with each planned line, for the clustering chosen in the Vectors tab (published 5 or recommended 4), with arrows in the direction of travel.",
   },
-  naturallines: {
-    title: "Natural phase lines",
-    body: "Where the advance itself drew its phase lines. Every daily division location (weighted by strength) is placed by how far east it was, and Jenks natural breaks split those positions into as many stretches as the plan has. Breaks fall where few division-days were spent — ground crossed quickly — so each natural line runs north–south between two places where the divisions bunched. They are paired in order with the planned lines A–E (first with A, and so on); clicking one gives the gap. All five fall 37–99 km west of (short of) their planned line, so the advance halted short of each planned line. The lines are straight because the breaks are a single east–west distance; they do not follow the front's bends. Analysis: analysis/phase_distributions.py; figures in analysis/phase_checkpoints/phase_maps.png.",
-  },
   naturalzones: {
-    title: "Natural breaks: front sectors",
-    body: "In each stretch between two phase lines, the divisions' north–south positions (every daily location, weighted by strength) are split by Jenks natural breaks into the sectors where they bunched. Breaks fall where few division-days were spent. The app uses the fewest sectors (2–5) that explain at least 80% of the spread (goodness of variance fit 0.8, the usual rule).",
+    title: "Natural breaks between the phase lines",
+    body: "Where the divisions bunched between one planned phase line and the next. Every daily division location (weighted by strength) is placed by how far across its stretch it was — 0% at the western phase line, 100% at the eastern one, measured at its own latitude (before line A: km west of A). Jenks natural breaks then split each stretch into bands: breaks fall where few division-days were spent, so the divisions crossed that ground quickly, and the bands are where they slowed or paused. Each break runs north–south and bends with the phase lines either side. The app uses the fewest bands (2–5) that explain at least 80% of the spread (goodness of variance fit 0.8, the usual rule). Brighter = a larger share of the stretch's division-days. Click a band for its numbers."
   },
   frontProfile: {
     title: "Front profile",
-    body: "One panel per stretch between phase lines, north at the top. The shape is where the divisions spent their days along the front (share of division-days, weighted by strength); the dashed outline is the stretch before, for comparison. Solid line: the centre of weight. Dotted lines: the natural breaks between sectors (also listed in the Checkpoints cards). The axis is latitude only, so a town named beside it marks how far north, not that the front was there.",
+    body: "One panel per stretch between phase lines, north at the top. The shape is where the divisions spent their days along the front (share of division-days, weighted by strength); the dashed outline is the stretch before, for comparison. Solid line: the centre of weight. The axis is latitude only, so a town named beside it marks how far north, not that the front was there.",
   },
   placesInLine: {
     title: "Places in line",
@@ -199,7 +195,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   phaseStep: {
     title: "Step through the lines",
-    body: "Pick a phase line to see only it on the map: the teal dashed line itself; a dot where each division crossed it, coloured by the group it crossed with; arrows showing each group arriving from the line before; and the gold natural phase line paired with it — where the advance actually bunched. If the coloured groups keep the same north–south order line after line, the front advanced as one piece; where they jump, it reshaped. The card below says the same in words. All shows every line at once.",
+    body: "Pick a phase line to see only it on the map: the teal dashed line itself; a dot where each division crossed it, coloured by the group it crossed with; arrows showing each group arriving from the line before; and the natural-break bands of the stretches just before and after it, brighter where more divisions spent their days. If the coloured groups keep the same north–south order line after line, the front advanced as one piece; where they jump, it reshaped. The card below says the same in words. All shows every line at once.",
   },
   frontShape: {
     title: "How the front changed at the line",

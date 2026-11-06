@@ -35,12 +35,14 @@ def test_jenks_finds_the_gap():
     assert breaks == [6] and gvf > 0.95
 
 
-def test_natural_lines_run_north_south_and_pair_in_order():
-    p = pd.DataFrame({"x": [0, 2, 4, 200, 202, 204], "y": [0, 50, 100, 0, 50, 100], "w": 1.0})
-    ll, km, breaks, gvf = pd_.natural_lines(p, {"A": [(90, 200), (90, -200)]})
-    assert breaks == [102] and gvf > 0.99
-    xs = {x for x, _ in km[0]["geometry"]["coordinates"]}
-    assert xs == {102} and km[0]["properties"] == {"name": "N1", "km_east": 102, "planned": "A", "gap_km": 12, "west_of_plan": False}
+def test_bands_split_a_stretch_across_and_follow_the_lines():
+    lines = {"A": [(0, 200), (0, -200)], "B": [(100, 200), (200, -200)]}  # B slants: 150 km east of A at y = 0, wider to the south
+    p = pd.DataFrame({"x": [12, 15, 18, 132, 135, 138], "y": [0] * 6, "w": [1, 1, 1, 1, 1, 2], "division": list("abcdef")})
+    bands, breaks, gvf, ll, km = pd_.stretch_bands(p, 1, lines, "A-B")
+    assert breaks == [50] and gvf > 0.99
+    assert [(b["band"], b["share"], b["from"], b["to"]) for b in bands] == [("near A", 43, 0, 50), ("near B", 57, 50, 100)]
+    ring = km[0]["geometry"]["coordinates"][0]
+    assert all(abs(x - 0.5 * pd_.line_x(lines["B"], [y])[0]) < 1e-6 for x, y in ring if x > 0)  # the break is halfway at every latitude
 
 
 if __name__ == "__main__":

@@ -25,13 +25,13 @@ function phaseData(s: State, id: "phaseavg" | "phasepieces"): FC {
   return phaseCache.get(key)!;
 }
 
-type StepLayer = "checklines" | "checkdots" | "checkpaths" | "naturallines";
+type StepLayer = "checklines" | "checkdots" | "checkpaths" | "naturalzones";
 const stepCache = new Map<string, FC>();
 /** Checkpoint and natural-break layers for the Phases stepper ("all" = everything): the chosen phase line, its crossings,
- * the group arrows arriving at it, and the natural phase line paired with it. */
+ * the group arrows arriving at it, and the natural-break bands of the stretches either side of it. */
 function stepData(step: string, id: StepLayer): FC {
   const all = { checklines: MILESTONES.AGS_PhaseLines, checkdots: PHASE_CHECKS.crossings, checkpaths: PHASE_CHECKS.ribbons,
-    naturallines: PHASE_PROFILES.natural_lines }[id];
+    naturalzones: PHASE_PROFILES.zones }[id];
   if (step === "all") return all;
   const key = `${id}|${step}`;
   if (!stepCache.has(key)) {
@@ -39,7 +39,7 @@ function stepData(step: string, id: StepLayer): FC {
       id === "checklines" ? String(p.line_id).toUpperCase() === step
         : id === "checkdots" ? p.line === step
         : id === "checkpaths" ? p.to_line === step
-        : p.planned === step;
+        : String(p.stretch).split("-").includes(step); // "A-B" borders lines A and B
     stepCache.set(key, { type: "FeatureCollection", features: all.features.filter((f) => keep(f.properties ?? {})) });
   }
   return stepCache.get(key)!;
@@ -63,7 +63,7 @@ function matchData(s: State, id: "matchplan" | "matchreal"): FC {
 export function sourceData(s: State, id: LayerId): FC | null {
   if (id === "matchplan" || id === "matchreal") return matchData(s, id);
   if (id === "phaseavg" || id === "phasepieces") return phaseData(s, id);
-  if (id === "checklines" || id === "checkdots" || id === "checkpaths" || id === "naturallines") return stepData(s.phaseStep, id);
+  if (id === "checklines" || id === "checkdots" || id === "checkpaths" || id === "naturalzones") return stepData(s.phaseStep, id);
   if (id === "plan_phase") return MILESTONES.AGS_PhaseLines;
   if (id === "plan_advance") return MILESTONES.AGS_AdvanceLines;
   if (id === "plan_pocket") return MILESTONES.AGS_SmallPocketCOA;
@@ -130,7 +130,6 @@ const HEAT_STOPS = HEAT_RAMP.flat();
 function labelText(id: LayerId): unknown {
   if (id === "dv" || id === "geo") return ["case", ["==", ["%", ["to-number", ["get", "Day_Index"], 0], 7], 1], ["slice", ["to-string", ["get", "Date"]], 5], ""];
   if (id === "plan_phase" || id === "checklines") return ["concat", "LINE ", ["upcase", ["get", "line_id"]]];
-  if (id === "naturallines") return ["concat", ["get", "name"], " · natural"];
   if (id === "areas") return ["upcase", ["get", "Region"]];
   if (id === "dvvec" || id === "geovec" || id === "phaseavg" || id === "checkpaths" || id === "matchreal") return "›"; // arrowheads show the direction of travel
   return null;
@@ -253,6 +252,6 @@ export function syncLayers(map: MLMap, s: State) {
 
 /** Layer ids that respond to clicks, top-most first. */
 export function clickableLayers(map: MLMap): string[] {
-  const ids = ["unit-points", "points", "paths", "matchreal", "matchplan", "checkdots", "checkpaths", "checklines", "naturallines", "phaseavg", "phasepieces", "dvvec", "geovec", "dv", "geo", "ellipses", "plan_phase", "plan_advance", "plan_pocket", "areas"];
+  const ids = ["unit-points", "points", "paths", "matchreal", "matchplan", "checkdots", "checkpaths", "checklines", "naturalzones", "phaseavg", "phasepieces", "dvvec", "geovec", "dv", "geo", "ellipses", "plan_phase", "plan_advance", "plan_pocket", "areas"];
   return ids.filter((id) => map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== "none");
 }

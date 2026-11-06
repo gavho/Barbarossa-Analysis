@@ -12,13 +12,11 @@ compared:
                   along the front (rho near 1) or swap places?
 Locations are weighted by fractional strength (Frac_Unit), so a 1/10 detachment counts a tenth of a division.
 
-Natural breaks (Jenks): within each stretch, the north-south positions are split into the fewest classes (2-5) that
-explain at least 80% of their variance (GVF >= 0.8). Breaks fall where few division-days were spent, so the classes are
-the sectors of the front where divisions bunched (front profile chart, and the Checkpoints cards).
-
-Natural phase lines (Jenks on the east-west axis): all locations' east positions are split into as many stretches as the
-plan has, so the breaks are north-south lines where the advance moved fast between two places it bunched; each is set
-beside the nearest planned phase line. Drawn on the app's map.
+Natural breaks (Jenks), between the phase lines: within each stretch, each location's position ACROSS the stretch (0 at
+the western phase line, 1 at the eastern one, measured at the location's latitude; km west of line A before it) is split
+into the fewest classes (2-5) that explain at least 80% of their variance (GVF >= 0.8). Breaks fall where few
+division-days were spent - ground crossed quickly - so the classes are the bands between two phase lines where the
+divisions bunched, and each break is a north-south curve that follows the two phase lines. Drawn on the app's map.
 
 Usage: python analysis/phase_distributions.py   (writes analysis/phase_distributions/*)
 """
@@ -47,9 +45,9 @@ NATION_CODES = {1: "Wehrmacht", 2: "SS"}  # domain_Nation: 1 DE (Wehrmacht), 2 S
 BIN_KM = 25  # about the ~17 km position merging plus georeferencing error; finer bins would chart noise
 MIN_DIVISIONS = 5  # below this a stretch has too few divisions to compare
 GVF_MIN = 0.8  # Jenks: the fewest classes explaining at least 80% of the variance (the usual stopping rule)
-SECTORS = {2: ["northern", "southern"], 3: ["northern", "central", "southern"],
-           4: ["northern", "north-central", "south-central", "southern"],
-           5: ["northern", "north-central", "central", "south-central", "southern"]}
+BANDS = {2: ["near {w}", "near {e}"], 3: ["near {w}", "midway", "near {e}"],
+         4: ["near {w}", "west of midway", "east of midway", "near {e}"],
+         5: ["near {w}", "west of midway", "midway", "east of midway", "near {e}"]}  # west to east
 
 
 def load_points():
@@ -139,29 +137,52 @@ def label_key(key, branch):
     return NATION_CODES[key[0]], branch[key[1]], key[2]
 
 
-def natural_lines(p, lines):
-    """Natural phase lines: Jenks on how far east every division location was (km, weighted by strength), split into as
-    many stretches as the plan has (one break per planned line). Breaks fall where few division-days were spent - ground
-    crossed quickly - so each break is a north-south line between two places the advance bunched. Breaks and planned
-    lines are paired in order, west to east (1st with A, ...); gap = mean east-west distance over the data's north-south span. Returns (lon/lat features, km
-    features, breaks, gvf)."""
-    breaks, gvf = jenks(p.x, p.w, len(lines) + 1)
-    ys = np.linspace(p.y.min(), p.y.max(), 25)
-    planned = {}
-    for L, ln in lines.items():
-        x, y = np.array(ln).T
-        o = np.argsort(y)
-        planned[L] = np.interp(ys, y[o], x[o])
+def line_x(line, ys):
+    """East coordinate of a (north-south, extended) phase line at each latitude ys."""
+    x, y = np.array(line).T
+    o = np.argsort(y)
+    return np.interp(ys, y[o], x[o])
+
+
+def position(x, ys, z, lines, t=None):
+    """Position across stretch z: 0..1 from its western to its eastern phase line at the same latitude; in the outer
+    stretches, km from their one line (negative = west). With t given, the inverse: the east coordinate of position t."""
+    L = list(lines)
+    w = line_x(lines[L[z - 1]], ys) if z > 0 else None
+    e = line_x(lines[L[z]], ys) if z < len(L) else None
+    if w is not None and e is not None:
+        return (x - w) / (e - w) if t is None else w + t * (e - w)
+    ref = e if e is not None else w
+    return x - ref if t is None else ref + t
+
+
+def stretch_bands(g, z, lines, stretch):
+    """Natural breaks across one stretch. Returns (bands, breaks, gvf, lon/lat features, km features); breaks and band
+    limits are % of the way across (km from the line in the outer stretches)."""
+    L, interior = list(lines), 0 < z < len(lines)
+    t = position(g.x.values, g.y.values, z, lines)
+    k, breaks, gvf = natural_breaks(t, g.w)
+    cls = np.digitize(t, breaks)
+    lo = t.min() if z == 0 else 0
+    hi = t.max() if z == len(L) else (1 if z else 0)
+    edges = [lo, *breaks, hi]
+    w, e = ("the border" if z == 0 else L[z - 1]), (L[z] if z < len(L) else "the far east")
+    ys = np.linspace(g.y.max() + 8, g.y.min() - 8, 30)  # north first
     inv = Transformer.from_crs(c.AEQD, 4326, always_xy=True)
-    ll, km = [], []
-    for i, (b, L) in enumerate(zip(breaks, sorted(planned, key=lambda L: planned[L].mean()))):
-        props = {"name": f"N{i + 1}", "km_east": round(b), "planned": L, "gap_km": round(float(np.mean(np.abs(b - planned[L])))),
-                 "west_of_plan": bool(b < planned[L].mean())}
-        coords = [(b, y) for y in np.linspace(p.y.max() + 8, p.y.min() - 8, 20)]  # north end first, like the phase lines
+    scale = 100 if interior else 1
+    bands, ll, km = [], [], []
+    for i in range(k):
+        m = g[cls == i]
+        band = {"band": BANDS[k][i].format(w=w, e=e), "share": round(100 * m.w.sum() / g.w.sum()), "divisions": m.division.nunique(),
+                "from": round(edges[i] * scale), "to": round(edges[i + 1] * scale), "unit": "%" if interior else "km"}
+        bands.append(band)
+        ring = [*zip(position(None, ys, z, lines, edges[i]), ys), *zip(position(None, ys[::-1], z, lines, edges[i + 1]), ys[::-1])]
+        ring.append(ring[0])
+        props = {"stretch": stretch, **band}
+        km.append({"type": "Feature", "properties": props, "geometry": {"type": "Polygon", "coordinates": [[[float(x), float(y)] for x, y in ring]]}})
         ll.append({"type": "Feature", "properties": props,
-                   "geometry": {"type": "LineString", "coordinates": [[round(v, 4) for v in inv.transform(x, y)] for x, y in coords]}})
-        km.append({"type": "Feature", "properties": props, "geometry": {"type": "LineString", "coordinates": coords}})
-    return ll, km, breaks, float(gvf)
+                   "geometry": {"type": "Polygon", "coordinates": [[[round(v, 4) for v in inv.transform(x, y)] for x, y in ring]]}})
+    return bands, [round(b * scale) for b in breaks], gvf, ll, km
 
 
 def latitude_ticks():
@@ -183,13 +204,11 @@ def draw(profiles, positions, bins, towns):
             ax.plot(profiles[i - 1]["share"], mid, color="0.6", lw=1, ls="--", label="previous stretch")
         ax.fill_betweenx(mid, 0, r["share"], color="0.25", step=None)
         ax.axhline(r["mean_km"], color="black", lw=1.5)
-        for b in r["breaks_km"]:
-            ax.axhline(b, color="black", lw=0.8, ls=":")
         ax.set_title(r["stretch"].replace("-", " → "), fontsize=9)
         ax.set_xticks([])
     axes[0].set_yticks([t["km"] for t in towns], [t["name"] for t in towns], fontsize=8)
     axes[1].legend(fontsize=7, loc="lower right", frameon=False)
-    fig.suptitle("Where along the front the divisions were (solid line: centre of weight; dotted: natural breaks)", fontsize=10)
+    fig.suptitle("Where along the front the divisions were (solid line: centre of weight)", fontsize=10)
     fig.tight_layout()
     for ext in ("png", "pdf"):
         fig.savefig(OUT / f"front_profile.{ext}", dpi=200)
@@ -230,35 +249,28 @@ def main():
 
     lines = pc.phase_lines()
     bins = np.arange(np.floor(p.y.min() / BIN_KM) * BIN_KM, p.y.max() + BIN_KM, BIN_KM)
-    profiles, positions = [], []
+    profiles, positions, zones_ll, zones_km = [], [], [], []
     names, branch = pc.unit_names(), pd.read_csv(c.DATA / "domain_Branch_Type.csv").set_index("Code").Label.to_dict()
     for z in zs:
         g = groups[z]
-        k, breaks, gvf = natural_breaks(g.y, g.w)
+        bands, breaks, gvf, ll, km = stretch_bands(g, z, lines, stretches[z])
+        zones_ll += ll
+        zones_km += km
         h, _ = np.histogram(g.y, bins, weights=g.w)
-        cls = np.digitize(g.y, breaks)
-        sectors = []
-        for i in reversed(range(k)):  # classes run south to north (ascending km); list them north first
-            m = g[cls == i]
-            sectors.append({"sector": SECTORS[k][k - 1 - i], "share": round(100 * m.w.sum() / g.w.sum()), "divisions": m.division.nunique(),
-                            "from_km": round(m.y.min()), "to_km": round(m.y.max())})
         profiles.append({"stretch": stretches[z], "share": [round(float(v), 4) for v in h / h.sum()],
-                         "mean_km": round(np.average(g.y, weights=g.w)), "breaks_km": [round(b) for b in breaks],
-                         "gvf": round(gvf, 2), "sectors": sectors})
+                         "mean_km": round(np.average(g.y, weights=g.w)), "breaks": breaks, "gvf": round(gvf, 2), "bands": bands})
         for key, y in g.groupby("division").y.mean().items():
             positions.append({"division": pc.label(label_key(key, branch), names), "stretch": stretches[z], "km": round(y)})
     towns = latitude_ticks()
-    pd.DataFrame([{"stretch": r["stretch"], "classes": len(r["sectors"]), "gvf": r["gvf"], **s} for r in profiles for s in r["sectors"]]) \
+    pd.DataFrame([{"stretch": r["stretch"], "classes": len(r["bands"]), "gvf": r["gvf"], **b} for r in profiles for b in r["bands"]]) \
         .to_csv(OUT / "natural_breaks.csv", index=False)
     draw(profiles, positions, bins, towns)
-    nat_ll, nat_km, nat_breaks, nat_gvf = natural_lines(p, lines)
-    pd.DataFrame([f["properties"] for f in nat_ll]).assign(gvf=round(nat_gvf, 2)).to_csv(OUT / "natural_lines.csv", index=False)
-    (OUT / "natural_lines.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": nat_km}), encoding="utf8")  # km, for phase_checkpoints maps
+    (OUT / "natural_zones.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": zones_km}), encoding="utf8")  # km, for phase_checkpoints maps
     # The app's Phases tab shows the sentence, with the numbers on request.
     (ROOT / "app" / "src" / "data" / "phase_distributions.json").write_text(pairs.to_json(orient="records"), encoding="utf8")
     (ROOT / "app" / "src" / "data" / "phase_profiles.json").write_text(json.dumps({
         "bin_km": BIN_KM, "bins_from_km": float(bins[0]), "towns": towns, "profiles": profiles, "positions": positions,
-        "natural_gvf": round(nat_gvf, 2), "natural_lines": {"type": "FeatureCollection", "features": [{**f, "id": i} for i, f in enumerate(nat_ll)]},
+        "zones": {"type": "FeatureCollection", "features": [{**f, "id": i} for i, f in enumerate(zones_ll)]},
     }, separators=(",", ":")), encoding="utf8")
     print("\n" + "\n".join(pairs.sentence))
     print(f"\nwrote {OUT}")

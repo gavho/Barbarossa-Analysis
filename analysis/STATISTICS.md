@@ -113,26 +113,21 @@ kept their places along the front.
 - Front shifted north-south at line D: Wilcoxon signed-rank, paired by division; 95% bootstrap CI -64.72 to -29.40 km
 - Divisions kept their north-south order at line D: 10000 permutations
 
-**Natural phase lines.** Jenks natural breaks on every division location's east–west position (weighted by strength),
-split into as many stretches as the plan has; each break is a north–south line where the advance moved fast between two
-places it bunched, paired in order with planned lines A–E. Divisions are resampled (100 times) for a 95%
-interval on each line; a planned line outside its interval sits measurably apart from where the advance bunched.
+**Natural breaks between the phase lines.** In each stretch, every division location's position across it (% of the way
+from the western phase line to the eastern one, at its latitude; km west of line A in the first stretch) is split by
+weighted Jenks natural breaks into the fewest bands (2–5) with goodness of variance fit ≥ 0.8. Divisions are resampled
+(100 times) for a 95% interval on each break.
 
 **Stability (descriptive).**
 - Checkpoint groups at line A (k = 4): bootstrap Jaccard 0.92, 0.88, 0.96, 1.00
 - Checkpoint groups at line B (k = 3): bootstrap Jaccard 0.88, 0.76, 0.91
 - Checkpoint groups at line C (k = 3): bootstrap Jaccard 0.95, 0.99, 0.93
 - Checkpoint groups at line D (k = 2): bootstrap Jaccard 0.86, 0.69
-- Natural breaks in Frontier-A (k = 3): 8 km (95% -7 to 60); 77 km (95% 68 to 127)
-- Natural breaks in A-B (k = 3): -33 km (95% -40 to 23); 43 km (95% 29 to 103)
-- Natural breaks in B-C (k = 3): -16 km (95% -37 to 16); 43 km (95% 26 to 76)
-- Natural breaks in C-D (k = 2): -44 km (95% -56 to -23)
-- Natural breaks in D-E (k = 3): -112 km (95% -121 to -101); -47 km (95% -59 to -39)
-- Natural phase line N1 (paired with A): -349 km east (95% -411 to -341); planned line A averages -289 km, outside the interval
-- Natural phase line N2 (paired with B): -231 km east (95% -307 to -220); planned line B averages -183 km, outside the interval
-- Natural phase line N3 (paired with C): -125 km east (95% -203 to -111); planned line C averages -73 km, outside the interval
-- Natural phase line N4 (paired with D): -25 km east (95% -101 to -6); planned line D averages 46 km, outside the interval
-- Natural phase line N5 (paired with E): 63 km east (95% 14 to 90); planned line E averages 183 km, outside the interval
+- Natural breaks across Frontier-A (3 bands): -122 km (95% -161 to -107); -57 km (95% -84 to -47)
+- Natural breaks across A-B (3 bands): 29 % (95% 27 to 34); 63 % (95% 61 to 67)
+- Natural breaks across B-C (3 bands): 38 % (95% 31 to 41); 71 % (95% 66 to 73)
+- Natural breaks across C-D (3 bands): 36 % (95% 33 to 39); 67 % (95% 64 to 70)
+- Natural breaks across D-E (3 bands): 25 % (95% 20 to 33); 55 % (95% 48 to 62)
 
 ## Limits — please keep with the results
 - **Small n.** 44–51 divisions; tests have little power, so "not significant" is weak evidence of no effect.

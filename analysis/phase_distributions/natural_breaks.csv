@@ -1,15 +1,16 @@
-stretch,classes,gvf,sector,share,divisions,from_km,to_km
-Frontier-A,3,0.84,northern,33,24,77,180
-Frontier-A,3,0.84,central,43,34,8,77
-Frontier-A,3,0.84,southern,24,17,-76,7
-A-B,3,0.86,northern,47,23,43,185
-A-B,3,0.86,central,29,24,-33,42
-A-B,3,0.86,southern,24,17,-182,-34
-B-C,3,0.84,northern,43,16,44,144
-B-C,3,0.84,central,34,27,-16,42
-B-C,3,0.84,southern,23,24,-115,-17
-C-D,2,0.8,northern,58,32,-43,123
-C-D,2,0.8,southern,42,19,-193,-45
-D-E,3,0.85,northern,22,15,-46,30
-D-E,3,0.85,central,46,19,-111,-48
-D-E,3,0.85,southern,31,17,-199,-113
+stretch,classes,gvf,band,share,divisions,from,to,unit
+Frontier-A,3,0.86,near the border,32,32,-251,-122,km
+Frontier-A,3,0.86,midway,32,41,-122,-57,km
+Frontier-A,3,0.86,near A,35,44,-57,0,km
+A-B,3,0.89,near A,28,38,0,29,%
+A-B,3,0.89,midway,30,42,29,63,%
+A-B,3,0.89,near B,42,44,63,100,%
+B-C,3,0.87,near B,27,38,0,38,%
+B-C,3,0.87,midway,46,41,38,71,%
+B-C,3,0.87,near C,28,35,71,100,%
+C-D,3,0.88,near C,31,38,0,36,%
+C-D,3,0.88,midway,32,35,36,67,%
+C-D,3,0.88,near D,37,30,67,100,%
+D-E,3,0.88,near D,39,23,0,25,%
+D-E,3,0.88,midway,35,22,25,55,%
+D-E,3,0.88,near E,25,13,55,100,%

@@ -7,7 +7,7 @@ and a Holm correction across the family of tests. Seeded: a re-run gives the sam
   B. Chain of command: do the groups line up with the planned formations (6A, III PzKo, PzGp1(-), 17A)?
   C. Are the clusters real? Gap statistic and silhouette against structureless data; bootstrap stability of each group.
   D. Phase lines: did the front shift at each line (Wilcoxon, paired by division)? Did divisions keep their order
-     (Spearman, permutation)? How stable are the checkpoint groups and the natural breaks (bootstrap)?
+     (Spearman, permutation)? How stable are the checkpoint groups and the natural breaks between the lines (bootstrap)?
 
 Run the analyses first (compare_loa.py, phase_distributions.py, phase_checkpoints.py), then:
   python analysis/significance.py            (writes analysis/significance/results.csv and analysis/STATISTICS.md)
@@ -222,32 +222,20 @@ def stability_phase(p, stretches, zs):
         k = df.group.nunique()
         _, jac = stability(X, k)
         notes.append(f"Checkpoint groups at line {L} (k = {k}): bootstrap Jaccard {', '.join(f'{v:.2f}' for v in jac.values())}")
+    lines = pc.phase_lines()
     for z in zs:
         g = p[p.zone == z]
-        k, breaks, _ = pdist.natural_breaks(g.y, g.w)
-        divs = g.division.unique()
+        bands, breaks, _, _, _ = pdist.stretch_bands(g, z, lines, stretches[z])
+        t = pdist.position(g.x.values, g.y.values, z, lines)
+        scale = 100 if bands[0]["unit"] == "%" else 1
+        idx = list(g.groupby("division").indices.values())  # row positions of each division
         boot = []
         for _ in range(max(20, N_BOOT // 3)):  # Jenks is the slow step
-            pick = rng.choice(len(divs), len(divs))
-            s = pd.concat([g[g.division == divs[i]] for i in pick])
-            boot.append(pdist.jenks(s.y, s.w, k)[0])
-        boot = np.array(boot)
-        notes.append(f"Natural breaks in {stretches[z]} (k = {k}): " + "; ".join(
-            f"{b:.0f} km (95% {np.percentile(boot[:, i], 2.5):.0f} to {np.percentile(boot[:, i], 97.5):.0f})" for i, b in enumerate(breaks)))
-    # Natural phase lines (east-west Jenks): is each planned line outside its natural line's bootstrap interval?
-    _, _, breaks, _ = pdist.natural_lines(p, pc.phase_lines())
-    planned = sorted(np.mean(np.array(ln)[:, 0]) for ln in pc.phase_lines().values())
-    divs = p.division.unique()
-    boot = []
-    for _ in range(max(20, N_BOOT // 3)):
-        pick = rng.choice(len(divs), len(divs))
-        s = pd.concat([p[p.division == divs[i]] for i in pick])
-        boot.append(pdist.jenks(s.x, s.w, len(planned) + 1)[0])
-    boot = np.array(boot)
-    for i, (b, L, x) in enumerate(zip(breaks, sorted(pc.phase_lines()), planned)):
-        lo, hi = np.percentile(boot[:, i], [2.5, 97.5])
-        notes.append(f"Natural phase line N{i + 1} (paired with {L}): {b:.0f} km east (95% {lo:.0f} to {hi:.0f}); planned line {L} averages "
-                     f"{x:.0f} km, {'outside' if not lo <= x <= hi else 'inside'} the interval")
+            rows = np.concatenate([idx[i] for i in rng.choice(len(idx), len(idx))])
+            boot.append(pdist.jenks(t[rows], g.w.values[rows], len(bands))[0])
+        boot = np.array(boot) * scale
+        notes.append(f"Natural breaks across {stretches[z]} ({len(bands)} bands): " + "; ".join(
+            f"{b} {bands[0]['unit']} (95% {np.percentile(boot[:, i], 2.5):.0f} to {np.percentile(boot[:, i], 97.5):.0f})" for i, b in enumerate(breaks)))
     for n in notes:
         print("  " + n)
     return notes
@@ -350,10 +338,10 @@ kept their places along the front.
 
 {chr(10).join(f"- {r.test}: {r.detail}" for r in ph.itertuples())}
 
-**Natural phase lines.** Jenks natural breaks on every division location's east–west position (weighted by strength),
-split into as many stretches as the plan has; each break is a north–south line where the advance moved fast between two
-places it bunched, paired in order with planned lines A–E. Divisions are resampled ({max(20, N_BOOT // 3)} times) for a 95%
-interval on each line; a planned line outside its interval sits measurably apart from where the advance bunched.
+**Natural breaks between the phase lines.** In each stretch, every division location's position across it (% of the way
+from the western phase line to the eastern one, at its latitude; km west of line A in the first stretch) is split by
+weighted Jenks natural breaks into the fewest bands (2–5) with goodness of variance fit ≥ 0.8. Divisions are resampled
+({max(20, N_BOOT // 3)} times) for a 95% interval on each break.
 
 **Stability (descriptive).**
 {chr(10).join(f"- {n}" for n in notes)}

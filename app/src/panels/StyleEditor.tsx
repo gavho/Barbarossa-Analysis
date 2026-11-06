@@ -1,11 +1,21 @@
 import { useMemo } from "react";
-import { RotateCcw } from "lucide-react";
+import { ArrowLeftRight, RotateCcw } from "lucide-react";
 import type { Feature } from "geojson";
 import type { Category, LayerDef, LayerStyle } from "@/config/presets";
 import { BRANCH_COLORS, CLUSTER_COLORS, SPEED_RAMP } from "@/config/presets";
 import { Segmented } from "@/ui/Segmented";
 
 const PALETTE = ["#e5484d", "#3e8ed0", "#46a758", "#ffb224", "#8e4ec6", "#12a594", "#f76b15", "#d6409f", "#978365", "#8d8d8d"];
+// Standard ramps, low value first (ColorBrewer / matplotlib); Invert flips any of them.
+const RAMPS: { name: string; colors: string[] }[] = [
+  { name: "Viridis", colors: ["#440154", "#3b528b", "#21918c", "#5ec962", "#fde725"] },
+  { name: "Magma", colors: ["#000004", "#51127c", "#b73779", "#fc8961", "#fcfdbf"] },
+  { name: "Yellow–Red", colors: ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"] },
+  { name: "Blues", colors: ["#eff3ff", "#bdd7e7", "#6baed6", "#3182bd", "#08519c"] },
+  { name: "Greys", colors: ["#f7f7f7", "#cccccc", "#969696", "#636363", "#252525"] },
+  { name: "Red–Yellow–Green", colors: ["#d7191c", "#fdae61", "#ffffbf", "#a6d96a", "#1a9641"] },
+  { name: "Red–Blue", colors: ["#ca0020", "#f4a582", "#f7f7f7", "#92c5de", "#0571b0"] },
+];
 const KNOWN: Record<string, Category[]> = { Branch_Type: BRANCH_COLORS, Branch: BRANCH_COLORS, Cluster_ID: CLUSTER_COLORS,
   Geo_ClusterID: CLUSTER_COLORS, DV_ClusterID: CLUSTER_COLORS };
 
@@ -92,6 +102,18 @@ export function StyleEditor({ def, style, features, onChange, onReset }: {
       {style.colorMode === "ramp" && (
         <>
           <Row label="Field"><FieldSelect fields={numericFields} value={style.colorField} onChange={setRampField} /></Row>
+          <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Preset ramps">
+            {RAMPS.map((r) => (
+              <button key={r.name} title={r.name} aria-label={`${r.name} ramp`} onClick={() => {
+                const lo = style.ramp?.[0]?.[0] ?? 0, hi = style.ramp?.at(-1)?.[0] ?? 1;
+                onChange({ ramp: r.colors.map((c, i) => [round(lo + ((hi - lo) * i) / (r.colors.length - 1)), c] as [number, string]) });
+              }} className="h-4 w-8 rounded-sm border border-border hover:ring-1 hover:ring-primary"
+                style={{ background: `linear-gradient(90deg,${r.colors.join(",")})` }} />
+            ))}
+            <button onClick={() => style.ramp && onChange({ ramp: style.ramp.map(([v], i, a) => [v, a[a.length - 1 - i][1]] as [number, string]) })}
+              className="ml-auto flex items-center gap-1 rounded border border-border px-1.5 py-0.5 text-[11px] text-muted-foreground hover:text-foreground"
+              title="Reverse the colours, keeping the values"><ArrowLeftRight size={11} /> Invert</button>
+          </div>
           <div className="flex flex-col gap-1">
             {style.ramp?.map(([v, c], i) => (
               <div key={i} className="flex items-center gap-1.5">

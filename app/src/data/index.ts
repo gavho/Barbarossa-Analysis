@@ -97,10 +97,10 @@ export const PHASE_CHECKS = phase_checkpoints as unknown as {
 /** Where along the front (north-south km) the divisions were per stretch, with Jenks natural breaks (phase_distributions.py). */
 export const PHASE_PROFILES = phase_profiles as unknown as {
   bin_km: number; bins_from_km: number; towns: { name: string; km: number }[];
-  profiles: { stretch: string; share: number[]; mean_km: number; breaks_km: number[]; gvf: number;
-    sectors: { sector: string; share: number; divisions: number; from_km: number; to_km: number }[] }[];
+  profiles: { stretch: string; share: number[]; mean_km: number; breaks: number[]; gvf: number;
+    bands: { band: string; share: number; divisions: number; from: number; to: number; unit: "%" | "km" }[] }[];
   positions: { division: string; stretch: string; km: number }[];
-  natural_gvf: number; natural_lines: FC;
+  zones: FC;
 };
 export interface PlanPair { planned: string; name: string; cluster: number; divisions: number; badge: "on plan" | "near plan" | "off plan";
   sentence: string; mean_offset_km: number; mean_gap_km: number; within50_pct: number; end_gap_km: number; bearing_diff: number;
