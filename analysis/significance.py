@@ -13,6 +13,7 @@ Run the analyses first (compare_loa.py, phase_distributions.py, phase_checkpoint
   python analysis/significance.py            (writes analysis/significance/results.csv and analysis/STATISTICS.md)
   python analysis/significance.py --quick    (fewer permutations, for checking the script)
 """
+import json
 import sys
 import time
 import warnings
@@ -221,7 +222,8 @@ def stability_phase(p, stretches, zs):
         X = (X - X.mean(axis=0)) / X.std(axis=0)
         k = df.group.nunique()
         _, jac = stability(X, k)
-        notes.append(f"Checkpoint groups at line {L} (k = {k}): bootstrap Jaccard {', '.join(f'{v:.2f}' for v in jac.values())}")
+        notes.append({"kind": "checkpoint", "label": f"line {L}", "values": [round(v, 2) for v in jac.values()],
+                      "text": f"Checkpoint groups at line {L} (k = {k}): bootstrap Jaccard {', '.join(f'{v:.2f}' for v in jac.values())}"})
     lines = pc.phase_lines()
     for z in zs:
         g = p[p.zone == z]
@@ -234,10 +236,12 @@ def stability_phase(p, stretches, zs):
             rows = np.concatenate([idx[i] for i in rng.choice(len(idx), len(idx))])
             boot.append(pdist.jenks(t[rows], g.w.values[rows], len(bands))[0])
         boot = np.array(boot) * scale
-        notes.append(f"Natural breaks across {stretches[z]} ({len(bands)} bands): " + "; ".join(
-            f"{b} {bands[0]['unit']} (95% {np.percentile(boot[:, i], 2.5):.0f} to {np.percentile(boot[:, i], 97.5):.0f})" for i, b in enumerate(breaks)))
+        ivs = [[b, round(float(np.percentile(boot[:, i], 2.5))), round(float(np.percentile(boot[:, i], 97.5)))] for i, b in enumerate(breaks)]
+        notes.append({"kind": "breaks", "label": stretches[z], "unit": bands[0]["unit"], "values": ivs,
+                      "text": f"Natural breaks across {stretches[z]} ({len(bands)} bands): " + "; ".join(
+                          f"{b} {bands[0]['unit']} (95% {lo} to {hi})" for b, lo, hi in ivs)})
     for n in notes:
-        print("  " + n)
+        print("  " + n["text"])
     return notes
 
 
@@ -344,7 +348,7 @@ weighted Jenks natural breaks into the fewest bands (2–5) with goodness of var
 ({max(20, N_BOOT // 3)} times) for a 95% interval on each break.
 
 **Stability (descriptive).**
-{chr(10).join(f"- {n}" for n in notes)}
+{chr(10).join(f"- {n['text']}" for n in notes)}
 
 ## Limits — please keep with the results
 - **Small n.** 44–51 divisions; tests have little power, so "not significant" is weak evidence of no effect.
@@ -385,6 +389,13 @@ def main():
     res["p_holm"] = holm(res.p.values)
     res.to_csv(OUT / "results.csv", index=False)
     write_md(res, gaps, notes, f)
+    # Data for the HTML statistics page (stats_page.py), so the page can be rebuilt without re-running the tests.
+    pd.concat([g.assign(clustering=name) for name, g in gaps.items()]).to_csv(OUT / "gaps.csv", index=False)
+    unknown = int(f.Group.map(lambda g: next((u for u, t in c.PLANNED_UNIT.items() if t(g)), None)).isna().sum())
+    (OUT / "notes.json").write_text(json.dumps({"notes": notes, "n_plan": N_PLAN, "n_perm": N_PERM, "n_boot": N_BOOT, "n_ref": N_REF,
+                                                "unknown_formation": unknown, "divisions": len(f), "quick": QUICK}, indent=1), encoding="utf8")
+    import stats_page
+    stats_page.main()
     print(f"\n{res[['test', 'estimate', 'p', 'p_holm']].to_string(index=False)}\n\nwrote {OUT} and analysis/STATISTICS.md in {time.time() - t0:.0f} s")
 
 

@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { CloudDownload, FileDown, FolderOpen, Image, Layers, Map as MapIcon, Menu, MonitorPlay, Save, Shield, Undo2 } from "lucide-react";
+import { ChartColumn, CloudDownload, FileDown, FolderOpen, Image, Layers, Map as MapIcon, Menu, MonitorPlay, Save, Shield, Undo2 } from "lucide-react";
 import { REGIONS, region, type PageId } from "@/config/regions";
 import { BASEMAPS, DEFAULT_BASEMAP } from "@/map/basemaps";
 import { unitsOf } from "@/lib/query";
@@ -85,6 +85,9 @@ export function Header() {
                 <hr className="my-1 border-border" />
                 <Item icon={<Image size={14} />} onClick={() => run("PNG export", exportMapPng)}>Export map · PNG</Item>
                 <Item icon={<FileDown size={14} />} onClick={() => run("PDF export", exportMapPdf)}>Export map · PDF</Item>
+                <hr className="my-1 border-border" />
+                {/* Statistics.html sits next to Barbarossa.html (repo root / GitHub Pages); written by analysis/stats_page.py. */}
+                <Item icon={<ChartColumn size={14} />} onClick={() => { setMenu(false); window.open("Statistics.html", "_blank", "noopener"); }}>Statistics explained</Item>
                 <hr className="my-1 border-border" />
                 <Item icon={<CloudDownload size={14} />} onClick={refresh}>Refresh from ArcGIS Online</Item>
                 {data.source.kind === "agol" && <Item icon={<Undo2 size={14} />} onClick={() => { setMenu(false); revertToEmbedded(); }}>Use embedded snapshot</Item>}

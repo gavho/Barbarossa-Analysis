@@ -1,5 +1,5 @@
 // Copy the single-file build to the repo root so non-developers can just open it.
-import { readFileSync, statSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 const dist = new URL("../dist/index.html", import.meta.url);
 const out = new URL("../../Barbarossa.html", import.meta.url);
 
@@ -16,4 +16,7 @@ const body = html.lastIndexOf("</body>");
 html = html.slice(0, body) + script + "\n" + html.slice(body);
 writeFileSync(dist, html);
 writeFileSync(out, html);
+// The statistics page the menu links to, so `npm run preview` serves it too.
+const stats = new URL("../../Statistics.html", import.meta.url);
+if (existsSync(stats)) copyFileSync(stats, new URL("../dist/Statistics.html", import.meta.url));
 console.log(`Barbarossa.html ${(statSync(out).size / 1024 / 1024).toFixed(2)} MB`);

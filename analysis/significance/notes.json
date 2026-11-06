@@ -1,0 +1,141 @@
+{
+ "notes": [
+  {
+   "kind": "checkpoint",
+   "label": "line A",
+   "values": [
+    0.92,
+    0.88,
+    0.96,
+    1.0
+   ],
+   "text": "Checkpoint groups at line A (k = 4): bootstrap Jaccard 0.92, 0.88, 0.96, 1.00"
+  },
+  {
+   "kind": "checkpoint",
+   "label": "line B",
+   "values": [
+    0.88,
+    0.76,
+    0.91
+   ],
+   "text": "Checkpoint groups at line B (k = 3): bootstrap Jaccard 0.88, 0.76, 0.91"
+  },
+  {
+   "kind": "checkpoint",
+   "label": "line C",
+   "values": [
+    0.95,
+    0.99,
+    0.93
+   ],
+   "text": "Checkpoint groups at line C (k = 3): bootstrap Jaccard 0.95, 0.99, 0.93"
+  },
+  {
+   "kind": "checkpoint",
+   "label": "line D",
+   "values": [
+    0.86,
+    0.69
+   ],
+   "text": "Checkpoint groups at line D (k = 2): bootstrap Jaccard 0.86, 0.69"
+  },
+  {
+   "kind": "breaks",
+   "label": "Frontier-A",
+   "unit": "km",
+   "values": [
+    [
+     -122,
+     -161,
+     -107
+    ],
+    [
+     -57,
+     -84,
+     -47
+    ]
+   ],
+   "text": "Natural breaks across Frontier-A (3 bands): -122 km (95% -161 to -107); -57 km (95% -84 to -47)"
+  },
+  {
+   "kind": "breaks",
+   "label": "A-B",
+   "unit": "%",
+   "values": [
+    [
+     29,
+     27,
+     34
+    ],
+    [
+     63,
+     61,
+     67
+    ]
+   ],
+   "text": "Natural breaks across A-B (3 bands): 29 % (95% 27 to 34); 63 % (95% 61 to 67)"
+  },
+  {
+   "kind": "breaks",
+   "label": "B-C",
+   "unit": "%",
+   "values": [
+    [
+     38,
+     31,
+     41
+    ],
+    [
+     71,
+     66,
+     73
+    ]
+   ],
+   "text": "Natural breaks across B-C (3 bands): 38 % (95% 31 to 41); 71 % (95% 66 to 73)"
+  },
+  {
+   "kind": "breaks",
+   "label": "C-D",
+   "unit": "%",
+   "values": [
+    [
+     36,
+     33,
+     39
+    ],
+    [
+     67,
+     64,
+     70
+    ]
+   ],
+   "text": "Natural breaks across C-D (3 bands): 36 % (95% 33 to 39); 67 % (95% 64 to 70)"
+  },
+  {
+   "kind": "breaks",
+   "label": "D-E",
+   "unit": "%",
+   "values": [
+    [
+     25,
+     20,
+     33
+    ],
+    [
+     55,
+     48,
+     62
+    ]
+   ],
+   "text": "Natural breaks across D-E (3 bands): 25 % (95% 20 to 33); 55 % (95% 48 to 62)"
+  }
+ ],
+ "n_plan": 1000,
+ "n_perm": 10000,
+ "n_boot": 300,
+ "n_ref": 100,
+ "unknown_formation": 17,
+ "divisions": 51,
+ "quick": false
+}
