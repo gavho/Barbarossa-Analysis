@@ -7,7 +7,10 @@ Replaces "clusters between the lines" (phase_clusters.py, kept as a method check
      A division already past a line on its first recorded day has no crossing for that line.
   3. At each line, crossings are grouped by place along the line and day (both standardized, k-means). The number of
      groups (2-5) is the one with the best silhouette among those with no single-division group.
-  4. Groups at the first line are numbered north to south; at each later line a group takes the number of the earlier
+     A "Start" checkpoint comes first: the divisions on the map on 22 June, at their first position, placed along line A
+     (km from its north end) and grouped by that place alone (they share the day). Divisions that first appear later join
+     at the first line they cross.
+  4. Groups at the first checkpoint are numbered north to south; at each later line a group takes the number of the earlier
      group it shares most divisions with (phase_clusters.follow_groups), so one map colour follows one group.
   5. Flows between consecutive lines (which group's divisions crossed the next line with which group, or did not reach
      it) feed the app's flow chart. A flow that takes a large share of a group means the group divided; a small one
@@ -36,6 +39,7 @@ OUT = ROOT / "analysis" / "phase_checkpoints"
 NATION_CODES = {1: "Wehrmacht", 2: "SS"}  # domain_Nation: 1 DE (Wehrmacht), 2 SS
 K_RANGE = range(2, 6)  # the app has five group colours
 DAY0 = pd.Timestamp("1941-06-22", tz="UTC")
+START = "Start"  # the checkpoint before line A: the 22 June line-up
 BREAKAWAY_MAX = 2  # at most this many divisions (and under a quarter of the group) leaving together is a breakaway
 
 
@@ -73,9 +77,20 @@ def crossing(track, line, poly):
     return pt, float(day), LineString(line).project(pt) - pc.FAR
 
 
+def start_point(track, first_line):
+    """Position on 22 June for the Start checkpoint: (point, day 0, km along the first phase line from its north end), or
+    None for a division first recorded later."""
+    if track.day[0] != 0:
+        return None
+    pt = Point(track.x[0], track.y[0])
+    return pt, 0.0, LineString(first_line).project(pt) - pc.FAR
+
+
 def group_line(df):
-    """Labels for one line's crossings (columns along, day): best-silhouette k with no single-division group."""
+    """Labels for one line's crossings (columns along, day): best-silhouette k with no single-division group.
+    A column with no spread (the Start checkpoint's shared day) is left out."""
     X = df[["along", "day"]].values
+    X = X[:, X.std(axis=0) > 0]
     X = (X - X.mean(axis=0)) / X.std(axis=0)
     best = None
     for k in K_RANGE:
@@ -111,6 +126,10 @@ def main():
 
     rows = []
     for key, tr in tracks.items():
+        hit = start_point(tr, lines[letters[0]])
+        if hit:
+            pt, day, along = hit
+            rows.append({"key": key, "division": pc.label(key, names), "line": START, "x": pt.x, "y": pt.y, "day": day, "along": along})
         for L in letters:
             hit = crossing(tr, lines[L], pc.east_polygon(lines[L]))
             if hit:
@@ -119,6 +138,7 @@ def main():
     cr = pd.DataFrame(rows)
     print(f"{len(tracks)} Wehrmacht/SS divisions; crossings per line: {cr.groupby('line').size().to_dict()}")
 
+    letters = [START] + letters  # checkpoints in order
     group, info, groups = {}, {}, []
     for j, L in enumerate(letters):
         df = cr[cr.line == L].reset_index(drop=True)
@@ -202,10 +222,12 @@ def draw_maps(cr, lines, done):
     grey = lambda share: str(round(0.93 - (min(max(share, 20), 50) - 20) / 30 * 0.4, 2))  # 20% light .. 50% dark
     marks = "os^Dv"
     (xlo, xhi), (ylo, yhi) = (cr.x.min() - 80, cr.x.max() + 80), (cr.y.min() - 60, cr.y.max() + 60)
-    fig, axes = plt.subplots(2, 2, figsize=(10, 8.6), sharex=True, sharey=True)
+    fig, axes = plt.subplots(3, 2, figsize=(10, 12.6), sharex=True, sharey=True)
+    for ax in axes.flat[len(done):]:
+        ax.axis("off")
     for ax, L in zip(axes.flat, done):
         for f in zones:
-            if L in f["properties"]["stretch"].split("-"):
+            if (L if L != START else "Frontier") in f["properties"]["stretch"].split("-"):
                 ax.fill(*zip(*f["geometry"]["coordinates"][0]), color=grey(f["properties"]["share"]), ec="0.55", lw=0.3)
         for M, ln in lines.items():
             ax.plot(*zip(*ln), color="black" if M == L else "0.55", lw=2 if M == L else 0.7, ls="-" if M == L else "--")
@@ -220,14 +242,15 @@ def draw_maps(cr, lines, done):
             q = c.to_km(Point(lon, lat))
             ax.plot(q.x, q.y, "k.", ms=3)
             ax.annotate(n, (q.x, q.y), xytext=(3, 3), textcoords="offset points", fontsize=7, style="italic")
-        ax.set_title(f"Line {L} · {len(m)} divisions crossed, {date(m.day.min())} – {date(m.day.max())}", fontsize=9)
+        ax.set_title(f"Start · {len(m)} divisions on 22 Jun" if L == START else
+                     f"Line {L} · {len(m)} divisions crossed, {date(m.day.min())} – {date(m.day.max())}", fontsize=9)
         ax.set(xlim=(xlo, xhi), ylim=(ylo, yhi), xticks=[], yticks=[], aspect="equal")
     used = sorted(int(g) for g in cr.group.unique())
     handles = [Line2D([], [], marker=marks[g], ls="", mfc="white", mec="black", label=f"Group {GROUP_NAMES[g]}") for g in used]
     handles += [Patch(color=grey(20), label="few division-days"), Patch(color=grey(50), label="many division-days")]
     fig.legend(handles=handles, loc="lower center", ncol=len(handles), fontsize=8, frameon=False)
-    fig.suptitle("Phase lines as checkpoints: where divisions crossed each line, and where they bunched either side of it", fontsize=10)
-    fig.subplots_adjust(left=0.02, right=0.98, top=0.92, bottom=0.07, hspace=0.14, wspace=0.03)  # equal-aspect panels defeat tight_layout
+    fig.suptitle("Phase lines as checkpoints: the 22 June line-up, where divisions crossed each line, and where they bunched", fontsize=10)
+    fig.subplots_adjust(left=0.02, right=0.98, top=0.94, bottom=0.05, hspace=0.12, wspace=0.03)  # equal-aspect panels defeat tight_layout
     for ext in ("png", "pdf"):
         fig.savefig(OUT / f"phase_maps.{ext}", dpi=200)
     plt.close(fig)

@@ -39,7 +39,7 @@ function stepData(step: string, id: StepLayer): FC {
       id === "checklines" ? String(p.line_id).toUpperCase() === step
         : id === "checkdots" ? p.line === step
         : id === "checkpaths" ? p.to_line === step
-        : String(p.stretch).split("-").includes(step); // "A-B" borders lines A and B
+        : String(p.stretch).split("-").includes(step === "Start" ? "Frontier" : step); // "A-B" borders lines A and B; Start opens "Frontier-A"
     stepCache.set(key, { type: "FeatureCollection", features: all.features.filter((f) => keep(f.properties ?? {})) });
   }
   return stepCache.get(key)!;

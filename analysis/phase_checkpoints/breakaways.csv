@@ -1,7 +1,10 @@
 from_line,to_line,division,from_group,division_went_to
-A,B,56. Infanterie-Division,0,1
-A,B,454. Sicherungs-Division,2,1
-B,C,132. Infanterie-Division,2,1
-B,C,296. Infanterie-Division,2,1
-B,C,68. Infanterie-Division,2,1
-B,C,71. Infanterie-Division,2,1
+Start,A,SS-Division (mot.) Wiking,0,1
+Start,A,213. Sicherungs-Division,0,2
+Start,A,444. Sicherungs-Division,1,3
+A,B,56. Infanterie-Division,0,2
+A,B,454. Sicherungs-Division,1,2
+B,C,132. Infanterie-Division,1,2
+B,C,296. Infanterie-Division,1,2
+B,C,68. Infanterie-Division,1,2
+B,C,71. Infanterie-Division,1,2

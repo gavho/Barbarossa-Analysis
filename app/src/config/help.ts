@@ -155,15 +155,15 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   checkpoints: {
     title: "Phase lines as checkpoints",
-    body: "Each phase line is treated as a checkpoint. For every Wehrmacht/SS division the app finds where and on which day its track first crossed the line (between the two daily positions either side of it; lines extended straight north and south). Divisions that crossed close together in place and time form a group. A colour is one group: at each later line, a group keeps the colour of the earlier group most of its divisions came from. In the first line the colours run north to south.",
+    body: "Each phase line is treated as a checkpoint. For every Wehrmacht/SS division the app finds where and on which day its track first crossed the line (between the two daily positions either side of it; lines extended straight north and south). Divisions that crossed close together in place and time form a group. A colour is one group: at each later line, a group keeps the colour of the earlier group most of its divisions came from. A Start checkpoint comes first, with its colours running north to south: where the divisions stood on 22 June, so the flow shows how the opening line-up carried on to line A. Divisions first recorded later join at the first line they cross.",
   },
   checkGroups: {
     title: "How many groups",
-    body: "At each line the crossings are grouped by place along the line and by day (k-means on both, scaled alike). The app tries 2 to 5 groups and keeps the number whose groups are most distinct (best silhouette), skipping any split that leaves a division on its own. Fewer divisions reach the later lines, so they have fewer groups.",
+    body: "At Start the divisions are grouped by place along the front alone (they share the day). At each line the crossings are grouped by place along the line and by day (k-means on both, scaled alike). The app tries 2 to 5 groups and keeps the number whose groups are most distinct (best silhouette), skipping any split that leaves a division on its own. Fewer divisions reach the later lines, so they have fewer groups.",
   },
   flowChart: {
     title: "Flow between lines",
-    body: "Each column is a phase line; each block a group that crossed it, its height the number of divisions. Bands show where a group's divisions crossed the next line: with the same group, with another one (the group divided or merged), or not at all by 5 August (grey). Hover for the numbers.",
+    body: "The first column, Start, is the 22 June line-up: the divisions on the map that day, grouped by where they stood along the front. Each later column is a phase line; each block a group that crossed it, its height the number of divisions. Bands show where a group's divisions crossed the next line: with the same group, with another one (the group divided or merged), or not at all by 5 August (grey). Hover for the numbers.",
   },
   breakaway: {
     title: "Broke away",
@@ -195,7 +195,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   phaseStep: {
     title: "Step through the lines",
-    body: "Pick a phase line to see only it on the map: the teal dashed line itself; a dot where each division crossed it, coloured by the group it crossed with; arrows showing each group arriving from the line before; and the natural-break bands of the stretches just before and after it, brighter where more divisions spent their days. If the coloured groups keep the same north–south order line after line, the front advanced as one piece; where they jump, it reshaped. The card below says the same in words. All shows every line at once.",
+    body: "Pick Start to see the 22 June line-up and the bands between the border and line A. Pick a phase line to see only it on the map: the teal dashed line itself; a dot where each division crossed it, coloured by the group it crossed with; arrows showing each group arriving from the line before; and the natural-break bands of the stretches just before and after it, brighter where more divisions spent their days. If the coloured groups keep the same north–south order line after line, the front advanced as one piece; where they jump, it reshaped. The card below says the same in words. All shows every line at once.",
   },
   frontShape: {
     title: "How the front changed at the line",

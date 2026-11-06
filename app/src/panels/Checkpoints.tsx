@@ -13,6 +13,9 @@ import { color, separation, Swatch } from "./Phases";
 const LAYERS = ["checklines", "checkpaths", "checkdots"] as const;
 const STOPPED = "var(--muted-foreground)";
 const northFirst = (a: CheckGroup, b: CheckGroup) => b.lonlat[1] - a.lonlat[1];
+/** "Start" is the 22 June line-up before line A; everything else is a phase line. */
+const lineName = (L: string) => (L === "Start" ? "Start" : `Line ${L}`);
+const stretchKey = (L: string) => (L === "Start" ? "Frontier" : L); // the first stretch is "Frontier-A"
 const coords = (c: unknown): number[][] => (typeof (c as unknown[])[0] === "number" ? [c as number[]] : (c as unknown[]).flatMap(coords));
 
 /** "near A 28% · midway 30% · near B 42%" for the stretch whose name matches. */
@@ -30,7 +33,7 @@ function flowData() {
   for (const L of PHASE_CHECKS.lines) {
     for (const g of PHASE_CHECKS.groups.filter((x) => x.line === L).sort(northFirst)) {
       index.set(`${L}|${g.group}`, nodes.length);
-      nodes.push({ name: `Line ${L} · ${g.sector} group`, fill: color(g.group) });
+      nodes.push({ name: `${lineName(L)} · ${g.sector} group`, fill: color(g.group) });
     }
     if (PHASE_CHECKS.flows.some((f) => f.to_line === L && f.to_group === null)) {
       index.set(`${L}|stop`, nodes.length);
@@ -72,7 +75,7 @@ export function Checkpoints() {
     if (L === "all") return;
     [...LAYERS, "naturalzones" as const].forEach((id) => setStyle(id, { visible: true }));
     const pts = PHASE_PROFILES.zones.features
-      .filter((f) => String(f.properties?.stretch).split("-").includes(L))
+      .filter((f) => String(f.properties?.stretch).split("-").includes(stretchKey(L)))
       .flatMap((f) => coords((f.geometry as { coordinates: unknown }).coordinates));
     const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
     mapRef?.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: 40, duration: 800 });
@@ -102,17 +105,18 @@ export function Checkpoints() {
         <ResponsiveContainer width="100%" height={230}>
           <Sankey data={flow} sort={false} align="left" nodePadding={12} nodeWidth={9} iterations={0}
             margin={{ top: 4, right: 18, bottom: 4, left: 2 }} node={FlowBlock as never} link={FlowBand as never}>
-            <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", fontSize: 11 }} />
+            <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 4, fontSize: 11, color: "var(--foreground)" }}
+              itemStyle={{ color: "var(--foreground)" }} />
           </Sankey>
         </ResponsiveContainer>
         <div className="flex justify-between pr-4 font-mono text-[10px] text-muted-foreground">
-          {PHASE_CHECKS.lines.map((L) => <span key={L}>Line {L}</span>)}
+          {PHASE_CHECKS.lines.map((L) => <span key={L}>{lineName(L)}</span>)}
         </div>
       </section>
 
       <div className="flex flex-wrap items-center gap-1.5">
         <Segmented<string> size="sm" value={s.phaseStep} onChange={step}
-          items={[{ value: "all", label: "All" }, ...PHASE_CHECKS.lines.map((L) => ({ value: L, label: `Line ${L}` }))]} />
+          items={[{ value: "all", label: "All" }, ...PHASE_CHECKS.lines.map((L) => ({ value: L, label: lineName(L) }))]} />
         <Help id="phaseStep" />
       </div>
 
@@ -121,13 +125,14 @@ export function Checkpoints() {
         const crossed = groups.reduce((n, g) => n + g.divisions, 0);
         const shift = PHASE_SHIFTS.find((x) => x.to.startsWith(`${L}-`));
         const away = PHASE_CHECKS.splits.filter((x) => x.from_line === L);
-        const before = bunched((x) => x.endsWith(`-${L}`)), after = bunched((x) => x.startsWith(`${L}-`));
+        const start = L === "Start";
+        const before = start ? null : bunched((x) => x.endsWith(`-${L}`)), after = bunched((x) => x.startsWith(`${stretchKey(L)}-`));
         return (
-          <section key={L} className="frame p-2.5" aria-label={`Line ${L}`}>
+          <section key={L} className="frame p-2.5" aria-label={lineName(L)}>
             <div className="mb-1.5 flex items-baseline justify-between gap-2">
-              <h3 className="display shrink-0 text-[15px]">Line {L}</h3>
+              <h3 className="display shrink-0 text-[15px]">{start ? "Start · 22 June" : lineName(L)}</h3>
               <span className="flex items-center gap-1 text-right text-[11px] text-muted-foreground">
-                {crossed} divisions crossed · {separation(PHASE_CHECKS.info[L].silhouette)} <Help id="checkGroups" />
+                {crossed} divisions {start ? "in the line-up" : "crossed"} · {separation(PHASE_CHECKS.info[L].silhouette)} <Help id="checkGroups" />
               </span>
             </div>
             <ul className="flex flex-col gap-1">
@@ -136,21 +141,21 @@ export function Checkpoints() {
                   <details className="rounded-[var(--radius)] border border-transparent hover:border-border">
                     <summary className="flex cursor-pointer list-none items-center gap-2 px-1.5 py-1 text-[12px]">
                       <Swatch cid={g.group} />
-                      <span className="min-w-0 truncate">{g.divisions} divisions · {g.sector} · {g.first === g.last ? g.first : `${g.first} – ${g.last}`}</span>
+                      <span className="min-w-0 truncate">{g.divisions} divisions · {g.sector}{start ? "" : ` · ${g.first === g.last ? g.first : `${g.first} – ${g.last}`}`}</span>
                       <button onClick={(e) => { e.preventDefault(); focus(L, g.group); }} className="ml-auto shrink-0 text-[11px] text-primary hover:underline"
-                        aria-label={`Show line ${L} ${g.sector} group on the map`}>map</button>
+                        aria-label={`Show ${lineName(L)} ${g.sector} group on the map`}>map</button>
                     </summary>
-                    <p className="px-1.5 pb-1.5 text-[11px] leading-relaxed text-muted-foreground">Half had crossed by {g.median}. {g.members}.</p>
+                    <p className="px-1.5 pb-1.5 text-[11px] leading-relaxed text-muted-foreground">{start ? "" : `Half had crossed by ${g.median}. `}{g.members}.</p>
                   </details>
                 </li>
               ))}
             </ul>
             {shift && <p className="mt-2 border-t border-border pt-1.5 text-[12px] leading-snug">{shift.sentence} <Help id="frontShape" /></p>}
-            {before && after && (
+            {(before || after) && (
               <dl className="mt-1.5 grid grid-cols-[auto_1fr] gap-x-2 text-[11px] leading-relaxed">
                 <dt className="col-span-2 flex items-center gap-1 text-muted-foreground">Where divisions bunched (share of division-days) <Help id="naturalzones" /></dt>
-                <dt className="text-muted-foreground">Before {L}</dt><dd>{before}</dd>
-                <dt className="text-muted-foreground">After {L}</dt><dd>{after}</dd>
+                {before && <><dt className="text-muted-foreground">Before {L}</dt><dd>{before}</dd></>}
+                {after && <><dt className="text-muted-foreground">{start ? "Border to A" : `After ${L}`}</dt><dd>{after}</dd></>}
               </dl>
             )}
             {away.length > 0 && (
@@ -162,7 +167,7 @@ export function Checkpoints() {
           </section>
         );
       })}
-      <p className="text-[11px] text-muted-foreground">Only one division had crossed line E by 5 August, so the checkpoints stop at line D.</p>
+      <p className="text-[11px] text-muted-foreground">Start is the 22 June line-up (divisions first recorded later join at the first line they cross). Only one division had crossed line E by 5 August, so the checkpoints stop at line D.</p>
     </div>
   );
 }

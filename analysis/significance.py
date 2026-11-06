@@ -217,13 +217,16 @@ def stability_phase(p, stretches, zs):
     """Descriptive: bootstrap the checkpoint groups (Jaccard) and the natural-break positions (95% intervals)."""
     notes = []
     cr = pd.read_csv(ROOT / "analysis" / "phase_checkpoints" / "crossings.csv").dropna(subset=["group"])
-    for L, df in cr.groupby("line"):
+    for L in sorted(cr.line.unique(), key=lambda l: (l != "Start", l)):  # Start first, then A-D
+        df = cr[cr.line == L]
         X = df[["along", "day"]].values
+        X = X[:, X.std(axis=0) > 0]  # Start shares one day: group by place alone, as phase_checkpoints does
         X = (X - X.mean(axis=0)) / X.std(axis=0)
         k = df.group.nunique()
         _, jac = stability(X, k)
-        notes.append({"kind": "checkpoint", "label": f"line {L}", "values": [round(v, 2) for v in jac.values()],
-                      "text": f"Checkpoint groups at line {L} (k = {k}): bootstrap Jaccard {', '.join(f'{v:.2f}' for v in jac.values())}"})
+        name = "Start (22 June line-up)" if L == "Start" else f"line {L}"
+        notes.append({"kind": "checkpoint", "label": name, "values": [round(v, 2) for v in jac.values()],
+                      "text": f"Checkpoint groups at {name} (k = {k}): bootstrap Jaccard {', '.join(f'{v:.2f}' for v in jac.values())}"})
     lines = pc.phase_lines()
     for z in zs:
         g = p[p.zone == z]

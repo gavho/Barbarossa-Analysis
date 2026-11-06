@@ -25,6 +25,19 @@ def test_no_crossing_when_starting_past_or_never_reaching():
     assert ck.crossing(pd.DataFrame({"day": [0, 1], "x": [20.0, 50.0], "y": [0.0, 0.0]}), LINE, poly) is None
 
 
+def test_start_only_for_divisions_there_on_day_one():
+    there = pd.DataFrame({"day": [0, 3], "x": [40.0, 140.0], "y": [100.0, 100.0]})
+    pt, day, along = ck.start_point(there, LINE)
+    assert (pt.x, day, round(along)) == (40.0, 0.0, 400 - pc.FAR)  # 400 km from the line's north end
+    assert ck.start_point(pd.DataFrame({"day": [5, 6], "x": [40.0, 50.0], "y": [0.0, 0.0]}), LINE) is None
+
+
+def test_start_groups_by_place_alone():
+    df = pd.DataFrame({"along": [0, 5, 10, 300, 305, 310], "day": [0.0] * 6})  # one shared day
+    labels, sil = ck.group_line(df)
+    assert len(set(labels[:3])) == 1 and labels[0] != labels[3] and sil > 0.9
+
+
 def test_new_group_does_not_borrow_a_colour():
     # Earlier line: groups 0 and 1. Now three groups; group 2 holds only divisions not seen before.
     prev = {"a": 0, "b": 0, "c": 1, "d": 1}
