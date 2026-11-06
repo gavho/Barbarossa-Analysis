@@ -4,12 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Operation Barbarossa Digital Analysis</title>
+    <!-- Loading screen, shown while the 8 MB file arrives; React replaces #root's contents on first render. -->
+    <style>
+      html, body { margin: 0; height: 100%; background: #0a0a0b; }
+      .boot { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+        font-family: "Arial Narrow", system-ui, sans-serif; color: #e4e6e9; text-align: center; padding: 0 16px; }
+      .boot-title { font-size: 26px; font-weight: 700; letter-spacing: 0.12em; }
+      .boot-sub { font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; color: #69b9f8; }
+      .boot-msg { font-size: 13px; color: #8b9099; font-family: system-ui, sans-serif; }
+      .boot-bar { width: 220px; max-width: 70vw; height: 2px; background: #2a2b30; overflow: hidden; margin-top: 6px; }
+      .boot-bar::after { content: ""; display: block; width: 35%; height: 100%; background: #69b9f8; animation: boot 1.2s ease-in-out infinite; }
+      @keyframes boot { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
+      @media (prefers-reduced-motion: reduce) { .boot-bar::after { animation: none; width: 100%; opacity: 0.5; } }
+    </style>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Saira+Stencil+One&display=swap" rel="stylesheet" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="boot" role="status">
+        <div class="boot-title">OPERATION BARBAROSSA</div>
+        <div class="boot-sub">Digital Analysis</div>
+        <div class="boot-bar" aria-hidden="true"></div>
+        <div class="boot-msg">Loading the map and data…</div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

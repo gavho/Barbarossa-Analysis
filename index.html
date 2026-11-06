@@ -2,11 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Operation Barbarossa Digital Analysis</title>
   <!-- GitHub Pages entry point: the app itself is the single-file Barbarossa.html built by app/ -->
   <meta http-equiv="refresh" content="0; url=Barbarossa.html">
+  <!-- Same loading screen as app/index.html, so the redirect never shows a white page. -->
+  <style>
+    html, body { margin: 0; height: 100%; background: #0a0a0b; }
+    .boot { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+      font-family: "Arial Narrow", system-ui, sans-serif; color: #e4e6e9; text-align: center; padding: 0 16px; }
+    .boot-title { font-size: 26px; font-weight: 700; letter-spacing: 0.12em; }
+    .boot-sub { font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; color: #69b9f8; }
+    .boot-msg { font-size: 13px; color: #8b9099; font-family: system-ui, sans-serif; }
+    .boot-msg a { color: #69b9f8; }
+    .boot-bar { width: 220px; max-width: 70vw; height: 2px; background: #2a2b30; overflow: hidden; margin-top: 6px; }
+    .boot-bar::after { content: ""; display: block; width: 35%; height: 100%; background: #69b9f8; animation: boot 1.2s ease-in-out infinite; }
+    @keyframes boot { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
+    @media (prefers-reduced-motion: reduce) { .boot-bar::after { animation: none; width: 100%; opacity: 0.5; } }
+  </style>
 </head>
 <body>
-  <p><a href="Barbarossa.html">Open the Operation Barbarossa Digital Analysis app</a></p>
+  <div class="boot" role="status">
+    <div class="boot-title">OPERATION BARBAROSSA</div>
+    <div class="boot-sub">Digital Analysis</div>
+    <div class="boot-bar" aria-hidden="true"></div>
+    <div class="boot-msg">Loading… <a href="Barbarossa.html">Open the app</a> if it doesn't start.</div>
+  </div>
 </body>
 </html>
