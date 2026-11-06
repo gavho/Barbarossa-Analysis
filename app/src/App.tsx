@@ -62,15 +62,37 @@ export function App() {
   );
 }
 
-/** Collapsible side column; the cult-ui side-panel's width/opacity tween, driven by store state. */
+const WIDTH = { left: 340, right: 380 };
+const readWidth = (side: "left" | "right") => { try { return Number(localStorage.getItem(`panel-${side}`)) || WIDTH[side]; } catch { return WIDTH[side]; } };
+
+/** Collapsible side column; the cult-ui side-panel's width/opacity tween, driven by store state. Drag the inner edge to resize (double-click resets). */
 function Side({ open, side, children }: { open: boolean; side: "left" | "right"; children: React.ReactNode }) {
+  const [width, setWidth] = useState(() => readWidth(side));
+  const [resizing, setResizing] = useState(false);
+  const save = (w: number) => { setWidth(w); try { localStorage.setItem(`panel-${side}`, String(w)); } catch { /* per-viewer convenience only */ } };
+  const drag = (e: React.PointerEvent) => {
+    e.preventDefault();
+    const x0 = e.clientX, w0 = width;
+    const move = (m: PointerEvent) => save(Math.round(Math.min(Math.max(w0 + (side === "left" ? 1 : -1) * (m.clientX - x0), 280), window.innerWidth * 0.6)));
+    const up = () => { setResizing(false); window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
+    setResizing(true);
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  };
+  const key = (e: React.KeyboardEvent) => {
+    const step = e.key === "ArrowRight" ? 20 : e.key === "ArrowLeft" ? -20 : 0;
+    if (step) { e.preventDefault(); save(Math.min(Math.max(width + (side === "left" ? step : -step), 280), window.innerWidth * 0.6)); }
+  };
   return (
     <AnimatePresence initial={false}>
       {open && (
-        <motion.aside key={side} initial={{ width: 0, opacity: 0 }} animate={{ width: side === "left" ? 340 : 380, opacity: 1 }} exit={{ width: 0, opacity: 0 }}
-          transition={{ type: "tween", ease: [0.42, 0, 0.58, 1], duration: 0.3 }}
-          className={cn("frame shrink-0 overflow-hidden max-lg:absolute max-lg:inset-y-2 max-lg:z-20 max-lg:shadow-2xl", side === "left" ? "max-lg:left-2" : "max-lg:right-2")}>
-          <div className="h-full w-[340px] max-lg:w-[min(340px,85vw)]" style={side === "right" ? { width: 380 } : undefined}>{children}</div>
+        <motion.aside key={side} initial={{ width: 0, opacity: 0 }} animate={{ width, opacity: 1 }} exit={{ width: 0, opacity: 0 }}
+          transition={resizing ? { duration: 0 } : { type: "tween", ease: [0.42, 0, 0.58, 1], duration: 0.3 }}
+          className={cn("frame relative shrink-0 overflow-hidden max-lg:absolute max-lg:inset-y-2 max-lg:z-20 max-lg:max-w-[85vw] max-lg:shadow-2xl", side === "left" ? "max-lg:left-2" : "max-lg:right-2")}>
+          <div className="h-full max-w-[85vw]" style={{ width }}>{children}</div>
+          <div role="separator" aria-orientation="vertical" aria-label={`Resize ${side} panel`} aria-valuenow={width} tabIndex={0} title="Drag to resize · double-click to reset"
+            onPointerDown={drag} onDoubleClick={() => save(WIDTH[side])} onKeyDown={key}
+            className={cn("absolute inset-y-0 z-10 w-1.5 cursor-col-resize hover:bg-primary/40 focus-visible:bg-primary/40", side === "left" ? "right-0" : "left-0", resizing && "bg-primary/60")} />
         </motion.aside>
       )}
     </AnimatePresence>

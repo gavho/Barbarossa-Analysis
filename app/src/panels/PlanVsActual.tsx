@@ -29,7 +29,7 @@ export function PlanVsActual() {
         </button>
       )}
       <p className="text-[12px] leading-relaxed text-muted-foreground">
-        <Help id="planVsActual" className="mr-1" />Phase lines a–e and lines of advance are the historian's pre-war estimates (Sorin's milestones). A division
+        <Help id="planVsActual" className="mr-1" />Phase lines a–e and lines of advance are the pre-war plan for Army Group South. A division
         point within a line's latitude band has <b>reached</b> it when it is beyond the line or no more than {reach} km short of it. <b>Lead</b> is the first day any
         had reached it; <b>Main body</b> is the first day at least half had.
       </p>

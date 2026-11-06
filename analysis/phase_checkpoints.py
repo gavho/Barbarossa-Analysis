@@ -191,25 +191,19 @@ GROUP_NAMES = ["red", "blue", "green", "purple", "orange"]  # the app's colour f
 
 def draw_maps(cr, lines, done):
     """Paper figure, black and white: one map per phase line with its crossings (marker shape = group) and the natural
-    sectors of the stretches either side, grey by share of division-days (from phase_distributions.py)."""
+    natural phase lines dotted (from phase_distributions.py)."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     from matplotlib.lines import Line2D
-    from matplotlib.patches import Patch
-    from shapely.geometry import shape
 
-    zones = json.loads((ROOT / "analysis" / "phase_distributions" / "natural_zones.geojson").read_text(encoding="utf8"))["features"]
-    grey = lambda share: str(round(0.93 - (min(max(share, 20), 60) - 20) / 40 * 0.4, 2))  # 20% light .. 60% dark
+    natural = json.loads((ROOT / "analysis" / "phase_distributions" / "natural_lines.geojson").read_text(encoding="utf8"))["features"]
     marks = "os^Dv"
     (xlo, xhi), (ylo, yhi) = (cr.x.min() - 80, cr.x.max() + 80), (cr.y.min() - 60, cr.y.max() + 60)
     fig, axes = plt.subplots(2, 2, figsize=(10, 8.6), sharex=True, sharey=True)
     for ax, L in zip(axes.flat, done):
-        for f in zones:
-            if L in f["properties"]["stretch"].split("-"):
-                g = shape(f["geometry"])
-                for poly in getattr(g, "geoms", [g]):
-                    ax.fill(*poly.exterior.xy, color=grey(f["properties"]["share"]), ec="0.55", lw=0.3)
+        for f in natural:
+            ax.plot(*zip(*f["geometry"]["coordinates"]), color="black" if f["properties"]["planned"] == L else "0.6", lw=1, ls=":")
         for M, ln in lines.items():
             ax.plot(*zip(*ln), color="black" if M == L else "0.55", lw=2 if M == L else 0.7, ls="-" if M == L else "--")
             top = LineString(ln).intersection(LineString([(xlo, yhi - 25), (xhi, yhi - 25)]))
@@ -227,9 +221,9 @@ def draw_maps(cr, lines, done):
         ax.set(xlim=(xlo, xhi), ylim=(ylo, yhi), xticks=[], yticks=[], aspect="equal")
     used = sorted(int(g) for g in cr.group.unique())
     handles = [Line2D([], [], marker=marks[g], ls="", mfc="white", mec="black", label=f"Group {GROUP_NAMES[g]}") for g in used]
-    handles += [Patch(color=grey(20), label="few division-days"), Patch(color=grey(60), label="many division-days")]
+    handles += [Line2D([], [], color="black", ls=":", lw=1, label="natural phase line (where the advance bunched)")]
     fig.legend(handles=handles, loc="lower center", ncol=len(handles), fontsize=8, frameon=False)
-    fig.suptitle("Phase lines as checkpoints: where divisions crossed each line, and where they bunched either side of it", fontsize=10)
+    fig.suptitle("Phase lines as checkpoints: where divisions crossed each line, beside the natural lines where the advance bunched", fontsize=10)
     fig.subplots_adjust(left=0.02, right=0.98, top=0.92, bottom=0.07, hspace=0.14, wspace=0.03)  # equal-aspect panels defeat tight_layout
     for ext in ("png", "pdf"):
         fig.savefig(OUT / f"phase_maps.{ext}", dpi=200)

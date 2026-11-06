@@ -78,7 +78,7 @@ function LayerRow({ def, style, expanded, onToggle, onChange, onReset, features,
           {style.visible ? <Eye size={15} /> : <EyeOff size={15} />}
         </button>
         <Swatch def={def} style={style} />
-        <button onClick={onToggle} className={cn("min-w-0 flex-1 truncate text-left text-[13px]", !style.visible && "text-muted-foreground")} aria-expanded={expanded}>
+        <button onClick={onToggle} className={cn("min-w-0 flex-1 text-left text-[13px] leading-snug [overflow-wrap:anywhere]", !style.visible && "text-muted-foreground")} aria-expanded={expanded}>
           {def.title}
         </button>
         {HELP[def.id.endsWith("vec") ? "vectors" : def.id] && <Help id={def.id.endsWith("vec") ? "vectors" : def.id} />}

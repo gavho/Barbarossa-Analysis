@@ -35,6 +35,14 @@ def test_jenks_finds_the_gap():
     assert breaks == [6] and gvf > 0.95
 
 
+def test_natural_lines_run_north_south_and_pair_in_order():
+    p = pd.DataFrame({"x": [0, 2, 4, 200, 202, 204], "y": [0, 50, 100, 0, 50, 100], "w": 1.0})
+    ll, km, breaks, gvf = pd_.natural_lines(p, {"A": [(90, 200), (90, -200)]})
+    assert breaks == [102] and gvf > 0.99
+    xs = {x for x, _ in km[0]["geometry"]["coordinates"]}
+    assert xs == {102} and km[0]["properties"] == {"name": "N1", "km_east": 102, "planned": "A", "gap_km": 12, "west_of_plan": False}
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

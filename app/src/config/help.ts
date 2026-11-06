@@ -71,7 +71,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   planMatch: {
     title: "Matched planned line",
-    body: "Frontier only. Each of the four planned AGS lines of advance (digitized from the historian's slide, ±5–10 km) is paired with one cluster by the smallest total Fréchet distance (Hungarian assignment), compared over the stretch both lines cover. The comparison keeps three vectors on both lines so they can be compared vector by vector, so its numbers come from analysis/compare_loa.py rather than this card's vectors.",
+    body: "Frontier only. Each of the four planned AGS lines of advance (digitized from a planning map, ±5–10 km) is paired with one cluster by the smallest total Fréchet distance (Hungarian assignment), compared over the stretch both lines cover. The comparison keeps three vectors on both lines so they can be compared vector by vector, so its numbers come from analysis/compare_loa.py rather than this card's vectors.",
   },
   frechet: {
     title: "Fréchet distance",
@@ -111,7 +111,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   planVsActual2: {
     title: "Planned vs actual",
-    body: "Each planned AGS line of advance (digitized from Rob Kirchubel's slide, ±5–10 km) is paired with the realized group whose average path is closest to it overall (smallest Fréchet distance, one group per line). The card shows both on one small map, says in words how far apart they ran, and plots the gap along the way. 'On plan' = on average within 20 km, the mapping-error band; 'near plan' = within 50 km; 'off plan' = further.",
+    body: "Each planned AGS line of advance (digitized from a planning map, ±5–10 km) is paired with the realized group whose average path is closest to it overall (smallest Fréchet distance, one group per line). The card shows both on one small map, says in words how far apart they ran, and plots the gap along the way. 'On plan' = on average within 20 km, the mapping-error band; 'near plan' = within 50 km; 'off plan' = further.",
   },
   planCorridor: {
     title: "50 km corridor",
@@ -141,13 +141,17 @@ export const HELP: Record<string, { title: string; body: string }> = {
     title: "Matched groups",
     body: "The average path of the realized group paired with each planned line, for the clustering chosen in the Vectors tab (published 5 or recommended 4), with arrows in the direction of travel.",
   },
+  naturallines: {
+    title: "Natural phase lines",
+    body: "Where the advance itself drew its phase lines. Every daily division location (weighted by strength) is placed by how far east it was, and Jenks natural breaks split those positions into as many stretches as the plan has. Breaks fall where few division-days were spent — ground crossed quickly — so each natural line runs north–south between two places where the divisions bunched. They are paired in order with the planned lines A–E (first with A, and so on); clicking one gives the gap. All five fall 37–99 km west of (short of) their planned line, so the advance halted short of each planned line. The lines are straight because the breaks are a single east–west distance; they do not follow the front's bends. Analysis: analysis/phase_distributions.py; figures in analysis/phase_checkpoints/phase_maps.png.",
+  },
   naturalzones: {
     title: "Natural breaks: front sectors",
-    body: "In each stretch between two phase lines, the divisions' north–south positions (every daily location, weighted by strength) are split by Jenks natural breaks into the sectors where they bunched. Breaks fall where few division-days were spent. The app uses the fewest sectors (2–5) that explain at least 80% of the spread (goodness of variance fit 0.8, the usual rule). Brighter = a larger share of the stretch's division-days.",
+    body: "In each stretch between two phase lines, the divisions' north–south positions (every daily location, weighted by strength) are split by Jenks natural breaks into the sectors where they bunched. Breaks fall where few division-days were spent. The app uses the fewest sectors (2–5) that explain at least 80% of the spread (goodness of variance fit 0.8, the usual rule).",
   },
   frontProfile: {
     title: "Front profile",
-    body: "One panel per stretch between phase lines, north at the top. The shape is where the divisions spent their days along the front (share of division-days, weighted by strength); the dashed outline is the stretch before, for comparison. Solid line: the centre of weight. Dotted lines: the natural breaks between sectors (see the map layer Natural Breaks). The axis is latitude only, so a town named beside it marks how far north, not that the front was there.",
+    body: "One panel per stretch between phase lines, north at the top. The shape is where the divisions spent their days along the front (share of division-days, weighted by strength); the dashed outline is the stretch before, for comparison. Solid line: the centre of weight. Dotted lines: the natural breaks between sectors (also listed in the Checkpoints cards). The axis is latitude only, so a town named beside it marks how far north, not that the front was there.",
   },
   placesInLine: {
     title: "Places in line",
@@ -171,7 +175,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   checklines: {
     title: "Phase lines",
-    body: "The AGS phase lines digitized from Rob Kirchubel's slide (hand-drawn, ±5–10 km). The checkpoints are measured where division tracks cross them.",
+    body: "The AGS phase lines digitized from a planning map (hand-drawn, ±5–10 km). The checkpoints are measured where division tracks cross them.",
   },
   checkpaths: {
     title: "Checkpoint group paths",
@@ -195,7 +199,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   phaseStep: {
     title: "Step through the lines",
-    body: "Pick a phase line to see only it on the map: the teal dashed line itself; a dot where each division crossed it, coloured by the group it crossed with; arrows showing each group arriving from the line before; and the shaded sectors of the stretches just before and just after it, brighter where more divisions spent their days. If the bright bands and the coloured groups keep the same north–south order line after line, the front advanced as one piece; where they jump, it reshaped. The card below says the same in words. All shows every line at once.",
+    body: "Pick a phase line to see only it on the map: the teal dashed line itself; a dot where each division crossed it, coloured by the group it crossed with; arrows showing each group arriving from the line before; and the gold natural phase line paired with it — where the advance actually bunched. If the coloured groups keep the same north–south order line after line, the front advanced as one piece; where they jump, it reshaped. The card below says the same in words. All shows every line at once.",
   },
   frontShape: {
     title: "How the front changed at the line",

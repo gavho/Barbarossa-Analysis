@@ -234,6 +234,20 @@ def stability_phase(p, stretches, zs):
         boot = np.array(boot)
         notes.append(f"Natural breaks in {stretches[z]} (k = {k}): " + "; ".join(
             f"{b:.0f} km (95% {np.percentile(boot[:, i], 2.5):.0f} to {np.percentile(boot[:, i], 97.5):.0f})" for i, b in enumerate(breaks)))
+    # Natural phase lines (east-west Jenks): is each planned line outside its natural line's bootstrap interval?
+    _, _, breaks, _ = pdist.natural_lines(p, pc.phase_lines())
+    planned = sorted(np.mean(np.array(ln)[:, 0]) for ln in pc.phase_lines().values())
+    divs = p.division.unique()
+    boot = []
+    for _ in range(max(20, N_BOOT // 3)):
+        pick = rng.choice(len(divs), len(divs))
+        s = pd.concat([p[p.division == divs[i]] for i in pick])
+        boot.append(pdist.jenks(s.x, s.w, len(planned) + 1)[0])
+    boot = np.array(boot)
+    for i, (b, L, x) in enumerate(zip(breaks, sorted(pc.phase_lines()), planned)):
+        lo, hi = np.percentile(boot[:, i], [2.5, 97.5])
+        notes.append(f"Natural phase line N{i + 1} (paired with {L}): {b:.0f} km east (95% {lo:.0f} to {hi:.0f}); planned line {L} averages "
+                     f"{x:.0f} km, {'outside' if not lo <= x <= hi else 'inside'} the interval")
     for n in notes:
         print("  " + n)
     return notes
@@ -335,6 +349,11 @@ kept their places along the front.
 {table(ph)}
 
 {chr(10).join(f"- {r.test}: {r.detail}" for r in ph.itertuples())}
+
+**Natural phase lines.** Jenks natural breaks on every division location's east–west position (weighted by strength),
+split into as many stretches as the plan has; each break is a north–south line where the advance moved fast between two
+places it bunched, paired in order with planned lines A–E. Divisions are resampled ({max(20, N_BOOT // 3)} times) for a 95%
+interval on each line; a planned line outside its interval sits measurably apart from where the advance bunched.
 
 **Stability (descriptive).**
 {chr(10).join(f"- {n}" for n in notes)}

@@ -14,7 +14,11 @@ Locations are weighted by fractional strength (Frac_Unit), so a 1/10 detachment 
 
 Natural breaks (Jenks): within each stretch, the north-south positions are split into the fewest classes (2-5) that
 explain at least 80% of their variance (GVF >= 0.8). Breaks fall where few division-days were spent, so the classes are
-the sectors of the front where divisions bunched. Drawn on the app's map as shaded zones between the phase lines.
+the sectors of the front where divisions bunched (front profile chart, and the Checkpoints cards).
+
+Natural phase lines (Jenks on the east-west axis): all locations' east positions are split into as many stretches as the
+plan has, so the breaks are north-south lines where the advance moved fast between two places it bunched; each is set
+beside the nearest planned phase line. Drawn on the app's map.
 
 Usage: python analysis/phase_distributions.py   (writes analysis/phase_distributions/*)
 """
@@ -28,8 +32,7 @@ import numpy as np
 import pandas as pd
 from pyproj import Transformer
 from scipy.stats import ks_2samp, pearsonr, spearmanr, wasserstein_distance
-from shapely.geometry import Point, box as shp_box, mapping
-from shapely.ops import transform as shp_transform
+from shapely.geometry import Point
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
@@ -136,20 +139,29 @@ def label_key(key, branch):
     return NATION_CODES[key[0]], branch[key[1]], key[2]
 
 
-def sector_zone(z, lines, m, p, stretch, props):
-    """Map polygon for one natural sector: the stretch between two phase lines, cut to the sector's north-south span and
-    to the east-west extent of the data. Returns GeoJSON features in lon/lat (app) and km (paper maps)."""
-    letters = list(lines)
-    box = shp_box(p.x.min() - 30, m.y.min() - 8, p.x.max() + 30, m.y.max() + 8)
-    area = box if z == 0 else box.intersection(pc.east_polygon(lines[letters[z - 1]]))
-    if z < len(letters):
-        area = area.difference(pc.east_polygon(lines[letters[z]]))
+def natural_lines(p, lines):
+    """Natural phase lines: Jenks on how far east every division location was (km, weighted by strength), split into as
+    many stretches as the plan has (one break per planned line). Breaks fall where few division-days were spent - ground
+    crossed quickly - so each break is a north-south line between two places the advance bunched. Breaks and planned
+    lines are paired in order, west to east (1st with A, ...); gap = mean east-west distance over the data's north-south span. Returns (lon/lat features, km
+    features, breaks, gvf)."""
+    breaks, gvf = jenks(p.x, p.w, len(lines) + 1)
+    ys = np.linspace(p.y.min(), p.y.max(), 25)
+    planned = {}
+    for L, ln in lines.items():
+        x, y = np.array(ln).T
+        o = np.argsort(y)
+        planned[L] = np.interp(ys, y[o], x[o])
     inv = Transformer.from_crs(c.AEQD, 4326, always_xy=True)
-    area = area.simplify(2)
-    geom = shp_transform(lambda x, y: inv.transform(x, y), area)
-    props = {"stretch": stretch, **props}
-    return ({"type": "Feature", "properties": props, "geometry": mapping(geom)},
-            {"type": "Feature", "properties": props, "geometry": mapping(area)})
+    ll, km = [], []
+    for i, (b, L) in enumerate(zip(breaks, sorted(planned, key=lambda L: planned[L].mean()))):
+        props = {"name": f"N{i + 1}", "km_east": round(b), "planned": L, "gap_km": round(float(np.mean(np.abs(b - planned[L])))),
+                 "west_of_plan": bool(b < planned[L].mean())}
+        coords = [(b, y) for y in np.linspace(p.y.max() + 8, p.y.min() - 8, 20)]  # north end first, like the phase lines
+        ll.append({"type": "Feature", "properties": props,
+                   "geometry": {"type": "LineString", "coordinates": [[round(v, 4) for v in inv.transform(x, y)] for x, y in coords]}})
+        km.append({"type": "Feature", "properties": props, "geometry": {"type": "LineString", "coordinates": coords}})
+    return ll, km, breaks, float(gvf)
 
 
 def latitude_ticks():
@@ -218,7 +230,7 @@ def main():
 
     lines = pc.phase_lines()
     bins = np.arange(np.floor(p.y.min() / BIN_KM) * BIN_KM, p.y.max() + BIN_KM, BIN_KM)
-    profiles, positions, zones_fc, zones_km = [], [], [], []
+    profiles, positions = [], []
     names, branch = pc.unit_names(), pd.read_csv(c.DATA / "domain_Branch_Type.csv").set_index("Code").Label.to_dict()
     for z in zs:
         g = groups[z]
@@ -230,9 +242,6 @@ def main():
             m = g[cls == i]
             sectors.append({"sector": SECTORS[k][k - 1 - i], "share": round(100 * m.w.sum() / g.w.sum()), "divisions": m.division.nunique(),
                             "from_km": round(m.y.min()), "to_km": round(m.y.max())})
-            ll, km = sector_zone(z, lines, m, p, stretches[z], sectors[-1])
-            zones_fc.append(ll)
-            zones_km.append(km)
         profiles.append({"stretch": stretches[z], "share": [round(float(v), 4) for v in h / h.sum()],
                          "mean_km": round(np.average(g.y, weights=g.w)), "breaks_km": [round(b) for b in breaks],
                          "gvf": round(gvf, 2), "sectors": sectors})
@@ -242,12 +251,14 @@ def main():
     pd.DataFrame([{"stretch": r["stretch"], "classes": len(r["sectors"]), "gvf": r["gvf"], **s} for r in profiles for s in r["sectors"]]) \
         .to_csv(OUT / "natural_breaks.csv", index=False)
     draw(profiles, positions, bins, towns)
-    (OUT / "natural_zones.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": zones_km}), encoding="utf8")  # km, for phase_checkpoints maps
+    nat_ll, nat_km, nat_breaks, nat_gvf = natural_lines(p, lines)
+    pd.DataFrame([f["properties"] for f in nat_ll]).assign(gvf=round(nat_gvf, 2)).to_csv(OUT / "natural_lines.csv", index=False)
+    (OUT / "natural_lines.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": nat_km}), encoding="utf8")  # km, for phase_checkpoints maps
     # The app's Phases tab shows the sentence, with the numbers on request.
     (ROOT / "app" / "src" / "data" / "phase_distributions.json").write_text(pairs.to_json(orient="records"), encoding="utf8")
     (ROOT / "app" / "src" / "data" / "phase_profiles.json").write_text(json.dumps({
         "bin_km": BIN_KM, "bins_from_km": float(bins[0]), "towns": towns, "profiles": profiles, "positions": positions,
-        "zones": {"type": "FeatureCollection", "features": [{**f, "id": i} for i, f in enumerate(zones_fc)]},
+        "natural_gvf": round(nat_gvf, 2), "natural_lines": {"type": "FeatureCollection", "features": [{**f, "id": i} for i, f in enumerate(nat_ll)]},
     }, separators=(",", ":")), encoding="utf8")
     print("\n" + "\n".join(pairs.sentence))
     print(f"\nwrote {OUT}")

@@ -6,7 +6,7 @@ const TITLES: Record<string, (p: Record<string, unknown>) => string> = {
   points: (p) => `${p.Num_Name} ${p.Branch_Type ?? ""} ${p.Unit_Type ?? ""}`,
   matchplan: (p) => `Planned: ${p.name}`,
   matchreal: (p) => `Group ${p.cluster} · matched to ${p.name} · ${p.badge}`,
-  naturalzones: (p) => `${p.stretch} · ${p.sector} sector · ${p.share}% of division-days`,
+  naturallines: (p) => `Natural line ${p.name} · ${p.gap_km} km ${p.west_of_plan ? "west (short)" : "east (beyond)"} of planned line ${p.planned}`,
   checkdots: (p) => `${p.division} · crossed line ${p.line} on ${p.date}`,
   checkpaths: (p) => `Group ${p.group} · line ${p.from_line} → ${p.to_line} · ${p.divisions} divisions`,
   phaseavg: (p) => `${p.method} group ${p.cluster} · ${p.stretch} · ${p.divisions} divisions`,

@@ -66,13 +66,12 @@ export function Checkpoints() {
   const show = (on: boolean) => LAYERS.forEach((id) => setStyle(id, { visible: on }));
   const lines = s.phaseStep === "all" ? PHASE_CHECKS.lines : [s.phaseStep];
 
-  // One line at a time: the map keeps only that line, its crossings and the sectors either side (syncLayers stepData).
+  // One line at a time: the map keeps only that line, its crossings and its natural counterpart (syncLayers stepData).
   const step = (L: string) => {
     set({ phaseStep: L });
     if (L === "all") return;
-    [...LAYERS, "naturalzones" as const].forEach((id) => setStyle(id, { visible: true }));
-    const pts = PHASE_PROFILES.zones.features
-      .filter((f) => String(f.properties?.stretch).split("-").includes(L))
+    [...LAYERS, "naturallines" as const].forEach((id) => setStyle(id, { visible: true }));
+    const pts = [...PHASE_CHECKS.crossings.features.filter((f) => f.properties?.line === L), ...PHASE_PROFILES.natural_lines.features.filter((f) => f.properties?.planned === L)]
       .flatMap((f) => coords((f.geometry as { coordinates: unknown }).coordinates));
     const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
     mapRef?.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: 40, duration: 800 });

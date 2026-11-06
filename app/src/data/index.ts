@@ -100,7 +100,7 @@ export const PHASE_PROFILES = phase_profiles as unknown as {
   profiles: { stretch: string; share: number[]; mean_km: number; breaks_km: number[]; gvf: number;
     sectors: { sector: string; share: number; divisions: number; from_km: number; to_km: number }[] }[];
   positions: { division: string; stretch: string; km: number }[];
-  zones: FC;
+  natural_gvf: number; natural_lines: FC;
 };
 export interface PlanPair { planned: string; name: string; cluster: number; divisions: number; badge: "on plan" | "near plan" | "off plan";
   sentence: string; mean_offset_km: number; mean_gap_km: number; within50_pct: number; end_gap_km: number; bearing_diff: number;

@@ -113,6 +113,11 @@ kept their places along the front.
 - Front shifted north-south at line D: Wilcoxon signed-rank, paired by division; 95% bootstrap CI -64.72 to -29.40 km
 - Divisions kept their north-south order at line D: 10000 permutations
 
+**Natural phase lines.** Jenks natural breaks on every division location's east–west position (weighted by strength),
+split into as many stretches as the plan has; each break is a north–south line where the advance moved fast between two
+places it bunched, paired in order with planned lines A–E. Divisions are resampled (100 times) for a 95%
+interval on each line; a planned line outside its interval sits measurably apart from where the advance bunched.
+
 **Stability (descriptive).**
 - Checkpoint groups at line A (k = 4): bootstrap Jaccard 0.92, 0.88, 0.96, 1.00
 - Checkpoint groups at line B (k = 3): bootstrap Jaccard 0.88, 0.76, 0.91
@@ -123,6 +128,11 @@ kept their places along the front.
 - Natural breaks in B-C (k = 3): -16 km (95% -37 to 16); 43 km (95% 26 to 76)
 - Natural breaks in C-D (k = 2): -44 km (95% -56 to -23)
 - Natural breaks in D-E (k = 3): -112 km (95% -121 to -101); -47 km (95% -59 to -39)
+- Natural phase line N1 (paired with A): -349 km east (95% -411 to -341); planned line A averages -289 km, outside the interval
+- Natural phase line N2 (paired with B): -231 km east (95% -307 to -220); planned line B averages -183 km, outside the interval
+- Natural phase line N3 (paired with C): -125 km east (95% -203 to -111); planned line C averages -73 km, outside the interval
+- Natural phase line N4 (paired with D): -25 km east (95% -101 to -6); planned line D averages 46 km, outside the interval
+- Natural phase line N5 (paired with E): 63 km east (95% 14 to 90); planned line E averages 183 km, outside the interval
 
 ## Limits — please keep with the results
 - **Small n.** 44–51 divisions; tests have little power, so "not significant" is weak evidence of no effect.
