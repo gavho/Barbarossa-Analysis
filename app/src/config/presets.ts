@@ -83,6 +83,13 @@ export const PHASE_LAYERS: LayerDef[] = [
   { id: "checkdots", title: "Checkpoint · Crossings", kind: "circle", time: "none", cluster: "none", fields: ["division", "line", "date", "group"] },
 ];
 
+/** Which tab of the left bar a layer is listed under. */
+export type LayerGroup = "units" | "clusters" | "phases" | "plan";
+export const groupOf = (id: string): LayerGroup =>
+  id === "dv" || id === "geo" || id.endsWith("vec") ? "clusters"
+    : id.startsWith("plan_") || id.startsWith("match") ? "plan"
+    : id.startsWith("phase") || id.startsWith("check") || id === "naturalzones" ? "phases" : "units";
+
 export const layersFor = (page: PageId, plan: boolean): LayerDef[] =>
   page === "home" ? HOME_LAYERS
     : [...REGION_LAYERS, ...(page === "frontier" ? PHASE_LAYERS : []), ...(page === "frontier" && plan ? PLAN_LAYERS : [])];
@@ -101,6 +108,9 @@ export const CLUSTER_COLORS: Category[] = [
   { value: 2, color: "#A7C636" },
   { value: 3, color: "#9E559C" },
   { value: 4, color: "#FC921F" },
+  { value: 5, color: "#F2D649" }, // 5-7 only appear with live cluster settings above 5 groups
+  { value: 6, color: "#2EC4B6" },
+  { value: 7, color: "#E7298A" },
 ];
 export const POSTURE_COLORS: Record<string, string> = {
   Move: "#5E8FD0",

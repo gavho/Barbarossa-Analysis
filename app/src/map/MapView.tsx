@@ -43,7 +43,7 @@ export function MapView() {
     });
     const unsub = useStore.subscribe((now, prev) => {
       if (!ready) return;
-      const keys = ["page", "mode", "date", "theme", "basemap", "styles", "filters", "showPlan", "unit", "userLayers", "data", "phase", "phaseStep", "planMatch", "planFocus"] as const;
+      const keys = ["page", "mode", "date", "theme", "basemap", "styles", "filters", "showPlan", "unit", "userLayers", "data", "phase", "phaseStep", "clusters", "planFocus"] as const;
       if (keys.some((k) => now[k] !== prev[k])) syncLayers(map, now);
       if (now.page !== prev.page && !now.presenting) {
         markSelected(map, null);

@@ -9,6 +9,7 @@ import { addDays, daysBetween, fmtShort } from "@/lib/dates";
 import { exportChartPng } from "@/io/export";
 import { set, useStore, type State } from "@/state/store";
 import { RollingNumber } from "@/ui/RollingNumber";
+import { regionOf } from "@/state/clusters";
 import { Help } from "@/ui/Help";
 
 const POSTURES = Object.keys(POSTURE_COLORS);
@@ -34,7 +35,7 @@ function RegionCharts({ s }: { s: State }) {
     const rows = Array.from({ length: daysBetween(start, end) + 1 }, (_, i) => ({ date: addDays(start, i), ...Object.fromEntries(POSTURES.map((p) => [p, 0])) })) as Record<string, number | string>[];
     const idx = new Map(rows.map((r, i) => [r.date as string, i]));
     if (s.page === "home") return rows;
-    for (const f of s.data.regions[s.page].points.features) {
+    for (const f of regionOf(s, s.page).points.features) {
       const p = f.properties ?? {};
       if (!matches(p, "none", "members", s.mode, s.date, s.filters, true)) continue;
       const i = idx.get(p.Date);

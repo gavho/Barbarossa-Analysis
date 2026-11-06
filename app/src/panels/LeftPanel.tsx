@@ -1,13 +1,9 @@
 import { ExternalLink, Map as MapIcon } from "lucide-react";
 import forcesImg from "@/assets/forces.webp";
 import { HOME, REGIONS, region } from "@/config/regions";
-import { CLUSTER_COLORS } from "@/config/presets";
 import { goTo, set, useStore } from "@/state/store";
-import { FilterDisclosure } from "@/ui/FilterDisclosure";
 import { LayerPanel } from "./LayerPanel";
 import { Help } from "@/ui/Help";
-
-const clusterOptions = [{ id: "all", label: "All clusters" }, ...CLUSTER_COLORS.map((c) => ({ id: String(c.value), label: `Cluster ${c.value}`, swatch: c.color }))];
 
 export function LeftPanel() {
   const page = useStore((s) => s.page);
@@ -49,7 +45,6 @@ function HomeIntro() {
 function RegionIntro() {
   const page = useStore((s) => s.page);
   const filters = useStore((s) => s.filters);
-  const showPlan = useStore((s) => s.showPlan);
   const r = region(page)!;
   return (
     <>
@@ -61,26 +56,11 @@ function RegionIntro() {
           <p className="mt-2 leading-relaxed text-muted-foreground">{r.text}</p>
         </div>
       </div>
-      <section aria-label="Cluster filters" className="flex flex-col gap-1.5">
-        <h2 className="display flex items-center gap-1.5 text-[13px] text-muted-foreground">Cluster filters <Help id="clusterFilters" /></h2>
-        <FilterDisclosure id="geo" label="Geometric clustering groups" options={clusterOptions} value={filters.geo === null ? "all" : String(filters.geo)}
-          onChange={(v) => set({ filters: { ...filters, geo: v === "all" ? null : Number(v) } })} />
-        <FilterDisclosure id="dv" label="Directional vector clustering groups" options={clusterOptions} value={filters.dv === null ? "all" : String(filters.dv)}
-          onChange={(v) => set({ filters: { ...filters, dv: v === "all" ? null : Number(v) } })} />
-        {filters.chart && (
-          <button onClick={() => set({ filters: { ...filters, chart: null } })}
-            className="flex items-center justify-between rounded-[var(--radius)] border border-primary/60 bg-primary/10 px-2 py-1 text-[12px]">
-            <span>Chart filter: {filters.chart.field} = {filters.chart.value}</span><span aria-hidden>✕</span>
-          </button>
-        )}
-        <p className="text-[11px] text-muted-foreground">Filters apply to division locations, division paths and cluster paths, and to the charts and table.</p>
-      </section>
-      {page === "frontier" && (
-        <label className="flex cursor-pointer items-center gap-2 rounded-[var(--radius)] border border-border bg-background px-2 py-1.5">
-          <input type="checkbox" checked={showPlan} onChange={(e) => set({ showPlan: e.target.checked, ...(e.target.checked ? { rightTab: "plan" as const, rightOpen: true } : {}) })} />
-          <MapIcon size={14} className="text-primary" />
-          <span className="text-[13px]">Plan vs Actual: AGS pre-war milestones</span>
-        </label>
+      {filters.chart && (
+        <button onClick={() => set({ filters: { ...filters, chart: null } })}
+          className="flex items-center justify-between rounded-[var(--radius)] border border-primary/60 bg-primary/10 px-2 py-1 text-[12px]">
+          <span>Chart filter: {filters.chart.field} = {filters.chart.value}</span><span aria-hidden>✕</span>
+        </button>
       )}
       <a href="https://experience.arcgis.com/experience/ba5e82851a854d8387a89ea37c32a009" target="_blank" rel="noreferrer"
         className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground"><ExternalLink size={11} /> Original ArcGIS Experience</a>

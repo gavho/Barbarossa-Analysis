@@ -104,12 +104,15 @@ export const PHASE_PROFILES = phase_profiles as unknown as {
 };
 export interface PlanPair { planned: string; name: string; cluster: number; divisions: number; badge: "on plan" | "near plan" | "off plan";
   sentence: string; mean_offset_km: number; mean_gap_km: number; within50_pct: number; end_gap_km: number; bearing_diff: number;
-  membership_agrees: boolean; profile: [number, number][]; planned_line: [number, number][]; realized_line: [number, number][] }
+  membership_agrees: boolean; profile: [number, number][]; planned_line: [number, number][]; realized_line: [number, number][];
+  frechet_km?: number; score_direction: number; score_route: number; score_destination: number; score_overall: number }
 export type PlanClustering = "DV" | "DV4";
 /** Planned AGS lines of advance vs the matched realized groups, published 5 clusters (DV) or 4 groups of advancing
  * divisions (DV4), from analysis/compare_loa.py. */
 export const PLAN_MATCH = plan_match as unknown as Record<PlanClustering, { pairs: PlanPair[]; unmatched: number[]; lines: FC }> & {
   stayed_behind: string[]; towns: Record<string, [number, number]>;
+  planned: Record<string, [number, number][]>; planned_names: Record<string, string>;
+  roster: Record<string, string>; names: Record<string, string>; // division key "Nation|Branch|Number" -> planned unit / name
 };
 export const MILESTONES = milestones as unknown as Record<"AGS_PhaseLines" | "AGS_AdvanceLines" | "AGS_SmallPocketCOA", FC>;
 

@@ -2,6 +2,7 @@ import type { GeoJSONSource, LayerSpecification, Map as MLMap } from "maplibre-g
 import { COUNTRIES, MILESTONES, PHASE_CHECKS, PHASE_PROFILES, PHASES, PLAN_MATCH, type FC } from "@/data";
 import { HEAT_RAMP, layersFor, type LayerDef, type LayerId, type LayerStyle } from "@/config/presets";
 import { styleOf, type State } from "@/state/store";
+import { regionOf } from "@/state/clusters";
 import { BASEMAPS, FONT } from "./basemaps";
 import { colorExpr, layerFilter, sizeExpr } from "./expressions";
 
@@ -47,10 +48,12 @@ function stepData(step: string, id: StepLayer): FC {
 const matchCache = new Map<string, FC>();
 /** Planned lines or their matched groups for the chosen clustering, all or the one planned line in focus. */
 function matchData(s: State, id: "matchplan" | "matchreal"): FC {
-  const key = `${id}|${s.planMatch}|${s.planFocus}`;
+  const lines = regionOf(s, "frontier").plan?.lines ?? PLAN_MATCH.DV.lines;
+  const key = `${id}|${s.planFocus}`;
+  if (matchCache.get("lines") !== lines) { matchCache.clear(); matchCache.set("lines", lines); }
   if (!matchCache.has(key)) {
     const kind = id === "matchplan" ? "planned" : "realized";
-    const features = PLAN_MATCH[s.planMatch].lines.features
+    const features = lines.features
       .filter((f) => f.properties?.kind === kind && (s.planFocus === null || f.properties?.planned === s.planFocus));
     matchCache.set(key, { type: "FeatureCollection", features });
   }
@@ -65,7 +68,7 @@ export function sourceData(s: State, id: LayerId): FC | null {
   if (id === "plan_advance") return MILESTONES.AGS_AdvanceLines;
   if (id === "plan_pocket") return MILESTONES.AGS_SmallPocketCOA;
   if (s.page === "home") return id === "areas" ? s.data.areas : id === "heat" ? s.data.overview : null;
-  const r = s.data.regions[s.page];
+  const r = regionOf(s, s.page);
   return id === "heat" ? r.points : (r[id as "points" | "paths" | "dv" | "geo" | "dvvec" | "geovec" | "ellipses"] ?? null);
 }
 

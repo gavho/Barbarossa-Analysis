@@ -7,7 +7,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   clusterFilters: {
     title: "Cluster filters",
-    body: "Each division path was assigned to one of five clusters per area, twice. Picking a cluster keeps only the division locations, division paths and cluster lines in it, and the charts and table follow. Five clusters per area were set by design; silhouette scores of 0.28–0.46 mean the groups are moderately distinct, a description of a largely continuous advance rather than evidence of command groupings.",
+    body: "Each division path is assigned to a cluster twice, once by each method; how many clusters, and whether units that barely moved are set aside, is set under Cluster settings above (Published = the paper's five per area). Picking a cluster keeps only the division locations, division paths and cluster lines in it, and the charts and table follow. Set-aside divisions belong to no cluster. Silhouette scores of about 0.3–0.5 mean the groups are moderately distinct; whether they match the planned formations is tested in analysis/STATISTICS.md.",
   },
   geo: {
     title: "Geometric clustering",
@@ -121,9 +121,17 @@ export const HELP: Record<string, { title: string; body: string }> = {
     title: "Gap along the way",
     body: "How far north (up) or south (down) of the planned line the realized group ran, every 10 km along the planned route from start to end. The grey band is ±20 km, within mapping error: a line inside it means the two cannot be told apart.",
   },
+  clusterSettings: {
+    title: "Cluster settings",
+    body: "Published: the clusters in the paper (5 per method, every division). Recommended (Frontier): set aside the divisions that moved under 200 km from start to end and form 4 groups, one per planned line. Custom: choose the number of groups for each method (2–8) and the 'set aside' distance. The groups are recomputed in the browser with the paper's methods — directional vector: k-means on each path's end point and centre; geometric: Hausdorff distance with average linkage — and then the cluster paths, filters, charts, table, Vectors cards and planned-vs-actual comparison all follow. 'Clearly separate' / 'fairly separate' / 'overlapping' read the silhouette score (≥ 0.5 / ≥ 0.25 / below). Live results use a simpler map projection than the Python analysis, so a few km and the odd border-line division can differ.",
+  },
+  planScores: {
+    title: "Plan agreement scores",
+    body: "Three simple 0–100 scores, each 100 when the difference is inside the mapping-error band, so 100 means 'can't be told apart from the plan'. Direction: the start-to-end bearing difference, 100 at 10° or less, 0 at 45°. Route: the average gap along the planned line, 100 at 20 km or less, 0 at 100 km. Destination: the gap between end points, 100 at 20 km or less, 0 at 150 km. Plan agreement is their average. The cut-offs are for reading, not significance tests; the tests are in analysis/STATISTICS.md.",
+  },
   whyFour: {
     title: "Published 5 or recommended 4",
-    body: "The published Frontier clusters use 5 groups, a choice made for the original web maps. Two of them turn out to be divisions that barely advanced (security and rear-area divisions in the west, 22, 76 and 239 ID in the south: 20–190 km, against 400–750 km for most). The data do not single out 5: the separation score (silhouette) is no better at 5 than at 2–3. Recommended: set aside the 7 divisions that moved under 200 km as 'stayed behind' and group the other 44 with the same method into 4, one per planned line. The groups come out balanced (7/11/12/14). Both are shown so the change can be judged; the evidence is in analysis/loa_frontier/cluster_count.csv.",
+    body: "The published Frontier clusters use 5 groups, a choice made for the original web maps. Two of them turn out to be divisions that barely advanced (security and rear-area divisions in the west, 22, 76 and 239 ID in the south: 20–190 km, against 400–750 km for most). The data do not single out 5: the separation score (silhouette) is no better at 5 than at 2–3. Recommended: set aside the 7 divisions that moved under 200 km as 'stayed behind' and group the other 44 with the same method into 4, one per planned line. The groups come out balanced (7/11/12/14). Both are offered so the change can be judged (and any other grouping under Custom in the Clusters tab); the evidence is in analysis/loa_frontier/cluster_count.csv.",
   },
   matchplan: {
     title: "Planned lines",

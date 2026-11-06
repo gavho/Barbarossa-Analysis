@@ -8,6 +8,7 @@ import { Help } from "@/ui/Help";
 import { Segmented } from "@/ui/Segmented";
 import { cn } from "@/lib/utils";
 import { PlanMatch } from "./PlanMatch";
+import { regionOf } from "@/state/clusters";
 
 type Kind = "dv" | "geo";
 const COMPASS = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
@@ -22,7 +23,7 @@ export function Vectors() {
   if (s.page === "home") return <p className="p-4 text-muted-foreground">Open a theater to see its cluster vectors.</p>;
   const id = kind === "dv" ? "dvvec" : "geovec";
   const style = styleOf(s, id);
-  const feats = [...s.data.regions[s.page][id].features].sort((a, b) => Number(a.properties?.Cluster_ID) - Number(b.properties?.Cluster_ID));
+  const feats = [...regionOf(s, s.page)[id].features].sort((a, b) => Number(a.properties?.Cluster_ID) - Number(b.properties?.Cluster_ID));
   const active = kind === "dv" ? s.filters.dv : s.filters.geo;
 
   const focus = (f: Feature) => {

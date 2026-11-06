@@ -26,6 +26,12 @@ def test_verdict_badges():
     assert badge == "off plan" and "75 km south" in text and "20° further south" in text and "another group" in text
 
 
+def test_scores():
+    assert c.scores(row()) == {"score_direction": 100, "score_route": 100, "score_destination": 100, "score_overall": 100}
+    s = c.scores(row(straight_bearing_diff=-27.5, mean_abs_offset_km=60.0, end_gap_km=200))
+    assert (s["score_direction"], s["score_route"], s["score_destination"], s["score_overall"]) == (50, 50, 0, 33)
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

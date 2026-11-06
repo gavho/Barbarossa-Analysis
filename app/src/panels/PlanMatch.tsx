@@ -1,6 +1,8 @@
 import { Eye, EyeOff } from "lucide-react";
 import { CartesianGrid, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, XAxis, YAxis } from "recharts";
-import { PLAN_MATCH, type PlanClustering, type PlanPair } from "@/data";
+import { PLAN_MATCH, type PlanPair } from "@/data";
+import { PUBLISHED, RECOMMENDED } from "@/lib/cluster";
+import { divisionName, regionOf, settingsOf } from "@/state/clusters";
 import { CLUSTER_COLORS } from "@/config/presets";
 import { mapRef } from "@/map/MapView";
 import { set, setStyle, styleOf, useStore } from "@/state/store";
@@ -60,10 +62,34 @@ function GapStrip({ p }: { p: PlanPair }) {
   );
 }
 
+function Bar({ label, value, big }: { label: string; value: number; big?: boolean }) {
+  return (
+    <div className="grid grid-cols-[5.5rem_1fr_2rem] items-center gap-1.5">
+      <span className={cn("text-muted-foreground", big ? "text-[12px] font-medium text-foreground" : "text-[11px]")}>{label}</span>
+      <span className="h-1.5 overflow-hidden rounded bg-muted"><span className="block h-full rounded bg-primary" style={{ width: `${value}%`, opacity: big ? 1 : 0.6 }} /></span>
+      <span className="text-right font-mono text-[11px]">{value}</span>
+    </div>
+  );
+}
+
+/** Overall agreement with the plan and its three parts, 0-100 (100 = within mapping error). */
+function Scores({ p }: { p: PlanPair }) {
+  return (
+    <div className="mt-1.5 flex flex-col gap-0.5" aria-label="Plan agreement scores">
+      <div className="flex items-center gap-1"><Bar label="Plan agreement" value={p.score_overall} big /><Help id="planScores" /></div>
+      <Bar label="Direction" value={p.score_direction} />
+      <Bar label="Route" value={p.score_route} />
+      <Bar label="Destination" value={p.score_destination} />
+    </div>
+  );
+}
+
 /** Planned AGS lines of advance next to the realized groups they match, in pictures and plain words. Frontier only. */
 export function PlanMatch() {
   const s = useStore();
-  const m = PLAN_MATCH[s.planMatch];
+  const st = settingsOf(s, "frontier"), live = regionOf(s, "frontier");
+  const m = live.plan ?? PLAN_MATCH.DV;
+  const behind = live.info?.stayedBehind ?? [];
   const f = frame(m.pairs);
   const onMap = styleOf(s, "matchreal").visible;
   const show = (on: boolean) => LAYERS.forEach((id) => setStyle(id, { visible: on }));
@@ -86,14 +112,16 @@ export function PlanMatch() {
         </button>
       </div>
       <div className="flex items-center gap-1.5">
-        <Segmented<PlanClustering> size="sm" value={s.planMatch} onChange={(v) => set({ planMatch: v, planFocus: null })}
-          items={[{ value: "DV", label: "Published (5 clusters)" }, { value: "DV4", label: "Recommended (4 groups)" }]} />
+        <Segmented<string> size="sm" value={st.preset}
+          onChange={(v) => v !== "custom" && set({ clusters: { ...s.clusters, frontier: v === "published" ? PUBLISHED : RECOMMENDED }, planFocus: null })}
+          items={[{ value: "published", label: "Published (5)" }, { value: "recommended", label: "Recommended (4)" },
+            ...(st.preset === "custom" ? [{ value: "custom", label: `Custom (${st.dvK})` }] : [])]} />
         <Help id="whyFour" />
       </div>
       <p className="text-[11px] leading-relaxed text-muted-foreground">
-        {s.planMatch === "DV4"
-          ? <>Stayed behind, not compared ({PLAN_MATCH.stayed_behind.length}): {PLAN_MATCH.stayed_behind.join(", ")}.</>
-          : <>Not matched to any planned line: cluster {m.unmatched.join(", ")}.</>}
+        {behind.length > 0 && <>Stayed behind, not compared ({behind.length}): {behind.map(divisionName).join(", ")}. </>}
+        {m.unmatched.length > 0 && <>Not matched to any planned line: cluster {m.unmatched.join(", ")}. </>}
+        Change the grouping in the Clusters tab on the left.
       </p>
       <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
         <span className="flex items-center gap-1"><svg width="22" height="6"><line x1="0" y1="3" x2="22" y2="3" stroke="var(--foreground)" strokeWidth="1.8" strokeDasharray="5 3" /></svg> planned</span>
@@ -111,6 +139,7 @@ export function PlanMatch() {
             <span className={cn("shrink-0 rounded px-1.5 py-0.5 text-[11px] font-medium", BADGE[p.badge])}>{p.badge}</span>
           </div>
           <MiniMap p={p} f={f} />
+          <Scores p={p} />
           <p className="mt-1.5 text-[12px] leading-snug">{p.sentence.split(": ").slice(1).join(": ")}</p>
           <div className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">Gap along the way <Help id="gapStrip" /></div>
           <GapStrip p={p} />

@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { ChevronDown, Eye, EyeOff, RotateCcw, Trash2 } from "lucide-react";
-import { layersFor, type LayerDef, type LayerStyle } from "@/config/presets";
+import { ChevronDown, Eye, EyeOff, FolderOpen, Layers, Map as MapIcon, Milestone, Network, Route, RotateCcw, Trash2 } from "lucide-react";
+import { groupOf, layersFor, type LayerDef, type LayerStyle } from "@/config/presets";
+import type { RegionId } from "@/config/regions";
+import { FluidTabs, type TabItem } from "@/ui/FluidTabs";
+import { ClusterFilters, ClusterSettings } from "./ClusterSettings";
 import { resetStyle, set, setStyle, styleOf, useStore } from "@/state/store";
 import { sourceData } from "@/map/syncLayers";
 import { colorExpr } from "@/map/expressions";
@@ -9,10 +12,25 @@ import { StyleEditor } from "./StyleEditor";
 import { Help } from "@/ui/Help";
 import { HELP } from "@/config/help";
 
+type Tab = "units" | "clusters" | "phases" | "plan" | "mine";
+const TABS: TabItem<Tab>[] = [
+  { id: "units", label: "Units", icon: <Layers size={14} /> },
+  { id: "clusters", label: "Clusters", icon: <Network size={14} /> },
+  { id: "phases", label: "Phases", icon: <Milestone size={14} /> },
+  { id: "plan", label: "Plan", icon: <Route size={14} /> },
+  { id: "mine", label: "Mine", icon: <FolderOpen size={14} /> },
+];
+
 export function LayerPanel() {
   const s = useStore();
-  const defs = layersFor(s.page, s.showPlan).slice().reverse(); // top of map first
+  const all = layersFor(s.page, s.showPlan).slice().reverse(); // top of map first
   const [open, setOpen] = useState<string | null>(null);
+  // A tab shows when it has something in it: its layers, the cluster tools on a theatre, the plan toggle on Frontier.
+  const tabs = TABS.filter((t) => t.id === "mine" ? s.userLayers.length > 0
+    : (t.id === "clusters" && s.page !== "home") || (t.id === "plan" && s.page === "frontier") || all.some((d) => groupOf(d.id) === t.id));
+  const tab = (tabs.find((t) => t.id === s.layerTab) ?? tabs[0]).id;
+  const defs = all.filter((d) => groupOf(d.id) === tab);
+  const region = s.page === "home" ? null : (s.page as RegionId);
 
   return (
     <section aria-label="Layers" className="flex flex-col gap-1">
@@ -22,13 +40,22 @@ export function LayerPanel() {
           <RotateCcw size={11} /> Reset all
         </button>
       </div>
+      {tabs.length > 1 && <FluidTabs tabs={tabs} active={tab} onChange={(t) => set({ layerTab: t })} layoutId="layer-tab-pill" />}
+      {tab === "clusters" && region && <><ClusterSettings region={region} /><ClusterFilters region={region} /></>}
+      {tab === "plan" && s.page === "frontier" && (
+        <label className="flex cursor-pointer items-center gap-2 rounded-[var(--radius)] border border-border bg-background px-2 py-1.5">
+          <input type="checkbox" checked={s.showPlan} onChange={(e) => set({ showPlan: e.target.checked, ...(e.target.checked ? { rightTab: "plan" as const, rightOpen: true } : {}) })} />
+          <MapIcon size={14} className="text-primary" />
+          <span className="text-[13px]">Plan vs Actual: AGS pre-war milestones</span>
+        </label>
+      )}
       {defs.map((def) => (
         <LayerRow key={def.id} def={def} style={styleOf(s, def.id)} expanded={open === def.id}
           onToggle={() => setOpen(open === def.id ? null : def.id)}
           onChange={(p) => setStyle(def.id, p)} onReset={() => resetStyle(def.id)}
           features={sourceData(s, def.id)?.features ?? []} />
       ))}
-      {s.userLayers.map((u) => (
+      {tab === "mine" && s.userLayers.map((u) => (
         <LayerRow key={u.id} def={{ id: `user-${u.id}` as never, title: u.name, kind: u.kind, time: "none", cluster: "none", fields: Object.keys(u.data.features[0]?.properties ?? {}) }}
           style={u.style} expanded={open === u.id} onToggle={() => setOpen(open === u.id ? null : u.id)}
           onChange={(p) => set({ userLayers: s.userLayers.map((x) => (x.id === u.id ? { ...x, style: { ...x.style, ...p } } : x)) })}

@@ -4,7 +4,7 @@ import { get, initialState, set, toast, useStore, type State } from "@/state/sto
 import { saveFile } from "./export";
 
 const KEYS = ["page", "mode", "date", "speed", "theme", "basemap", "styles", "filters", "showPlan", "unit", "follow",
-  "leftOpen", "rightOpen", "rightTab", "tableLayer", "tableExtentOnly", "stories", "userLayers", "view"] as const;
+  "leftOpen", "rightOpen", "rightTab", "tableLayer", "tableExtentOnly", "stories", "userLayers", "view", "clusters"] as const;
 type Saved = Pick<State, (typeof KEYS)[number]>;
 
 export interface Workspace extends Partial<Saved> {

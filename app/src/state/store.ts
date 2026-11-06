@@ -4,6 +4,7 @@ import { EMBEDDED, type Dataset } from "@/data";
 import { preset, styleKey, type LayerId, type LayerStyle, type Mode } from "@/config/presets";
 import { timeWindow, type PageId, type RegionId } from "@/config/regions";
 import type { Filters } from "@/map/expressions";
+import type { ClusterSettings } from "@/lib/cluster";
 
 export type Theme = "tactical" | "period";
 export type RightTab = "charts" | "table" | "info" | "days" | "plan" | "oob" | "vectors" | "phases";
@@ -46,7 +47,8 @@ export interface State {
   data: Dataset;
   phase: PhaseView;
   phaseStep: string; // Phases tab stepper: "all" or a phase line letter
-  planMatch: "DV" | "DV4"; // Vectors tab: published 5 clusters or 4 groups of advancing divisions
+  clusters: Partial<Record<RegionId, ClusterSettings>>; // live cluster settings per theatre; missing = published
+  layerTab: string; // left bar: units / clusters / phases / plan / mine
   planFocus: string | null; // planned line shown alone on the map, or all
   view: View | null;
   toasts: Toast[];
@@ -78,7 +80,8 @@ export const initialState: State = {
   data: EMBEDDED,
   phase: { method: "DV", stretch: "all" },
   phaseStep: "all",
-  planMatch: "DV4",
+  clusters: {},
+  layerTab: "units",
   planFocus: null,
   view: null,
   toasts: [],
