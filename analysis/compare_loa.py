@@ -348,7 +348,32 @@ def verdict(r):
                    f"{r['realized_within_50km_pct']}% of the way, ended {r['end_gap_km']} km from the planned end point, {heading}. {who}")
 
 
-def plan_match_export(runs_out, behind, names):
+def _ramp(value, full, zero):
+    """100 up to `full`, falling linearly to 0 at `zero`."""
+    return round(100 * min(1.0, max(0.0, (zero - value) / (zero - full))))
+
+
+def scores(r):
+    """Three 0-100 scores for readers, each 100 inside the mapping-error band (presentational cut-offs, not tests):
+    direction (straight bearing difference, 100 at <= 10 deg, 0 at 45), route (mean gap, 100 at <= 20 km, 0 at 100),
+    destination (end-point gap, 100 at <= 20 km, 0 at 150), and their mean."""
+    d = _ramp(abs(r["straight_bearing_diff"]), NOISE_BEARING_DEG, 45)
+    route = _ramp(r["mean_abs_offset_km"], NOISE_OFFSET_KM, 100)
+    dest = _ramp(r["end_gap_km"], NOISE_OFFSET_KM, 150)
+    return {"score_direction": d, "score_route": route, "score_destination": dest, "score_overall": round((d + route + dest) / 3)}
+
+
+def roster(f):
+    """Division key "Nation|Branch|Number" -> the planned unit its researched group belongs to (the app's membership check)."""
+    out = {}
+    for r in f.itertuples():
+        unit = next((u for u, test in PLANNED_UNIT.items() if test(r.Group)), None)
+        if unit:
+            out[f"{r.Nation}|{r.Branch}|{r.Num_Name}"] = unit
+    return out
+
+
+def plan_match_export(runs_out, behind, names, f=None):
     """app/src/data/plan_match.json: per clustering, each planned line with its matched group, verdict, both lines in
     lon/lat and the signed-offset profile."""
     import phase_clusters as pc
@@ -364,8 +389,8 @@ def plan_match_export(runs_out, behind, names):
             size = int(members.loc[members.cluster == cid, "formations"].iloc[0])
             rows.append({"planned": r["planned"], "name": PLANNED_NAMES[r["planned"]], "cluster": int(cid), "divisions": size,
                          "badge": badge, "sentence": text, "mean_offset_km": r["mean_signed_offset_km"], "mean_gap_km": r["mean_abs_offset_km"],
-                         "within50_pct": r["realized_within_50km_pct"], "end_gap_km": r["end_gap_km"], "bearing_diff": r["straight_bearing_diff"],
-                         "membership_agrees": bool(r["membership_agrees"]), "profile": [[int(a), round(float(b))] for a, b in zip(s, off)],
+                         "within50_pct": r["realized_within_50km_pct"], "end_gap_km": r["end_gap_km"], "bearing_diff": r["straight_bearing_diff"], "frechet_km": r["frechet_km"],
+                         "membership_agrees": bool(r["membership_agrees"]), **scores(r), "profile": [[int(a), round(float(b))] for a, b in zip(s, off)],
                          "planned_line": ll(planned[r["planned"]]), "realized_line": ll(clusters[cid])})
             for kind, line in (("planned", planned[r["planned"]]), ("realized", clusters[cid])):
                 feats.append({"type": "Feature", "id": len(feats), "properties": {"kind": kind, "planned": r["planned"], "name": PLANNED_NAMES[r["planned"]],
@@ -374,6 +399,13 @@ def plan_match_export(runs_out, behind, names):
                            "lines": {"type": "FeatureCollection", "features": feats}}
     out["stayed_behind"] = sorted(pc.label(k, names) for k in behind)
     out["towns"] = {n: [lon, lat] for n, (lat, lon) in CITIES.items()}
+    # For the app's live re-clustering: the planned lines themselves and each division's planned unit.
+    first = next(iter(runs_out.values()))[0]
+    out["planned"] = {u: ll(line) for u, line in first.items()}
+    out["planned_names"] = PLANNED_NAMES
+    if f is not None:
+        out["roster"] = roster(f)
+        out["names"] = {f"{r.Nation}|{r.Branch}|{r.Num_Name}": pc.label((r.Nation, r.Branch, r.Num_Name), names) for r in f.itertuples()}
     (ROOT / "app" / "src" / "data" / "plan_match.json").write_text(__import__("json").dumps(out, separators=(",", ":")), encoding="utf8")
 
 
@@ -412,7 +444,7 @@ def draw_plan_maps(planned, clusters, pairs, profiles, path, title):
             ax.text(x + 5, y + 5, n, fontsize=6.5, color="0.35", style="italic")
         ax.set(xlim=(min(xs) - 20, max(xs) + 20), ylim=(min(ys) - 20, max(ys) + 20), aspect="equal", xticks=[], yticks=[])
         badge, text = verdict(r)
-        ax.set_title(f"{PLANNED_NAMES[r['planned']]} — {badge}", fontsize=9, fontweight="bold", loc="left")
+        ax.set_title(f"{PLANNED_NAMES[r['planned']]} — {badge} · agreement {scores(r)['score_overall']}/100", fontsize=9, fontweight="bold", loc="left")
         caption = text.split(": ", 1)[1]
         ax.text(0, -0.02, "\n".join(textwrap.wrap(caption[0].upper() + caption[1:], 95)), transform=ax.transAxes, fontsize=6.5, va="top")
         s, off, _ = profiles[r["planned"]]
@@ -677,6 +709,7 @@ def main():
                 assert check.mean_point_gap_km.max() < NOISE_OFFSET_KM, f"{clustering}: member paths no longer reproduce the stored average paths\n{check}"
             all_members.append(members)
         pairing, cost, pairs, segs, profiles, fits = compare(planned, clusters, members, clustering, pairing)
+        pairs = pairs.join(pd.DataFrame([scores(r) for r in pairs.to_dict("records")], index=pairs.index))
         all_pairs.append(pairs)
         all_segs.append(segs)
         if cost is not None:
@@ -697,7 +730,7 @@ def main():
     pd.concat(all_costs).to_csv(OUT / "frechet_matrix.csv", index=False)
     pd.concat(all_checks).to_csv(OUT / "reconstruction_check.csv", index=False)
     import phase_clusters as pc
-    plan_match_export(runs_out, behind, pc.unit_names())
+    plan_match_export(runs_out, behind, pc.unit_names(), f)
     counts = cluster_count(flines)
     counts.to_csv(OUT / "cluster_count.csv", index=False)
     print("\nHow many clusters?\n" + counts.to_string(index=False))
