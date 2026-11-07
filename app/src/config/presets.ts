@@ -201,7 +201,7 @@ export function preset(page: PageId, mode: Mode, id: LayerId): LayerStyle {
     case "jenksdots":
       return { ...base, colorMode: "category", colorField: "bin", categories: GROUP_COLORS, size: [5.5, 5.5], outline: "rgba(0,0,0,0.7)" };
     case "jenkslines":
-      return { ...base, color: "#e4e6e9", size: [1.6, 1.6], dash: true };
+      return { ...base, color: "#7d8899", size: [2, 2], dash: true }; // mid grey-blue: visible on light and dark basemaps
     case "spreadsurface":
       return { ...base, opacity: 0.45, colorMode: "ramp", colorField: "level", ramp: [[0.35, "#5d6f88"], [1, "#9aae5a"], [2, "#e0b52b"], [4, "#ffe27a"]],
         outline: "rgba(0,0,0,0)" };

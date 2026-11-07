@@ -156,7 +156,9 @@ def table(doc, df, widths=None):
         for cell, v in zip(t.add_row().cells, row):
             cell.text = "" if pd.isna(v) else str(v)
     for row in t.rows:
-        for cell in row.cells:
+        for i, cell in enumerate(row.cells):
+            if widths:
+                cell.width = Mm(widths[i])  # Word reads widths per cell; equal columns wasted space on short numbers
             for p in cell.paragraphs:
                 for run in p.runs:
                     run.font.size = Pt(8)
@@ -173,107 +175,118 @@ def main():
     ent = pd.read_csv(A / "phase_checkpoints" / "entropy.csv")
     flow_chart(OUT / "flow_chart.png")
 
-    doc = Document()
-    doc.styles["Normal"].font.size = Pt(10.5)
-    doc.add_heading("Army Group South, June-July 1941: plan versus what happened", level=1)
-    doc.add_paragraph("Bare-bones summary of the analyses discussed on 6 November 2026, for Sorin. Frontier Breakthrough "
-                      "(Army Group South) only. Numbers come from the project's scripts and data; the dashboard shows the same.")
-
-    # 1. Lines of operation
-    doc.add_heading("1. Planned versus realized lines of operation", level=2)
-    doc.add_paragraph("Each of Rob's four planned lines of operation is paired with the realized line (the average path of the "
-                      "closest cluster of divisions) and scored 0-100 on three things: direction (start-to-end bearing; 100 "
-                      "within 5°, 0 at 45°), route (average gap along the way; 100 within 20 km, 0 at 100 km) and destination "
-                      "(gap between end points; 100 within 20 km, 0 at 150 km). 100 means the difference is within mapping error.")
+    fig_loa_overview(OUT / "fig_loa_overview.png")
+    screens = OUT / "screens"
     order = ["17A", "PzGp1(-)", "III PzKo", "6A"]
     p = pairs.set_index("planned").loc[order].reset_index()
-    table(doc, pd.DataFrame({"Planned line": [NAMES[x] for x in p.planned], "Direction": p.score_direction,
-                             "Route": p.score_route, "Destination": p.score_destination, "Overall": p.score_overall}))
-    for r in p.itertuples():
-        doc.add_paragraph(f"{pair_sentence(r)} {NOTES[r.planned]}", style="List Bullet")
-    doc.add_paragraph("In depth, between two phase lines only (the same measures on that stretch):")
-    for r in sub.itertuples():
-        bd = int(r.straight_bearing_diff)
-        doc.add_paragraph(f"{NAMES[r.planned]}, phases {r.stretch.replace('-', ' to ')}: direction {r.score_direction} (headed "
-                          f"{abs(bd)}° further {'south' if bd > 0 else 'north'} than planned), route {r.score_route} "
-                          f"(average gap {round(r.mean_abs_offset_km)} km), destination {r.score_destination} "
-                          f"(ended {r.end_gap_km} km off).", style="List Bullet")
-    doc.add_picture(str(A / "loa_frontier" / "plan_vs_actual_DV.png"), width=Mm(150))
+    a = arrival.set_index("phase").arrived_pct
+    past_divs = jbins[jbins["class"] == "past"].groupby("phase").divisions.sum().reindex(jsum.phase, fill_value=0)
+    turn = lambda bd: "on course" if abs(bd) <= 5 else f"{abs(bd)}° further {'south' if bd > 0 else 'north'}"
+
+    doc = Document()
+    doc.styles["Normal"].font.size = Pt(10.5)
+    bullet = lambda text: doc.add_paragraph(text, style="List Bullet")
+
+    def question(text):
+        doc.add_paragraph().add_run(text).italic = True
+
+    def picture(path, mm, caption):
+        doc.add_picture(str(path), width=Mm(mm))
+        doc.add_paragraph().add_run(caption).font.size = Pt(8.5)
+
+    doc.add_heading("Army Group South, June-July 1941: plan versus what happened", level=1)
+    doc.add_paragraph("For Sorin, ahead of the 10 November meeting. Frontier Breakthrough only; every number comes from the "
+                      "project data and matches the dashboard (Barbarossa.html).")
+    doc.add_heading("In short", level=2)
+    worst = sub.loc[sub.straight_bearing_diff.abs().idxmax()]
+    bullet(f"Rob's four lines of operation were broadly followed (overall {p.score_overall.min()}-{p.score_overall.max()} of 100), "
+           f"but the {NAMES[worst.planned]} turned {turn(int(worst.straight_bearing_diff))} than planned between phases "
+           f"{worst.stretch.replace('-', ' and ')}.")
+    bullet(f"On the planned dates, {a[1]}%, {a[2]}%, {a[3]}% and {a[4]}% of divisions had reached phases 1-4 (within 10 km or "
+           f"past); none reached phase 5.")
+    bullet(f"Natural breaks show those lines were met loosely: only a front group was clearly past (at most "
+           f"{jsum.past.max()}% of divisions); most sat in groups straddling the line.")
+    bullet("Phase by phase the divisions fought as two to three groups: the southern one mostly 17th Army, the northern "
+           "one mixing the 6th Army with the panzer formations.")
+
+    # 1. Lines of operation
+    doc.add_heading("1. Did the armies follow Rob's planned lines?", level=2)
+    question("Each planned line is paired with the route its divisions actually took, and scored 0-100 on direction, "
+             "route and destination (100 = within mapping error).")
+    picture(screens / "plan_cards.png", 160, "Figure 1. Dashboard view: each planned line (dashed) and the route its divisions took (solid), "
+            "with the agreement scores.")
+    reading = {"17A": "right direction and end point, different route", "PzGp1(-)": "on route, but missed the end point",
+               "III PzKo": "as planned", "6A": "as planned overall, but bent north on the way"}
+    table(doc, pd.DataFrame({"Planned line": [NAMES[x] for x in p.planned], "Direction": p.score_direction, "Route": p.score_route,
+                             "Destination": p.score_destination, "Overall": p.score_overall,
+                             "Reading": [reading[x] for x in p.planned]}), widths=[42, 17, 15, 20, 15, 51])
+    doc.add_paragraph("In depth, between two phase lines only:")
+    table(doc, pd.DataFrame({"Stretch": [f"{NAMES[r.planned]}, phases {r.stretch}" for r in sub.itertuples()],
+                             "Heading vs plan": [turn(int(r.straight_bearing_diff)) for r in sub.itertuples()],
+                             "Direction": sub.score_direction, "Average gap": [f"{round(v)} km" for v in sub.mean_abs_offset_km],
+                             "End gap": [f"{v} km" for v in sub.end_gap_km]}), widths=[52, 34, 20, 26, 28])
 
     # 2. Arrival
-    doc.add_heading("2. Arrival at the phase lines on the planned dates", level=2)
-    doc.add_paragraph("For each phase line, the share of divisions that were past it or within 10 km of it on the date they "
-                      "were meant to be there (among divisions in the line's north-south span).")
-    doc.add_picture(str(ROOT / "figures" / "arrival" / "arrival_bars.png"), width=Mm(140))
-    a = arrival.set_index("phase").arrived_pct
-    doc.add_paragraph(f"Phase 1 (30 June): {a[1]}%. Phase 2 (7 July): {a[2]}%. Phase 3 (22 July, the middle of 'mid-July'): "
-                      f"{a[3]}%. Phase 4 (25 July): {a[4]}%. Phase 5 (30 July): {a[5]}%, no division came within 10 km. "
-                      "The advance was roughly on schedule to phase 3, slipped at 4 and never reached 5. The dates for 3-5 are our "
-                      "reading of vague planning dates ('mid-July', 'after mid-July', 'late July').")
+    doc.add_heading("2. Did the divisions reach each phase line on time?", level=2)
+    question("Share of divisions past each phase line, or within 10 km of it, on its planned date.")
+    picture(ROOT / "figures" / "arrival" / "arrival_bars.png", 130, "Figure 2. Arrival at each phase line on its planned date.")
+    bullet(f"Phases 1-3 were reached by about half to three quarters of the divisions on time ({a[1]}%, {a[2]}%, {a[3]}%); "
+           f"phase 4 by {a[4]}%; phase 5 by none.")
+    bullet("Dates for phases 3-5 are our reading of vague planning dates: 22 July for 'mid-July', 25 July for 'after "
+           "mid-July', 30 July for 'late July'.")
 
     # 3. Natural breaks
-    doc.add_heading("3. Natural breaks at each phase line", level=2)
-    doc.add_paragraph("The 10 km rule gives one number per phase line; it cannot tell a line barely reached by a crowd "
-                      "from one clearly beaten by a group. So, on each planned date, every division is placed on one line: "
-                      "its distance along the general direction of the whole advance (bearing 101 degrees). Jenks natural "
-                      "breaks then cut that line where the divisions clump, into the fewest bins that explain at least 90% "
-                      "of the spread. Only then is each bin read against the phase line: past (all its divisions had "
-                      "crossed), straddling (some had) or behind (none had). Bins are numbered from the front.")
-    doc.add_picture(str(A / "phase_distributions" / "jenks_by_phase.png"), width=Mm(150))
-    a10 = arrival.set_index("phase").arrived_pct
-    for r in jsum.itertuples():
-        b = jbins[jbins.phase == r.phase].sort_values("bin")
-        bins_txt = "; ".join(f"bin {x['bin']}: {x['divisions']} divisions, {x['past']} past ({x['class']})" for x in b.to_dict("records"))
-        doc.add_paragraph(f"Phase {r.phase} ({pd.Timestamp(r.date):%d %b}), {r.bins} bins: {bins_txt}. In all, {r.past}% of "
-                          f"divisions were in bins clearly past the line, {r.straddling}% straddling it and {r.behind}% behind "
-                          f"(the 10 km rule: {a10[int(r.phase)]}%).", style="List Bullet")
-    table(doc, pd.DataFrame({"Phase": jbins.phase, "Bin": jbins.bin, "km along the advance": [f"{x}-{y}" for x, y in zip(jbins.from_km, jbins.to_km)],
-                             "Divisions": jbins.divisions, "Past the line": jbins.past, "Class": jbins["class"]}))
-    doc.add_paragraph("So most of each phase was reached loosely: the bins around each line hold divisions on both sides of "
-                      "it. Only a front bin was clearly past: 3 divisions at phase 1, 15 at phase 2 and 13 at phase 3. "
-                      "Phase 4 was met by about half of the leading bin, and phase 5 by none.")
+    doc.add_heading("3. How were the divisions spread around each line?", level=2)
+    question("On each planned date, every division is placed along the general direction of the advance; Jenks natural "
+             "breaks cut that line where the divisions clump; only then is each group read against the phase line.")
+    picture(screens / "natural_breaks_strips.png", 160, "Figure 3. Dashboard view, phases 1-5: divisions along the advance on each "
+            "planned date. Filled: past the phase line. Dashed: natural breaks; groups numbered from the front.")
+    table(doc, pd.DataFrame({"Phase (date)": [f"{r.phase} ({pd.Timestamp(r.date):%d %b})" for r in jsum.itertuples()],
+                             "10 km rule": [f"{a[int(x)]}%" for x in jsum.phase], "Groups": jsum.bins,
+                             "Clearly past": [f"{r.past}% ({past_divs[r.phase]} div.)" for r in jsum.itertuples()],
+                             "Straddling": [f"{x}%" for x in jsum.straddling], "Behind": [f"{x}%" for x in jsum.behind]}))
+    bullet("The 10 km rule makes phases 1-4 look roughly half met or better; the natural breaks show they were met loosely. Only a "
+           "front group was clearly past the line, and most divisions sat in groups straddling it.")
+    bullet("The phase lines run at an angle to the advance, so a group can straddle a line with its southern divisions "
+           "past it and its northern ones short.")
+    if (screens / "natural_breaks_phase3.png").exists():
+        picture(screens / "natural_breaks_phase3.png", 150, "Figure 4. Dashboard view, phase 3 on 22 July: the phase line "
+                "(teal), the natural breaks (dashed) and the divisions coloured by group: red = 1 (front, all past), "
+                "blue = 2 (mostly past), green = 3, purple = 4 (behind).")
 
-    # 4. Groups of divisions
-    doc.add_heading("4. Groups of divisions", level=2)
-    doc.add_heading("4a. Crossing groups: who crossed each phase line together", level=3)
-    doc.add_paragraph("At each phase line, divisions that crossed it close together in place and time form a fighting group "
-                      "(blocks, numbers = divisions; each block is split by greater unit, with the group's map colour as a thin "
-                      "strip on its left). Bands show where each group's divisions went next, coloured by the "
-                      "greater unit they belonged to (grey bands: other or unidentified divisions; grey blocks: divisions that did not reach the next phase line by 5 August). Diversity is the entropy of the greater units within a group, scaled "
-                      "0-1: 0 = one greater unit fighting as itself, 1 = all four equally mixed.")
-    doc.add_picture(str(OUT / "flow_chart.png"), width=Mm(150))
-    e = ent.dropna(subset=["entropy"])
-    table(doc, pd.DataFrame({"Phase": e.phase, "Group": e.sector, "Divisions": e.divisions, "6A": e["6A"],
-                             "III PzKo": e["III PzKo"], "PzGp1(-)": e["PzGp1(-)"], "17A": e["17A"], "Other": e.other,
-                             "Diversity": e.entropy}))
-    doc.add_paragraph("Over the whole period the divisions follow four lines of operation, but phase by phase they fought as "
-                      "two to three groups (III Panzer Corps merged with Panzer Group 1), with an occasional small fourth. The "
-                      "southern group stays mostly 17th Army (diversity near 0 by phases 3 and 4); the northern group mixes "
-                      "6th Army and the panzer formations (diversity about 0.8 to 0.95).")
+    # 4. Fighting groups
+    doc.add_heading("4. Who fought together from phase to phase?", level=2)
+    question("At each phase line, divisions that crossed it close together in place and time form a fighting group. "
+             "The chart follows those groups from line to line (the dashboard chart, as is).")
+    picture(screens / "flow_chart_app.png", 120, "Figure 5. Blocks: fighting groups at each line (number = divisions), split by army; "
+            "bands: where their divisions went next. Grey blocks: did not reach the next line by 5 August.")
+    mixed = ent.dropna(subset=["entropy"]).query("divisions >= 5")  # the small groups say little about mixing
+    bullet("They fought as two to three groups at each line (III Panzer Corps merged with Panzer Group 1), with an "
+           "occasional small fourth.")
+    bullet("How mixed each group of 5+ divisions was (0 = one army on its own, 1 = all four mixed; unidentified divisions left out): " + "; ".join(
+        f"phase {ph}: " + ", ".join(f"{g.sector} ({g.divisions} div.) {g.entropy:.1f}" for g in mixed[mixed.phase == ph].itertuples())
+        for ph in ["1", "2", "3", "4"] if (mixed.phase == ph).any()) + ".")
 
-    doc.add_heading("4b. Local groups: who stood together, day by day", level=3)
-    doc.add_paragraph("A second way of grouping, independent of the phase lines: on every day from 22 June to 5 August, two "
-                      "divisions belong to the same group when they stood within 30 km of each other, directly or through a "
-                      "chain of neighbours (30 km is one and a half times the mapping error). A group keeps its identity while "
-                      "it shares most of its divisions with the day before, so the figure shows groups forming, holding, "
-                      "splitting and merging. Most lasted only a few days; the ones that held together for ten days or more were:")
-    doc.add_picture(str(A / "phase_distributions" / "groups_daily.png"), width=Mm(150))
-    daily = pd.read_csv(A / "phase_distributions" / "groups_daily.csv")
-    life = daily.groupby("id").agg(first=("date", "min"), last=("date", "max"), days=("date", "size"), peak=("divisions", "max"),
-                                    dominant=("dominant", lambda x: x.mode()[0])).query("days >= 10").sort_values("first")
-    for r in life.itertuples():
-        who = {"other": "Unidentified divisions", "mixed": "Mixed formations"}.get(r.dominant, NAMES.get(r.dominant, r.dominant))
-        doc.add_paragraph(f"{who}: {pd.Timestamp(r.first):%d %b} to {pd.Timestamp(r.last):%d %b} ({r.days} days, up to "
-                          f"{r.peak} divisions).", style="List Bullet")
+    # 5. Also explored
+    doc.add_heading("5. Also explored: local groups, day by day", level=2)
+    doc.add_paragraph("Beyond what we discussed: on every day, divisions within 30 km of each other (directly or through "
+                      "neighbours) form a local group, and the groups are followed from day to day. Most lasted only a "
+                      "few days; the 17th Army group held together for all 45 days, and 6th Army, panzer and mixed groups "
+                      "formed in July.")
+    picture(screens / "local_groups_chart.png", 120, "Figure 6. Dashboard view: local groups day by day; strong colours: groups "
+            "that held together 10 days or more.")
+    if (screens / "local_groups_0721.png").exists():
+        picture(screens / "local_groups_0721.png", 150, "Figure 7. Dashboard view, 21 July: local groups (outlined, "
+                "labelled number · divisions) on the density of divisions (shading).")
 
-    # 5. Done so far
-    doc.add_heading("5. What we have done so far", level=2)
-    for item in ["Digitized and cleaned division positions for the four theaters; interactive dashboard (Barbarossa.html).",
-                 "Clustered the division paths into lines of operation and compared them with Rob's planned lines (scores above).",
-                 "Measured arrival at Rob's phase lines on their planned dates (10 km rule) and the spread around each line (natural breaks).",
-                 "Grouped divisions at each phase line into fighting groups, followed them from phase to phase, and measured how mixed each group was.",
-                 "Black-and-white posture-over-time charts for the four theaters (for the paper)."]:
-        doc.add_paragraph(item, style="List Bullet")
+    # 6. Done so far
+    doc.add_heading("6. What we have done so far", level=2)
+    for item in ["Digitized and cleaned daily division positions for four theaters; built the interactive dashboard (Barbarossa.html).",
+                 "Compared Rob's planned lines of operation with the routes the divisions took (section 1).",
+                 "Measured arrival at Rob's phase lines on their planned dates, and the spread around each line (sections 2-3).",
+                 "Followed the fighting groups from phase line to phase line, and how mixed they were (section 4).",
+                 "Black-and-white posture-over-time charts for the four theaters, for the paper."]:
+        bullet(item)
 
     path = OUT / "Barbarossa brief 2026-11-09.docx"
     doc.save(path)
