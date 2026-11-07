@@ -41,8 +41,11 @@ COLORS = ["#ED5151", "#149ECE", "#A7C636", "#9E559C"]
 
 
 # ---------------------------------------------------------------- phase lines and stretches
+PHASE_NO = {l: str(i + 1) for i, l in enumerate("ABCDE")}  # the source layer's line_id a-e; we call them phases 1-5 (Sorin, 11-6)
+
+
 def phase_lines():
-    """Phase lines a-e in km, each extended straight north and south so every position is either short of it or past it."""
+    """Phase lines 1-5 in km, each extended straight north and south so every position is either short of it or past it."""
     gdf = c.gpd.read_file(ROOT / "milestones" / "AGS_Milestones.gdb", layer="AGS_PhaseLines").sort_values("line_id")
     out = {}
     for r in gdf.itertuples():
@@ -51,7 +54,7 @@ def phase_lines():
         if coords[0][1] < coords[-1][1]:
             coords = coords[::-1]  # north end first
         (nx, ny), (sx, sy) = coords[0], coords[-1]
-        out[str(r.line_id).upper()] = [(nx, ny + FAR), *coords, (sx, sy - FAR)]
+        out[PHASE_NO[str(r.line_id).upper()]] = [(nx, ny + FAR), *coords, (sx, sy - FAR)]
     return out
 
 

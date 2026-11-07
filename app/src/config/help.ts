@@ -143,7 +143,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   naturalzones: {
     title: "Natural breaks between the phase lines",
-    body: "Where the divisions bunched between one planned phase line and the next. Every daily division location (weighted by strength) is placed by how far across its stretch it was — 0% at the western phase line, 100% at the eastern one, measured at its own latitude (before phase A: km west of A). Jenks natural breaks then split each stretch into bands: breaks fall where few division-days were spent, so the divisions crossed that ground quickly, and the bands are where they slowed or paused. Each break runs north–south and bends with the phase lines either side. The app uses the fewest bands (2–5) that explain at least 80% of the spread (goodness of variance fit 0.8, the usual rule). Brighter = a larger share of the stretch's division-days. Click a band for its numbers."
+    body: "Where the divisions bunched between one planned phase line and the next. Every daily division location (weighted by strength) is placed by how far across its stretch it was — 0% at the western phase line, 100% at the eastern one, measured at its own latitude (before phase 1: km west of it). Jenks natural breaks then split each stretch into bands: breaks fall where few division-days were spent, so the divisions crossed that ground quickly, and the bands are where they slowed or paused. Each break runs north–south and bends with the phase lines either side. The app uses the fewest bands (2–5) that explain at least 80% of the spread (goodness of variance fit 0.8, the usual rule). Brighter = a larger share of the stretch's division-days. Click a band for its numbers."
   },
   frontProfile: {
     title: "Front profile",
@@ -155,7 +155,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   checkpoints: {
     title: "Phase lines as checkpoints",
-    body: "Each phase line is treated as a checkpoint. For every Wehrmacht/SS division the app finds where and on which day its track first crossed the line (between the two daily positions either side of it; lines extended straight north and south). Divisions that crossed close together in place and time form a group. A colour is one group: at each later line, a group keeps the colour of the earlier group most of its divisions came from. A Start checkpoint comes first, with its colours running north to south: where the divisions stood on 22 June, so the flow shows how the opening line-up carried on to phase A. Divisions first recorded later join at the first line they cross.",
+    body: "Each phase line is treated as a checkpoint. For every Wehrmacht/SS division the app finds where and on which day its track first crossed the line (between the two daily positions either side of it; lines extended straight north and south). Divisions that crossed close together in place and time form a group. A colour is one group: at each later line, a group keeps the colour of the earlier group most of its divisions came from. A Start checkpoint comes first, with its colours running north to south: where the divisions stood on 22 June, so the flow shows how the opening line-up carried on to phase 1. Divisions first recorded later join at the first line they cross.",
   },
   checkGroups: {
     title: "How many groups",
@@ -195,7 +195,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   phaseStep: {
     title: "Step through the lines",
-    body: "Pick Start to see the 22 June line-up and the bands between the border and phase A. Pick a phase line to see only it on the map: the teal dashed line itself; a dot where each division crossed it, coloured by the group it crossed with; arrows showing each group arriving from the line before; and the natural-break bands of the stretches just before and after it, brighter where more divisions spent their days. If the coloured groups keep the same north–south order line after line, the front advanced as one piece; where they jump, it reshaped. The card below says the same in words. All shows every line at once.",
+    body: "Pick Start to see the 22 June line-up and the bands between the border and phase 1. Pick a phase line to see only it on the map: the teal dashed line itself; a dot where each division crossed it, coloured by the group it crossed with; arrows showing each group arriving from the line before; and the natural-break bands of the stretches just before and after it, brighter where more divisions spent their days. If the coloured groups keep the same north–south order line after line, the front advanced as one piece; where they jump, it reshaped. The card below says the same in words. All shows every line at once.",
   },
   frontShape: {
     title: "How the front changed at the line",

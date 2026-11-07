@@ -1,5 +1,5 @@
 from,to,divisions_a,divisions_b,divisions_in_both,shift_km,wasserstein_km,hist_r,ks_D,ks_p,order_rho,order_p,sentence
-Frontier-A,A-B,48,47,46,-25,25,0.59,0.34,0.006,0.8,0.0,"Past line A the line-up of divisions changed shape somewhat, its centre of weight moved about 25 km south, and divisions kept their places in line."
-A-B,B-C,47,43,43,2,16,0.85,0.2,0.273,0.94,0.0,"Past line B the line-up of divisions kept the same shape, its centre of weight stayed put, and divisions kept their places in line."
-B-C,C-D,43,42,39,-56,56,0.44,0.21,0.242,0.82,0.0,"Past line C the line-up of divisions changed shape somewhat, its centre of weight moved about 56 km south, and divisions kept their places in line."
-C-D,D-E,42,26,26,-54,57,-0.02,0.51,0.0,0.7,0.0,"Past line D the line-up of divisions took a different shape, its centre of weight moved about 54 km south, and divisions mostly kept their places; 16 fewer divisions got past it."
+Frontier-1,1-2,48,47,46,-25,25,0.59,0.34,0.006,0.8,0.0,"Past phase 1 the line-up of divisions changed shape somewhat, its centre of weight moved about 25 km south, and divisions kept their places in line."
+1-2,2-3,47,43,43,2,16,0.85,0.2,0.273,0.94,0.0,"Past phase 2 the line-up of divisions kept the same shape, its centre of weight stayed put, and divisions kept their places in line."
+2-3,3-4,43,42,39,-56,56,0.44,0.21,0.242,0.82,0.0,"Past phase 3 the line-up of divisions changed shape somewhat, its centre of weight moved about 56 km south, and divisions kept their places in line."
+3-4,4-5,42,26,26,-54,57,-0.02,0.51,0.0,0.7,0.0,"Past phase 4 the line-up of divisions took a different shape, its centre of weight moved about 54 km south, and divisions mostly kept their places; 16 fewer divisions got past it."

@@ -7,7 +7,7 @@ Replaces "clusters between the lines" (phase_clusters.py, kept as a method check
      A division already past a line on its first recorded day has no crossing for that line.
   3. At each line, crossings are grouped by place along the line and day (both standardized, k-means). The number of
      groups (2-5) is the one with the best silhouette among those with no single-division group.
-     A "Start" checkpoint comes first: the divisions on the map on 22 June, at their first position, placed along line A
+     A "Start" checkpoint comes first: the divisions on the map on 22 June, at their first position, placed along phase 1
      (km from its north end) and grouped by that place alone (they share the day). Divisions that first appear later join
      at the first line they cross.
   4. Groups at the first checkpoint are numbered north to south; at each later line a group takes the number of the earlier
@@ -39,7 +39,7 @@ OUT = ROOT / "analysis" / "phase_checkpoints"
 NATION_CODES = {1: "Wehrmacht", 2: "SS"}  # domain_Nation: 1 DE (Wehrmacht), 2 SS
 K_RANGE = range(2, 6)  # the app has five group colours
 DAY0 = pd.Timestamp("1941-06-22", tz="UTC")
-START = "Start"  # the checkpoint before line A: the 22 June line-up
+START = "Start"  # the checkpoint before phase 1: the 22 June line-up
 FORMATIONS = ["6A", "III PzKo", "PzGp1(-)", "17A"]  # the four planned lines, north to south; anything else is "other"
 BREAKAWAY_MAX = 2  # at most this many divisions (and under a quarter of the group) leaving together is a breakaway
 
@@ -158,7 +158,7 @@ def main():
         df = cr[cr.line == L].reset_index(drop=True)
         best = group_line(df) if len(df) >= 4 else None
         if best is None:
-            print(f"  line {L}: {len(df)} crossings, too few to group")
+            print(f"  phase {L}: {len(df)} crossings, too few to group")
             continue
         labels, sil = best
         if j == 0 or not any(g for (l, _), g in group.items() if l == letters[j - 1]):
@@ -178,7 +178,7 @@ def main():
                            "first": date(m.day.min()), "median": date(m.day.median()), "last": date(m.day.max()),
                            "lonlat": ll(m.x.mean(), m.y.mean()), "members": "; ".join(sorted(m.division)),
                            "formations": count(m.key), "entropy": entropy(count(m.key))})
-        print(f"  line {L}: {len(df)} crossings in {info[L]['k']} groups (silhouette {info[L]['silhouette']})")
+        print(f"  phase {L}: {len(df)} crossings in {info[L]['k']} groups (silhouette {info[L]['silhouette']})")
 
     flows, splits, ribbons = [], [], []
     done = [L for L in letters if L in info]
@@ -261,7 +261,7 @@ def draw_maps(cr, lines, done):
             ax.plot(q.x, q.y, "k.", ms=3)
             ax.annotate(n, (q.x, q.y), xytext=(3, 3), textcoords="offset points", fontsize=7, style="italic")
         ax.set_title(f"Start · {len(m)} divisions on 22 Jun" if L == START else
-                     f"Line {L} · {len(m)} divisions crossed, {date(m.day.min())} – {date(m.day.max())}", fontsize=9)
+                     f"Phase {L} · {len(m)} divisions crossed, {date(m.day.min())} – {date(m.day.max())}", fontsize=9)
         ax.set(xlim=(xlo, xhi), ylim=(ylo, yhi), xticks=[], yticks=[], aspect="equal")
     used = sorted(int(g) for g in cr.group.unique())
     handles = [Line2D([], [], marker=marks[g], ls="", mfc="white", mec="black", label=f"Group {GROUP_NAMES[g]}") for g in used]

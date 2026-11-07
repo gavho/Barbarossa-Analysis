@@ -2,7 +2,7 @@
 
 Same rule and data as the app's Plan vs Actual tab (app/src/lib/crossing.ts share()), so the numbers match what the
 dashboard shows: of that day's Frontier points inside the phase line's latitude span, the share east of the line or no
-more than REACH_KM short of it. Planned dates as agreed with Sorin on 11-6-2026 (C "mid-July" = 22 Jul, the middle of
+more than REACH_KM short of it. Planned dates as agreed with Sorin on 11-6-2026 (phase 3 "mid-July" = 22 Jul, the middle of
 15-30 Jul). Writes figures/arrival/arrival_bars.{pdf,png} and arrival.csv. Usage: python figures/arrival_bars.py
 """
 import json
@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 APPDATA = ROOT / "app" / "src" / "data"
 OUT = ROOT / "figures" / "arrival"
 REACH_KM = 10
-PLANNED = {"A": "1941-06-30", "B": "1941-07-07", "C": "1941-07-22", "D": "1941-07-25", "E": "1941-07-30"}
+PLANNED = {"1": "1941-06-30", "2": "1941-07-07", "3": "1941-07-22", "4": "1941-07-25", "5": "1941-07-30"}
 EAST = 60  # same polygon closure as the app
 
 plt.rcParams.update({"font.family": ["Arial", "DejaVu Sans"], "font.size": 8, "pdf.fonttype": 42, "axes.linewidth": 0.6})
@@ -81,9 +81,9 @@ def draw(df, stem):
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     df = arrival()
-    # Self-check against the dashboard as read in the 11-6 meeting (10 km reach): A 61%, B 49%.
+    # Self-check against the dashboard as read in the 11-6 meeting (10 km reach): phase 1 61%, phase 2 49%.
     got = dict(zip(df.phase, df.arrived_pct))
-    assert abs(got["A"] - 61) <= 2 and abs(got["B"] - 49) <= 2, got
+    assert abs(got["1"] - 61) <= 2 and abs(got["2"] - 49) <= 2, got
     df.to_csv(OUT / "arrival.csv", index=False)
     draw(df, OUT / "arrival_bars")
     print(df.to_string(index=False))

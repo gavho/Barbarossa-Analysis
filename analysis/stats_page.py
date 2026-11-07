@@ -78,7 +78,7 @@ def shift_chart(rows):
     for i, (line, est, lo, hi, sig) in enumerate(vals):
         y = 22 + 34 * i
         cls = "sig" if sig else "nosig"
-        out += [f'<text x="8" y="{y + 4}" class="lab">Line {line}</text>',
+        out += [f'<text x="8" y="{y + 4}" class="lab">Phase {line}</text>',
                 f'<line x1="{x(lo):.1f}" x2="{x(hi):.1f}" y1="{y}" y2="{y}" class="ci {cls}"/>',
                 f'<circle cx="{x(est):.1f}" cy="{y}" r="5" class="dot {cls}"/>',
                 f'<text x="{x(est):.1f}" y="{y - 9}" class="val" text-anchor="middle">{est:+.0f} km</text>']
@@ -99,7 +99,7 @@ def bands_chart(nb, intervals):
         ivs = "".join(f'<span class="iv" style="left:{pos(a):.1f}%;width:{max(pos(b) - pos(a), 0.6):.1f}%" title="95% range of this break: {a} to {b} {g.unit.iloc[0]}"></span>'
                       for _, a, b in intervals.get(stretch, []))
         unit = g.unit.iloc[0]
-        ends = (f"{lo} km", "line A") if unit == "km" else (f"line {stretch.split('-')[0]}", f"line {stretch.split('-')[1]}")
+        ends = (f"{lo} km", "phase 1") if unit == "km" else (f"phase {stretch.split('-')[0]}", f"phase {stretch.split('-')[1]}")
         out.append(f'<div class="stretch"><div class="stretch-name">{escape(stretch.replace("-", " → "))}</div>'
                    f'<div class="track">{segs}{ivs}</div><div class="ends"><span>{ends[0]}</span><span>{ends[1]}</span></div></div>')
     return "\n".join(out)
@@ -170,14 +170,14 @@ def build(res, gaps, meta, nb):
     for r in shifts:
         lo, hi = (float(v) for v in re.search(r"CI (-?[\d.]+) to (-?[\d.]+)", r.detail).groups())
         D_shift.append({"line": r.test[-1], "est": r.estimate, "lo": lo, "hi": hi, "sig": sig(r), "p": r.p_holm, "n": r.n})
-    D_rows = [[f"Line {d['line']}", f"<b>{abs(d['est']):.0f} km {'south' if d['est'] < 0 else 'north'}</b>",
+    D_rows = [[f"Phase {d['line']}", f"<b>{abs(d['est']):.0f} km {'south' if d['est'] < 0 else 'north'}</b>",
                f"{abs(d['hi']):.0f}–{abs(d['lo']):.0f} km" if d["hi"] < 0 else f"{d['lo']:.0f} to {d['hi']:.0f} km",
                d["n"], p_text(d["p"]), chip(d["sig"])] for d in D_shift]
-    O_rows = [[f"Line {r.test[-1]}", f"<b>{r.estimate:g}</b> ({strength_rho(r.estimate)})", r.n, p_text(r.p_holm), chip(sig(r))] for r in orders]
+    O_rows = [[f"Phase {r.test[-1]}", f"<b>{r.estimate:g}</b> ({strength_rho(r.estimate)})", r.n, p_text(r.p_holm), chip(sig(r))] for r in orders]
     sig_lines = [d["line"] for d in D_shift if d["sig"]]
     unclear = [d for d in D_shift if not d["sig"]]
     unclear_txt = "".join(
-        f" At line {d['line']} most divisions did move south (median {abs(d['est']):.0f} km), but a minority moved a long way north, "
+        f" At phase {d['line']} most divisions did move south (median {abs(d['est']):.0f} km), but a minority moved a long way north, "
         "so the test, which weighs how far each division moved, cannot rule out chance." for d in unclear)
 
     # natural breaks
@@ -197,7 +197,7 @@ def build(res, gaps, meta, nb):
          "Tighter than made-up data with no groups; different yardsticks favour 2–3 or 5–6 groups.", "clusters"),
         ("Did the front shift north or south at each phase line?",
          "Yes at " + ", ".join(sig_lines) if sig_lines else "No clear shift", bool(sig_lines) and not unclear,
-         "Southward at every line; " + (f"not clear enough at line {', '.join(d['line'] for d in unclear)}." if unclear else "all clear."), "shift"),
+         "Southward at every phase; " + (f"not clear enough at phase {', '.join(d['line'] for d in unclear)}." if unclear else "all clear."), "shift"),
         ("Did divisions keep their places in the line?", "Yes" if all(sig(r) for r in orders) else "Mostly", all(sig(r) for r in orders),
          f"Order kept at every line (ρ {min(r.estimate for r in orders):g}–{max(r.estimate for r in orders):g}).", "order"),
         ("Where did divisions bunch between phase lines?", "Described, not tested", None,
@@ -342,7 +342,7 @@ resampled (95% range): narrow strips mean the break is firm.</p>
 <div class="card wide">{bands_chart(nb, intervals)}</div>
 {table(["Stretch", "Breaks (95% range)"], NB_rows)}
 {how("Every daily division location (weighted by strength) gets a position across its stretch: 0% at the western phase line, 100% at the "
-     "eastern one, measured at its own latitude (before line A: km west of A). Jenks natural breaks split the positions into the fewest "
+     "eastern one, measured at its own latitude (before phase 1: km west of it). Jenks natural breaks split the positions into the fewest "
      "bands (2–5) that explain at least 80% of their spread.",
      f"Divisions were resampled {max(20, n_boot // 3)} times and the breaks recomputed; the 95% range is the middle 95% of those breaks.")}
 <h3>Checkpoint groups</h3>

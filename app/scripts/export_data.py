@@ -176,6 +176,8 @@ def main():
     ms = {}
     for layer in ("AGS_PhaseLines", "AGS_AdvanceLines", "AGS_SmallPocketCOA"):
         df = read(layer, gdb=MILESTONES)
+        if "line_id" in df:  # phase lines are numbered 1-5 in everything we show (Sorin, 11-6); the source layer has a-e
+            df["line_id"] = df.line_id.str.upper().map(lambda l: str("ABCDE".index(l) + 1))
         for f in ("date_start", "date_end"):
             if f in df:
                 df[f] = day(pd.to_datetime(df[f], utc=True))

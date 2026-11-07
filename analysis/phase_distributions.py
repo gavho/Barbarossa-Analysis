@@ -13,7 +13,7 @@ compared:
 Locations are weighted by fractional strength (Frac_Unit), so a 1/10 detachment counts a tenth of a division.
 
 Natural breaks (Jenks), between the phase lines: within each stretch, each location's position ACROSS the stretch (0 at
-the western phase line, 1 at the eastern one, measured at the location's latitude; km west of line A before it) is split
+the western phase line, 1 at the eastern one, measured at the location's latitude; km west of phase 1 before it) is split
 into the fewest classes (2-5) that explain at least 80% of their variance (GVF >= 0.8). Breaks fall where few
 division-days were spent - ground crossed quickly - so the classes are the bands between two phase lines where the
 divisions bunched, and each break is a north-south curve that follows the two phase lines. Drawn on the app's map.
@@ -96,7 +96,7 @@ def sentence(r):
              if r["order_rho"] >= 0.5 else "divisions changed places")
     fewer = r["divisions_a"] - r["divisions_b"]
     left = f"; {fewer} fewer divisions got past it" if fewer >= 5 else ""
-    return f"Past line {line} the line-up of divisions {shape}, {shift}, and {order}{left}."
+    return f"Past phase {line} the line-up of divisions {shape}, {shift}, and {order}{left}."
 
 
 def jenks(values, weights, k):
@@ -166,7 +166,7 @@ def stretch_bands(g, z, lines, stretch):
     lo = t.min() if z == 0 else 0
     hi = t.max() if z == len(L) else (1 if z else 0)
     edges = [lo, *breaks, hi]
-    w, e = ("the border" if z == 0 else L[z - 1]), (L[z] if z < len(L) else "the far east")
+    w, e = ("the border" if z == 0 else f"phase {L[z - 1]}"), (f"phase {L[z]}" if z < len(L) else "the far east")
     ys = np.linspace(g.y.max() + 8, g.y.min() - 8, 30)  # north first
     inv = Transformer.from_crs(c.AEQD, 4326, always_xy=True)
     scale = 100 if interior else 1
@@ -228,7 +228,7 @@ def draw(profiles, positions, bins, towns):
     plt.close(fig)
 
 
-PLANNED = {"A": "1941-06-30", "B": "1941-07-07", "C": "1941-07-22", "D": "1941-07-25", "E": "1941-07-30"}  # agreed 11-6-2026
+PLANNED = {"1": "1941-06-30", "2": "1941-07-07", "3": "1941-07-22", "4": "1941-07-25", "5": "1941-07-30"}  # agreed 11-6-2026
 
 
 def classify_bins(bins, past):

@@ -141,7 +141,7 @@ def main():
     doc.add_paragraph("In depth, between two phase lines only (the same measures on that stretch):")
     for r in sub.itertuples():
         bd = int(r.straight_bearing_diff)
-        doc.add_paragraph(f"{NAMES[r.planned]}, phase {r.stretch.replace('-', ' to ')}: direction {r.score_direction} (headed "
+        doc.add_paragraph(f"{NAMES[r.planned]}, phases {r.stretch.replace('-', ' to ')}: direction {r.score_direction} (headed "
                           f"{abs(bd)}° further {'south' if bd > 0 else 'north'} than planned), route {r.score_route} "
                           f"(average gap {round(r.mean_abs_offset_km)} km), destination {r.score_destination} "
                           f"(ended {r.end_gap_km} km off).", style="List Bullet")
@@ -153,9 +153,9 @@ def main():
                       "were meant to be there (among divisions in the line's north-south span).")
     doc.add_picture(str(ROOT / "figures" / "arrival" / "arrival_bars.png"), width=Mm(140))
     a = arrival.set_index("phase").arrived_pct
-    doc.add_paragraph(f"Phase A (30 June): {a['A']}%. Phase B (7 July): {a['B']}%. Phase C (22 July, the middle of 'mid-July'): "
-                      f"{a['C']}%. Phase D (25 July): {a['D']}%. Phase E (30 July): {a['E']}%, no division came within 10 km. "
-                      "The advance was roughly on schedule to C, slipped at D and never reached E. The dates for C-E are our "
+    doc.add_paragraph(f"Phase 1 (30 June): {a[1]}%. Phase 2 (7 July): {a[2]}%. Phase 3 (22 July, the middle of 'mid-July'): "
+                      f"{a[3]}%. Phase 4 (25 July): {a[4]}%. Phase 5 (30 July): {a[5]}%, no division came within 10 km. "
+                      "The advance was roughly on schedule to phase 3, slipped at 4 and never reached 5. The dates for 3-5 are our "
                       "reading of vague planning dates ('mid-July', 'after mid-July', 'late July').")
 
     # 3. Natural breaks
@@ -169,7 +169,7 @@ def main():
     table(doc, pd.DataFrame({"Phase": breaks.phase, "Date": breaks.date, "Divisions": breaks.divisions,
                              "Groups": breaks.classes, "Past %": breaks.past, "Straddling %": breaks.straddling,
                              "Behind %": breaks.behind}))
-    doc.add_paragraph("Only at phase C did a whole group get clearly past the line (on 22 July). At A, B and D the lead group "
+    doc.add_paragraph("Only at phase 3 did a whole group get clearly past the line (on 22 July). At phases 1, 2 and 4 the lead group "
                       "straddled the line: the goal was reached, but loosely, with divisions spread on both sides.")
 
     # 4. Fighting groups
@@ -185,7 +185,7 @@ def main():
                              "Diversity": e.entropy}))
     doc.add_paragraph("Over the whole period the divisions follow four lines of operation, but phase by phase they fought as "
                       "two to three groups (III Panzer Corps merged with Panzer Group 1), with an occasional small fourth. The "
-                      "southern group stays mostly 17th Army (diversity near 0 by phases C and D); the northern group mixes "
+                      "southern group stays mostly 17th Army (diversity near 0 by phases 3 and 4); the northern group mixes "
                       "6th Army and the panzer formations (diversity about 0.8 to 0.95).")
 
     # 5. Done so far

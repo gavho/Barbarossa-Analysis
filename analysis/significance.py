@@ -201,15 +201,15 @@ def test_phases():
         w = wilcoxon(d)
         boots = [np.median(rng.choice(d, len(d))) for _ in range(N_BOOT)]
         line = stretches[b].split("-")[0]
-        rows.append({"family": "D", "test": f"Front shifted north-south at line {line}", "statistic": "median shift per division (km, + north)",
+        rows.append({"family": "D", "test": f"Front shifted north-south at phase {line}", "statistic": "median shift per division (km, + north)",
                      "estimate": round(float(np.median(d)), 1), "null_median": 0.0, "p": float(w.pvalue), "n": len(d),
                      "detail": f"Wilcoxon signed-rank, paired by division; 95% bootstrap CI {ci(boots)} km"})
         rho = spearmanr(x, y).statistic
         null = [spearmanr(x, rng.permutation(y)).statistic for _ in range(N_PERM)]
-        rows.append({"family": "D", "test": f"Divisions kept their north-south order at line {line}", "statistic": "Spearman rho",
+        rows.append({"family": "D", "test": f"Divisions kept their north-south order at phase {line}", "statistic": "Spearman rho",
                      "estimate": round(float(rho), 2), "null_median": round(float(np.median(null)), 2),
                      "p": perm_p(rho, null, smaller_is_extreme=False), "n": len(d), "detail": f"{N_PERM} permutations"})
-        print(f"  D line {line}: shift {np.median(d):.0f} km p={w.pvalue:.4f}; rho {rho:.2f}")
+        print(f"  D phase {line}: shift {np.median(d):.0f} km p={w.pvalue:.4f}; rho {rho:.2f}")
     return rows, stability_phase(p, stretches, zs)
 
 
@@ -224,7 +224,7 @@ def stability_phase(p, stretches, zs):
         X = (X - X.mean(axis=0)) / X.std(axis=0)
         k = df.group.nunique()
         _, jac = stability(X, k)
-        name = "Start (22 June line-up)" if L == "Start" else f"line {L}"
+        name = "Start (22 June line-up)" if L == "Start" else f"phase {L}"
         notes.append({"kind": "checkpoint", "label": name, "values": [round(v, 2) for v in jac.values()],
                       "text": f"Checkpoint groups at {name} (k = {k}): bootstrap Jaccard {', '.join(f'{v:.2f}' for v in jac.values())}"})
     lines = pc.phase_lines()
@@ -346,7 +346,7 @@ kept their places along the front.
 {chr(10).join(f"- {r.test}: {r.detail}" for r in ph.itertuples())}
 
 **Natural breaks between the phase lines.** In each stretch, every division location's position across it (% of the way
-from the western phase line to the eastern one, at its latitude; km west of line A in the first stretch) is split by
+from the western phase line to the eastern one, at its latitude; km west of phase 1 in the first stretch) is split by
 weighted Jenks natural breaks into the fewest bands (2–5) with goodness of variance fit ≥ 0.8. Divisions are resampled
 ({max(20, N_BOOT // 3)} times) for a 95% interval on each break.
 

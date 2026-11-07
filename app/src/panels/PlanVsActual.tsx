@@ -47,7 +47,7 @@ export function PlanVsActual() {
           return (
             <div key={r.lineId} className={cn("frame p-2", inWindow && "ring-1 ring-primary")}>
               <div className="flex items-baseline justify-between gap-2">
-                <h3 className="display text-[15px]"><span className="text-primary">Line {r.lineId.toUpperCase()}</span> · {r.name}</h3>
+                <h3 className="display text-[15px]"><span className="text-primary">Phase {r.lineId}</span> · {r.name}</h3>
                 {r.delay !== null && (
                   <span className={cn("shrink-0 rounded px-1.5 font-mono text-[11px]", r.delay > 0 ? "bg-danger/20 text-danger" : "bg-ok/20 text-ok")}>
                     {r.delay > 0 ? `+${r.delay}d late` : r.delay < 0 ? `${-r.delay}d early` : "on time"}

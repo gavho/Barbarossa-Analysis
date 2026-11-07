@@ -16,7 +16,7 @@ const TITLES: Record<string, (p: Record<string, unknown>) => string> = {
   paths: (p) => `${p.Nation} ${p.Num_Name} ${p.Branch ?? ""} · ${p.Start_Date} → ${p.End_Date}`,
   dv: (p) => `DV cluster ${p.Cluster_ID} · day ${p.Day_Index}`,
   geo: (p) => `Geometric cluster ${p.Cluster_ID} · day ${p.Day_Index}`,
-  plan_phase: (p) => `Line ${String(p.line_id).toUpperCase()}: ${p.name}`,
+  plan_phase: (p) => `Phase ${p.line_id}: ${p.name}`,
   plan_advance: (p) => `Line of advance: ${p.unit}`,
   plan_pocket: (p) => `Small-pocket COA: ${p.unit}`,
 };

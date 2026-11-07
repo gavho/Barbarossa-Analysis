@@ -14,12 +14,12 @@ import { color, separation, Swatch } from "./Phases";
 const LAYERS = ["checklines", "checkpaths", "checkdots"] as const;
 const STOPPED = "var(--muted-foreground)";
 const northFirst = (a: CheckGroup, b: CheckGroup) => b.lonlat[1] - a.lonlat[1];
-/** "Start" is the 22 June line-up before phase A; everything else is a phase line. */
+/** "Start" is the 22 June line-up before phase 1; everything else is a phase line. */
 const lineName = (L: string) => (L === "Start" ? "Start" : `Phase ${L}`);
-const stretchKey = (L: string) => (L === "Start" ? "Frontier" : L); // the first stretch is "Frontier-A"
+const stretchKey = (L: string) => (L === "Start" ? "Frontier" : L); // the first stretch is "Frontier-1"
 const coords = (c: unknown): number[][] => (typeof (c as unknown[])[0] === "number" ? [c as number[]] : (c as unknown[]).flatMap(coords));
 
-/** "near A 28% · midway 30% · near B 42%" for the stretch whose name matches. */
+/** "near phase 1 28% · midway 30% · near phase 2 42%" for the stretch whose name matches. */
 function bunched(match: (stretch: string) => boolean) {
   const p = PHASE_PROFILES.profiles.find((x) => match(x.stretch));
   return p ? p.bands.map((x) => `${x.band} ${x.share}%`).join(" · ") : null;
@@ -163,8 +163,8 @@ export function Checkpoints() {
             {(before || after) && (
               <dl className="mt-1.5 grid grid-cols-[auto_1fr] gap-x-2 text-[11px] leading-relaxed">
                 <dt className="col-span-2 flex items-center gap-1 text-muted-foreground">Where divisions bunched (share of division-days) <Help id="naturalzones" /></dt>
-                {before && <><dt className="text-muted-foreground">Before {L}</dt><dd>{before}</dd></>}
-                {after && <><dt className="text-muted-foreground">{start ? "Border to A" : `After ${L}`}</dt><dd>{after}</dd></>}
+                {before && <><dt className="text-muted-foreground">Before phase {L}</dt><dd>{before}</dd></>}
+                {after && <><dt className="text-muted-foreground">{start ? "Border to phase 1" : `After phase ${L}`}</dt><dd>{after}</dd></>}
               </dl>
             )}
             {away.length > 0 && (
@@ -176,7 +176,7 @@ export function Checkpoints() {
           </section>
         );
       })}
-      <p className="text-[11px] text-muted-foreground">Start is the 22 June line-up (divisions first recorded later join at the first line they cross). Only one division had crossed phase E by 5 August, so the checkpoints stop at phase D.</p>
+      <p className="text-[11px] text-muted-foreground">Start is the 22 June line-up (divisions first recorded later join at the first line they cross). Only one division had crossed phase 5 by 5 August, so the checkpoints stop at phase 4.</p>
     </div>
   );
 }

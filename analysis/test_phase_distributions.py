@@ -26,8 +26,8 @@ def test_whole_front_moves_south_in_order():
 
 
 def test_sentence_reads_the_numbers():
-    r = {"from": "B-C", "to": "C-D", "hist_r": 0.2, "shift_km": -56, "order_rho": 0.9, "divisions_a": 43, "divisions_b": 42}
-    assert pd_.sentence(r) == ("Past line C the line-up of divisions took a different shape, its centre of weight moved "
+    r = {"from": "2-3", "to": "3-4", "hist_r": 0.2, "shift_km": -56, "order_rho": 0.9, "divisions_a": 43, "divisions_b": 42}
+    assert pd_.sentence(r) == ("Past phase 3 the line-up of divisions took a different shape, its centre of weight moved "
                                "about 56 km south, and divisions kept their places in line.")
 
 
@@ -37,13 +37,13 @@ def test_jenks_finds_the_gap():
 
 
 def test_bands_split_a_stretch_across_and_follow_the_lines():
-    lines = {"A": [(0, 200), (0, -200)], "B": [(100, 200), (200, -200)]}  # B slants: 150 km east of A at y = 0, wider to the south
+    lines = {"1": [(0, 200), (0, -200)], "2": [(100, 200), (200, -200)]}  # 2 slants: 150 km east of 1 at y = 0, wider to the south
     p = pd.DataFrame({"x": [12, 15, 18, 132, 135, 138], "y": [0] * 6, "w": [1, 1, 1, 1, 1, 2], "division": list("abcdef")})
-    bands, breaks, gvf, ll, km = pd_.stretch_bands(p, 1, lines, "A-B")
+    bands, breaks, gvf, ll, km = pd_.stretch_bands(p, 1, lines, "1-2")
     assert breaks == [50] and gvf > 0.99
-    assert [(b["band"], b["share"], b["from"], b["to"]) for b in bands] == [("near A", 43, 0, 50), ("near B", 57, 50, 100)]
+    assert [(b["band"], b["share"], b["from"], b["to"]) for b in bands] == [("near phase 1", 43, 0, 50), ("near phase 2", 57, 50, 100)]
     ring = km[0]["geometry"]["coordinates"][0]
-    assert all(abs(x - 0.5 * pd_.line_x(lines["B"], [y])[0]) < 1e-6 for x, y in ring if x > 0)  # the break is halfway at every latitude
+    assert all(abs(x - 0.5 * pd_.line_x(lines["2"], [y])[0]) < 1e-6 for x, y in ring if x > 0)  # the break is halfway at every latitude
 
 
 

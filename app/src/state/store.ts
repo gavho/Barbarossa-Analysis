@@ -8,7 +8,7 @@ import type { ClusterSettings } from "@/lib/cluster";
 
 export type Theme = "tactical" | "period";
 export type RightTab = "charts" | "table" | "info" | "days" | "plan" | "oob" | "vectors" | "phases";
-export interface PhaseView { method: "DV" | "GEO"; stretch: string } // stretch "all" or a name like "A-B"
+export interface PhaseView { method: "DV" | "GEO"; stretch: string } // stretch "all" or a name like "1-2"
 
 export interface View { center: [number, number]; zoom: number; bearing: number; pitch: number }
 export interface Step { title: string; caption: string; date: string; mode: Mode; view: View | null }

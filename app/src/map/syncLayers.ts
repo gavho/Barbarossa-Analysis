@@ -39,7 +39,7 @@ function stepData(step: string, id: StepLayer): FC {
       id === "checklines" ? String(p.line_id).toUpperCase() === step
         : id === "checkdots" ? p.line === step
         : id === "checkpaths" ? p.to_line === step
-        : String(p.stretch).split("-").includes(step === "Start" ? "Frontier" : step); // "A-B" borders lines A and B; Start opens "Frontier-A"
+        : String(p.stretch).split("-").includes(step === "Start" ? "Frontier" : step); // "1-2" borders phases 1 and 2; Start opens "Frontier-1"
     stepCache.set(key, { type: "FeatureCollection", features: all.features.filter((f) => keep(f.properties ?? {})) });
   }
   return stepCache.get(key)!;
@@ -129,7 +129,7 @@ const HEAT_STOPS = HEAT_RAMP.flat();
 
 function labelText(id: LayerId): unknown {
   if (id === "dv" || id === "geo") return ["case", ["==", ["%", ["to-number", ["get", "Day_Index"], 0], 7], 1], ["slice", ["to-string", ["get", "Date"]], 5], ""];
-  if (id === "plan_phase" || id === "checklines") return ["concat", "LINE ", ["upcase", ["get", "line_id"]]];
+  if (id === "plan_phase" || id === "checklines") return ["concat", "PHASE ", ["get", "line_id"]];
   if (id === "areas") return ["upcase", ["get", "Region"]];
   if (id === "dvvec" || id === "geovec" || id === "phaseavg" || id === "checkpaths" || id === "matchreal") return "›"; // arrowheads show the direction of travel
   return null;

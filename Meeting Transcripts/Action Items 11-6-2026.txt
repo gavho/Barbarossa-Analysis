@@ -18,9 +18,8 @@ A. ACTION ITEMS
      Sorin's readings: 17th Army = direction 100, destination 100, route 75. Panzer Group 1 = route and direction as
      intended, destination off, so the gap was not closed neatly.
    - In-depth: compare the same relationships for only two stretches (confirmed with Gavin):
-       6th Army between phase lines B and C ("phase two and three"). The single start-to-end bearing hides its
-         northerly drift (the bend).
-       III Panzer Korps (the red one) between phase lines C and D ("phase three and four").
+       6th Army between phases 2 and 3. The single start-to-end bearing hides its northerly drift (the bend).
+       III Panzer Korps (the red one) between phases 3 and 4.
      "Just report those. I only need that."
 
 2. [GAVIN] DO NOT remove the stayed-behind / garrison divisions from the clusters (13:39-15:33)
@@ -28,9 +27,10 @@ A. ACTION ITEMS
      divisions that were held back are part of the story. Keep it simple; don't add things that need explaining.
 
 3. [GAVIN] Arrival at phase lines: a simple black-and-white BAR chart
-   - One bar per phase (A-E). y = % of divisions within 10 km of the phase line or past it, on its planned date.
-   - Planned dates (confirmed): A 30 Jun, B 7 Jul, C 22 Jul (middle of "mid-July"), D 25 Jul, E 30 Jul.
-   - Read off live (C at 15 Jul): A 61%, B 49%, C 47%, D 47%, E 0% (no division reached E).
+   - One bar per phase (1-5). y = % of divisions within 10 km of the phase line or past it, on its planned date.
+   - Planned dates (confirmed): 1 = 30 Jun, 2 = 7 Jul, 3 = 22 Jul (middle of "mid-July"), 4 = 25 Jul, 5 = 30 Jul.
+   - Read off live (phase 3 at 15 Jul): 61%, 49%, 47%, 47%, 0% (no division reached phase 5).
+   - Phases are numbered 1-5 (the map layer calls them A-E).
    - Plus a simple blow-by-blow paragraph for the paper.
 
 4. [GAVIN] Natural breaks, redone as Sorin described (22:26-40:03)
