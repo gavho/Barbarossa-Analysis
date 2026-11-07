@@ -1,0 +1,79 @@
+ACTION ITEMS - Gavin / Sorin meeting, 11-6-2026
+Source: Meeting Transcripts/11-6-2026.txt (complete, 1:08:42)
+
+DEADLINE: send Sorin (only him, not everyone) a bare-bones Word document by MONDAY 9 NOV, EVENING. He will use it at
+the meeting with Rob and Greg on Tuesday 10 Nov. Gavin is at a conference Mon-Tue and will miss that meeting.
+Sorin: "Don't try to do everything... bare bones information, a little bit for each... dump the flow chart in this
+document... at the end, this is what we've done so far." Write it as "a simple paper": Rob gets confused by dashboards.
+
+=====================================================================
+A. ACTION ITEMS
+=====================================================================
+
+1. [GAVIN] Plan vs actual lines of operation: report the scores pair by pair
+   - Sorin accepted the direction / route / destination scores ("That's plenty good").
+   - Lower the direction bar from 10 degrees to 5 degrees and report that (9:11, 9:34, 10:01; at 10:01 he says "5%",
+     but he means degrees). Everything else stays as is.
+   - Write a narrative of the fit for each pair, using the three dimensions, overall for each pair (12:00).
+     Sorin's readings: 17th Army = direction 100, destination 100, route 75. Panzer Group 1 = route and direction as
+     intended, destination off, so the gap was not closed neatly.
+   - In-depth: compare the same relationships for only two stretches (confirmed with Gavin):
+       6th Army between phase lines B and C ("phase two and three"). The single start-to-end bearing hides its
+         northerly drift (the bend).
+       III Panzer Korps (the red one) between phase lines C and D ("phase three and four").
+     "Just report those. I only need that."
+
+2. [GAVIN] DO NOT remove the stayed-behind / garrison divisions from the clusters (13:39-15:33)
+   - Gavin showed that removing them improves the fit a little. Sorin: the change "is not that dramatic", and the
+     divisions that were held back are part of the story. Keep it simple; don't add things that need explaining.
+
+3. [GAVIN] Arrival at phase lines: a simple black-and-white BAR chart
+   - One bar per phase (A-E). y = % of divisions within 10 km of the phase line or past it, on its planned date.
+   - Planned dates (confirmed): A 30 Jun, B 7 Jul, C 22 Jul (middle of "mid-July"), D 25 Jul, E 30 Jul.
+   - Read off live (C at 15 Jul): A 61%, B 49%, C 47%, D 47%, E 0% (no division reached E).
+   - Plus a simple blow-by-blow paragraph for the paper.
+
+4. [GAVIN] Natural breaks, redone as Sorin described (22:26-40:03)
+   - The current bands impose the phase line's shape ("It is more imposed", Gavin agreed). Redo it as a 1-D
+     distribution: project the divisions' positions on the planned date onto the general bearing of the whole
+     advance (not strict east-west), then find natural Jenks breaks, as for GIS colour ramps.
+   - Then use the phase line to sort the bins: past / on it (straddling, maybe +/-30 km) / behind. The point is to
+     tell apart two phases that both show 60% "within 10 km" when one barely made it and the other beat the goal.
+   - Colour-code the units by bin (or draw contours around them) instead of bands.
+   - Sorin: "don't overcomplicate it". 2-D bins are fine if they stay simple.
+
+5. [GAVIN] Flow chart (Sankey, Phases tab)
+   - Sorin loves it and wants it as a "central feature". In the brief, "just dump the flow chart" as it is.
+   - Change "line" to "phase" everywhere, for consistency (53:00).
+   - Keep the structure (the fighting groups), but colour by parent formation: 4 colours, for 6th Army,
+     III Panzer Korps, Panzer Group 1 and 17th Army (54:39-55:33).
+   - For each phase line and each fighting group, compute unit diversity as entropy: -sum(p log p) over the
+     formations, normalised by the maximum entropy so it runs 0-1. 0 = fought as its own formation;
+     1 = a hodgepodge. "Numbers don't lie, colors do."
+   - Story for the paper: over the whole period there are 4 lines of operation, but phase by phase the divisions
+     fought as 2-3 groups (III PzKo merged with Panzer Group 1), with a marginal 4th, and units swapped between
+     groups.
+   - A global-versus-per-phase comparison was raised and judged "difficult". Not now.
+
+6. [GAVIN] Log your hours. Sorin: "clock every minute you spend on this". He also offered to cover AI subscription
+   costs by letting you add a few hours ("just don't overcharge me").
+
+=====================================================================
+B. STATUS OF ITEMS FROM 10-30-2026
+=====================================================================
+- Average distance and bearing per pair: built (analysis/loa_frontier/pairs.csv; scores in the app). Superseded by A1.
+- Share of divisions within 10 km of each phase line: built in the app (Plan tab reach slider). Paper table and chart
+  = A3.
+- "Natural change analysis": turned out to mean natural (Jenks) breaks. First version built
+  (analysis/phase_distributions/); Sorin wants it redone = A4.
+- Rob to check the unit roster: no news in this meeting.
+- Clustering each stretch between phase lines: built (analysis/phase_clusters/, analysis/phase_checkpoints/,
+  flow chart). Sorin liked it = A5.
+- GitHub Pages: an entry point was added 11-05. Sorin praised the site ("even cooler than the ArcGIS site").
+
+=====================================================================
+C. ASIDES (no action)
+=====================================================================
+- Sorin showed his cluster analysis of the WikiLeaks Iraq War Diary reports (8 hotspots: Baghdad, Basra, Mosul,
+  Diyala...). "Maybe we'll look at this at some other point."
+- Sorin says Rob thinks he is "almost done" writing; there is a disconnect Sorin wants to address on Tuesday.

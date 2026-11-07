@@ -1,0 +1,15 @@
+phase,group,sector,divisions,6A,III PzKo,PzGp1(-),17A,other,entropy
+Start,0,northern,9,5,2,1,0,1,0.65
+Start,1,southern,26,6,1,3,13,3,0.78
+A,0,northern,18,9,3,4,1,1,0.83
+A,1,south-central,19,2,0,2,12,3,0.53
+A,2,north-central,7,0,0,1,0,6,0.0
+A,3,southern,2,0,0,0,0,2,
+B,0,northern,16,5,3,4,0,4,0.78
+B,1,southern,24,5,0,3,13,3,0.66
+B,2,central,4,1,0,0,0,3,0.0
+C,0,central,17,5,3,7,2,0,0.93
+C,1,southern,10,0,0,0,8,2,0.0
+C,2,northern,13,3,0,0,3,7,0.5
+D,0,northern,22,3,3,7,6,3,0.95
+D,1,southern,4,0,0,0,4,0,0.0

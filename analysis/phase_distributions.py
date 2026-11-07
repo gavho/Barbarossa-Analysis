@@ -228,6 +228,75 @@ def draw(profiles, positions, bins, towns):
     plt.close(fig)
 
 
+PLANNED = {"A": "1941-06-30", "B": "1941-07-07", "C": "1941-07-22", "D": "1941-07-25", "E": "1941-07-30"}  # agreed 11-6-2026
+
+
+def classify_bins(bins, past):
+    """Per natural-break bin: past (all its divisions past the phase line), behind (none), straddling (both sides)."""
+    out = {}
+    for b in np.unique(bins):
+        on = past[bins == b]
+        out[int(b)] = "past" if on.all() else "behind" if not on.any() else "straddling"
+    return out
+
+
+def breaks_by_phase():
+    """Sorin's 11-6 version of natural breaks: on each phase line's planned date, every division's position projected on
+    one axis along the general bearing of the whole advance (mean 22 June position -> mean last position), split by
+    Jenks; then each bin is read against the phase line. Returns (bins table, per-phase summary, plot data)."""
+    import phase_checkpoints as ck
+    tracks, lines = ck.daily_tracks(), pc.phase_lines()
+    first = np.mean([t.iloc[0][["x", "y"]].to_numpy(float) for t in tracks.values()], axis=0)
+    last = np.mean([t.iloc[-1][["x", "y"]].to_numpy(float) for t in tracks.values()], axis=0)
+    u = (last - first) / np.linalg.norm(last - first)
+    heading = round(c.bearing(first, last))
+    rows, summary, plots = [], [], []
+    for L, day in PLANNED.items():
+        d = (pd.Timestamp(day, tz=ck.DAY0.tz) - ck.DAY0).days
+        xy = np.array([t.loc[t.day == d, ["x", "y"]].iloc[0].to_numpy(float) for t in tracks.values() if (t.day == d).any()])
+        if len(xy) < MIN_DIVISIONS:
+            continue
+        along = (xy - first) @ u
+        poly = pc.east_polygon(lines[L])
+        past = np.array([poly.contains(Point(q)) for q in xy])
+        k, breaks, gvf = natural_breaks(along, np.ones(len(along)))
+        bins = np.digitize(along, breaks)
+        cls = classify_bins(bins, past)
+        for b, kind in cls.items():
+            m = bins == b
+            rows.append({"phase": L, "date": day, "bearing": heading, "bin": b + 1, "from_km": round(along[m].min()),
+                         "to_km": round(along[m].max()), "divisions": int(m.sum()), "past_line": int(past[m].sum()), "class": kind})
+        share = {kind: round(100 * sum((bins == b).sum() for b, x in cls.items() if x == kind) / len(along))
+                 for kind in ("past", "straddling", "behind")}
+        line_along = (np.array([q for q in lines[L][1:-1]]) - first) @ u  # the drawn line, without its extensions
+        summary.append({"phase": L, "date": day, "divisions": len(along), "classes": k, "gvf": round(gvf, 2), **share})
+        plots.append((L, day, along, past, breaks, (line_along.min(), line_along.max())))
+    return pd.DataFrame(rows), pd.DataFrame(summary), plots, heading
+
+
+def draw_breaks(plots, heading):
+    """One strip per phase: divisions along the general bearing, breaks as ticks, the phase line's span shaded."""
+    plt.rcParams.update({"font.size": 8, "pdf.fonttype": 42})
+    fig, axes = plt.subplots(len(plots), 1, figsize=(129 / 25.4, 0.75 * len(plots) + 0.5), sharex=True)
+    for ax, (L, day, along, past, breaks, (lo, hi)) in zip(np.atleast_1d(axes), plots):
+        ax.axvspan(lo, hi, color="0.88", lw=0)
+        jitter = np.random.default_rng(0).uniform(-0.25, 0.25, len(along))
+        ax.scatter(along[past], jitter[past], s=10, c="black", lw=0)
+        ax.scatter(along[~past], jitter[~past], s=10, facecolors="white", edgecolors="black", lw=0.6)
+        for b in breaks:
+            ax.axvline(b, color="black", lw=0.8, ls=(0, (3, 2)))
+        ax.set_yticks([])
+        ax.set_ylim(-0.5, 0.5)
+        ax.set_ylabel(f"Phase {L}\n{pd.Timestamp(day):%d %b}", rotation=0, ha="right", va="center")
+        ax.spines[["top", "right", "left"]].set_visible(False)
+    np.atleast_1d(axes)[-1].set_xlabel(f"km along the general direction of advance (bearing {heading}°)")
+    fig.text(0.01, 0.005, "Filled = past the phase line, open = short of it, dashed = natural break, grey = phase line span", fontsize=7)
+    fig.tight_layout(rect=(0, 0.03, 1, 1))
+    for ext in ("pdf", "png"):
+        fig.savefig(OUT / f"breaks_by_phase.{ext}", dpi=300)
+    plt.close(fig)
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     p, stretches = load_points()
@@ -273,6 +342,11 @@ def main():
         "zones": {"type": "FeatureCollection", "features": [{**f, "id": i} for i, f in enumerate(zones_ll)]},
     }, separators=(",", ":")), encoding="utf8")
     print("\n" + "\n".join(pairs.sentence))
+    bins_t, by_phase, plots, heading = breaks_by_phase()
+    bins_t.to_csv(OUT / "breaks_by_phase.csv", index=False)
+    by_phase.to_csv(OUT / "breaks_by_phase_summary.csv", index=False)
+    draw_breaks(plots, heading)
+    print(f"\nNatural breaks along the general bearing ({heading} deg) on each planned date:\n" + by_phase.to_string(index=False))
     print(f"\nwrote {OUT}")
 
 

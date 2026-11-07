@@ -29,7 +29,7 @@ def test_verdict_badges():
 def test_scores():
     assert c.scores(row()) == {"score_direction": 100, "score_route": 100, "score_destination": 100, "score_overall": 100}
     s = c.scores(row(straight_bearing_diff=-27.5, mean_abs_offset_km=60.0, end_gap_km=200))
-    assert (s["score_direction"], s["score_route"], s["score_destination"], s["score_overall"]) == (50, 50, 0, 33)
+    assert (s["score_direction"], s["score_route"], s["score_destination"], s["score_overall"]) == (44, 50, 0, 31)  # direction ramps from 5 deg (Sorin, 11-6)
 
 
 if __name__ == "__main__":

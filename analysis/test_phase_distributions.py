@@ -2,6 +2,7 @@
 import sys
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -43,6 +44,13 @@ def test_bands_split_a_stretch_across_and_follow_the_lines():
     assert [(b["band"], b["share"], b["from"], b["to"]) for b in bands] == [("near A", 43, 0, 50), ("near B", 57, 50, 100)]
     ring = km[0]["geometry"]["coordinates"][0]
     assert all(abs(x - 0.5 * pd_.line_x(lines["B"], [y])[0]) < 1e-6 for x, y in ring if x > 0)  # the break is halfway at every latitude
+
+
+
+def test_bins_are_past_behind_or_straddling():
+    bins = np.array([0, 0, 1, 1, 2, 2])
+    past = np.array([False, False, True, False, True, True])
+    assert pd_.classify_bins(bins, past) == {0: "behind", 1: "straddling", 2: "past"}
 
 
 if __name__ == "__main__":

@@ -43,6 +43,8 @@ MIN_SEG_KM = 60  # a vector shorter than this is noise (digitizing 5-10 km, geor
 SENSITIVITY_MIN_SEG = (40, 60, 80)
 NOISE_OFFSET_KM = 20  # differences below this are within digitizing + georeferencing error
 NOISE_BEARING_DEG = 10
+DIRECTION_FULL_DEG = 5  # direction score is 100 only within 5 deg (Sorin, 11-6), stricter than the 10 deg noise band
+SUBSTRETCHES = {"6A": ("B", "C"), "III PzKo": ("C", "D")}  # in-depth fits between two phase lines (Sorin, 11-6)
 MIN_COMMON_KM = 100  # pairs sharing less than this are not comparable
 CLUSTERINGS = {"DV": "DirectionalVector_Cluster_Avg_Paths", "GEO": "Geometric_Cluster_avg_paths"}
 STAYED_BEHIND_KM = 200  # start-to-end; most divisions moved 400-750 km, the 7 below this barely left the frontier zone
@@ -86,13 +88,13 @@ def clip_x(line, xmin, xmax):
     return LineString(seg) if len(seg) >= 2 and LineString(seg).length > 1 else None
 
 
-def common_clip(a, b):
+def common_clip(a, b, min_common=MIN_COMMON_KM):
     xmin = max(a.coords[0][0], b.coords[0][0])
     xmax = min(max(c[0] for c in a.coords), max(c[0] for c in b.coords))
     if xmax <= xmin:
         return None, None
     ca, cb = clip_x(a, xmin, xmax), clip_x(b, xmin, xmax)
-    if ca is None or cb is None or min(ca.length, cb.length) < MIN_COMMON_KM:
+    if ca is None or cb is None or min(ca.length, cb.length) < min_common:
         return None, None
     return ca, cb
 
@@ -355,9 +357,9 @@ def _ramp(value, full, zero):
 
 def scores(r):
     """Three 0-100 scores for readers, each 100 inside the mapping-error band (presentational cut-offs, not tests):
-    direction (straight bearing difference, 100 at <= 10 deg, 0 at 45), route (mean gap, 100 at <= 20 km, 0 at 100),
+    direction (straight bearing difference, 100 at <= 5 deg, 0 at 45), route (mean gap, 100 at <= 20 km, 0 at 100),
     destination (end-point gap, 100 at <= 20 km, 0 at 150), and their mean."""
-    d = _ramp(abs(r["straight_bearing_diff"]), NOISE_BEARING_DEG, 45)
+    d = _ramp(abs(r["straight_bearing_diff"]), DIRECTION_FULL_DEG, 45)
     route = _ramp(r["mean_abs_offset_km"], NOISE_OFFSET_KM, 100)
     dest = _ramp(r["end_gap_km"], NOISE_OFFSET_KM, 150)
     return {"score_direction": d, "score_route": route, "score_destination": dest, "score_overall": round((d + route + dest) / 3)}
@@ -499,8 +501,11 @@ def segment_rows(pname, cname, a, b, min_km, clustering):
     k = min(K, int(min(a.length, b.length) // min_km))
     if k < 1:
         return [], None
-    Va, rms_a = fit_segments(a, k, min_km)
-    Vb, rms_b = fit_segments(b, k, min_km)
+    try:
+        Va, rms_a = fit_segments(a, k, min_km)
+        Vb, rms_b = fit_segments(b, k, min_km)
+    except ValueError:  # a short phase-to-phase stretch cannot hold k vectors of min_km
+        return [], None
     rows = []
     for i in range(k):
         ba, bb = bearing(Va[i], Va[i + 1]), bearing(Vb[i], Vb[i + 1])
@@ -514,7 +519,7 @@ def segment_rows(pname, cname, a, b, min_km, clustering):
     return rows, (Va, Vb, rms_a, rms_b)
 
 
-def compare(planned, clusters, members, clustering, pairing=None):
+def compare(planned, clusters, members, clustering, pairing=None, min_common=MIN_COMMON_KM):
     cost = None
     if pairing is None:
         pairing, cost = pair_lines(planned, clusters)
@@ -522,7 +527,7 @@ def compare(planned, clusters, members, clustering, pairing=None):
     pair_rows, seg_rows, profiles, fits = [], [], {}, {}
     for p in order:
         cid = pairing[p]
-        a, b = common_clip(planned[p], clusters[cid])
+        a, b = common_clip(planned[p], clusters[cid], min_common)
         if a is None:
             continue
         s, off = signed_offsets(a, b)
@@ -553,6 +558,20 @@ def compare(planned, clusters, members, clustering, pairing=None):
             "cluster_unidentified_pct": rec["pct_unknown"] if rec is not None else None,
             "membership_agrees": (best == cid) if members is not None else None})
     return pairing, cost, pd.DataFrame(pair_rows), pd.DataFrame(seg_rows), profiles, fits
+
+
+def substretch(planned, clusters, pairing, clustering):
+    """The same comparison and scores for one planned line and its matched cluster, cut between two phase lines."""
+    import phase_clusters as pc
+    lines = pc.phase_lines()
+    rows = []
+    for p, (w, e) in SUBSTRETCHES.items():
+        zone = pc.east_polygon(lines[w]).difference(pc.east_polygon(lines[e]))
+        a, b = (orient_east(merge_line(l.intersection(zone))) for l in (planned[p], clusters[pairing[p]]))
+        pairs = compare({p: a}, {pairing[p]: b}, None, clustering, {p: pairing[p]}, min_common=20)[2]  # a stretch is ~100 km
+        for r in pairs.to_dict("records"):
+            rows.append({"stretch": f"{w}-{e}", **r, **scores(r)})
+    return pd.DataFrame(rows)
 
 
 def spacing(planned, clusters, pairing, step=50):
@@ -721,6 +740,10 @@ def main():
         if clustering in ("DV", "UNIT"):
             stem = "frontier_loa_comparison" if clustering == "DV" else "frontier_loa_units"
             draw(planned, clusters, pairing, profiles, fits, OUT / stem, clustering)
+        if clustering == "DV":
+            sub = substretch(planned, clusters, pairing, clustering)
+            sub.to_csv(OUT / "substretch.csv", index=False)
+            print("\n=== DV: in-depth stretches ===\n" + sub[["stretch", "planned", "cluster", "mean_abs_offset_km", "end_gap_km", "straight_bearing_diff", "score_direction", "score_route", "score_destination"]].to_string(index=False))
         print(f"\n=== {clustering}: planned line vs realized line (south to north) ===")
         print(pairs[[c for c in cols if c in pairs]].to_string(index=False))
     pd.concat(all_pairs).to_csv(OUT / "pairs.csv", index=False)

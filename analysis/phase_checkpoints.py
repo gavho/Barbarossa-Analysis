@@ -40,6 +40,7 @@ NATION_CODES = {1: "Wehrmacht", 2: "SS"}  # domain_Nation: 1 DE (Wehrmacht), 2 S
 K_RANGE = range(2, 6)  # the app has five group colours
 DAY0 = pd.Timestamp("1941-06-22", tz="UTC")
 START = "Start"  # the checkpoint before line A: the 22 June line-up
+FORMATIONS = ["6A", "III PzKo", "PzGp1(-)", "17A"]  # the four planned lines, north to south; anything else is "other"
 BREAKAWAY_MAX = 2  # at most this many divisions (and under a quarter of the group) leaving together is a breakaway
 
 
@@ -110,6 +111,16 @@ SECTORS = {1: ["whole line"], 2: ["northern", "southern"], 3: ["northern", "cent
            5: ["northern", "north-central", "central", "south-central", "southern"]}
 
 
+def entropy(counts):
+    """Unit diversity of a fighting group: Shannon entropy over the four formations, divided by its maximum (ln 4).
+    0 = all from one formation (it fought as itself), 1 = all four equally mixed. "other" divisions are left out."""
+    n = np.array([counts.get(f, 0) for f in FORMATIONS], float)
+    if n.sum() == 0:
+        return None
+    p = n[n > 0] / n.sum()
+    return round(float(-(p * np.log(p)).sum() / np.log(len(FORMATIONS))), 2) + 0.0  # + 0.0 turns -0.0 into 0.0
+
+
 def date(day):
     d = DAY0 + pd.Timedelta(days=round(day))
     return f"{d.day} {d:%b}"
@@ -119,6 +130,9 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     tracks = daily_tracks()
     names = pc.unit_names()
+    roster = c.roster(c.formations())
+    form = lambda k: roster.get("|".join(map(str, k)), "other")
+    count = lambda keys: {f: n for f in FORMATIONS + ["other"] if (n := sum(form(k) == f for k in keys))}
     lines = pc.phase_lines()
     letters = list(lines)
     inv = Transformer.from_crs(c.AEQD, 4326, always_xy=True)
@@ -162,7 +176,8 @@ def main():
             m = df[labels == g]
             groups.append({"line": L, "group": int(g), "divisions": len(m), "sector": SECTORS[len(order)][order.index(g)],
                            "first": date(m.day.min()), "median": date(m.day.median()), "last": date(m.day.max()),
-                           "lonlat": ll(m.x.mean(), m.y.mean()), "members": "; ".join(sorted(m.division))})
+                           "lonlat": ll(m.x.mean(), m.y.mean()), "members": "; ".join(sorted(m.division)),
+                           "formations": count(m.key), "entropy": entropy(count(m.key))})
         print(f"  line {L}: {len(df)} crossings in {info[L]['k']} groups (silhouette {info[L]['silhouette']})")
 
     flows, splits, ribbons = [], [], []
@@ -178,7 +193,7 @@ def main():
             major = t in (-1, f) or len(g) == largest or len(g) >= max(BREAKAWAY_MAX + 1, 0.25 * len(on))
             members = sorted(pc.label(k, names) for k in g.key)
             flows.append({"from_line": a, "from_group": int(f), "to_line": b, "to_group": None if t == -1 else int(t),
-                          "divisions": len(g), "major": bool(major), "members": "; ".join(members)})
+                          "divisions": len(g), "major": bool(major), "members": "; ".join(members), "formations": count(g.key)})
             if not major:
                 splits += [{"from_line": a, "to_line": b, "division": m, "from_group": int(f), "division_went_to": int(t)} for m in members]
         ga = {x["group"]: x for x in groups if x["line"] == a}
@@ -192,6 +207,9 @@ def main():
     cr["date"] = [date(d) for d in cr.day]
     cr.drop(columns=["key"]).to_csv(OUT / "crossings.csv", index=False)
     pd.DataFrame(groups).to_csv(OUT / "groups.csv", index=False)
+    pd.DataFrame([{"phase": g["line"], "group": g["group"], "sector": g["sector"], "divisions": g["divisions"],
+                   **{f: g["formations"].get(f, 0) for f in FORMATIONS + ["other"]}, "entropy": g["entropy"]}
+                  for g in groups]).to_csv(OUT / "entropy.csv", index=False)
     pd.DataFrame(flows).to_csv(OUT / "flows.csv", index=False)
     pd.DataFrame(splits).to_csv(OUT / "breakaways.csv", index=False)
 

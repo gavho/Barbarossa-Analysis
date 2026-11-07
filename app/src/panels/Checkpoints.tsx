@@ -3,6 +3,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { ResponsiveContainer, Sankey, Tooltip } from "recharts";
 import type { Point } from "geojson";
 import { Segmented } from "@/ui/Segmented";
+import { FORMATION_COLORS } from "@/config/presets";
 import { PHASE_CHECKS, PHASE_PROFILES, PHASE_SHIFTS, type CheckGroup } from "@/data";
 import { mapRef } from "@/map/MapView";
 import { set, setStyle, styleOf, useStore } from "@/state/store";
@@ -13,8 +14,8 @@ import { color, separation, Swatch } from "./Phases";
 const LAYERS = ["checklines", "checkpaths", "checkdots"] as const;
 const STOPPED = "var(--muted-foreground)";
 const northFirst = (a: CheckGroup, b: CheckGroup) => b.lonlat[1] - a.lonlat[1];
-/** "Start" is the 22 June line-up before line A; everything else is a phase line. */
-const lineName = (L: string) => (L === "Start" ? "Start" : `Line ${L}`);
+/** "Start" is the 22 June line-up before phase A; everything else is a phase line. */
+const lineName = (L: string) => (L === "Start" ? "Start" : `Phase ${L}`);
 const stretchKey = (L: string) => (L === "Start" ? "Frontier" : L); // the first stretch is "Frontier-A"
 const coords = (c: unknown): number[][] => (typeof (c as unknown[])[0] === "number" ? [c as number[]] : (c as unknown[]).flatMap(coords));
 
@@ -26,23 +27,25 @@ function bunched(match: (stretch: string) => boolean) {
 
 interface FlowNode { name: string; fill: string }
 
-/** Columns = phase lines, blocks = groups north to south, plus a grey "did not reach" block per line. */
+/** Columns = phase lines, blocks = groups north to south, plus a grey "did not reach" block per phase.
+ * Bands are split by formation (one colour per greater unit), so the structure is the battle and the colour is who fought in it. */
 function flowData() {
   const nodes: FlowNode[] = [];
   const index = new Map<string, number>();
   for (const L of PHASE_CHECKS.lines) {
     for (const g of PHASE_CHECKS.groups.filter((x) => x.line === L).sort(northFirst)) {
       index.set(`${L}|${g.group}`, nodes.length);
-      nodes.push({ name: `${lineName(L)} · ${g.sector} group`, fill: color(g.group) });
+      nodes.push({ name: `${lineName(L)} · ${g.sector} group${g.entropy === null ? "" : ` · diversity ${g.entropy}`}`, fill: color(g.group) });
     }
     if (PHASE_CHECKS.flows.some((f) => f.to_line === L && f.to_group === null)) {
       index.set(`${L}|stop`, nodes.length);
-      nodes.push({ name: `Did not reach line ${L}`, fill: STOPPED });
+      nodes.push({ name: `Did not reach phase ${L}`, fill: STOPPED });
     }
   }
-  const links = PHASE_CHECKS.flows.map((f) => ({
-    source: index.get(`${f.from_line}|${f.from_group}`)!, target: index.get(`${f.to_line}|${f.to_group ?? "stop"}`)!, value: f.divisions,
-  }));
+  const links = PHASE_CHECKS.flows.flatMap((f) => Object.entries(f.formations).map(([unit, n]) => ({
+    source: index.get(`${f.from_line}|${f.from_group}`)!, target: index.get(`${f.to_line}|${f.to_group ?? "stop"}`)!, value: n,
+    fill: FORMATION_COLORS[unit] ?? STOPPED,
+  })));
   return { nodes, links };
 }
 
@@ -55,10 +58,10 @@ const FlowBlock = ({ x, y, width, height, payload }: NodeProps) => (
 );
 
 interface LinkProps { sourceX: number; targetX: number; sourceY: number; targetY: number; sourceControlX: number; targetControlX: number;
-  linkWidth: number; payload: { source: FlowNode } }
+  linkWidth: number; payload: { fill: string } }
 const FlowBand = ({ sourceX, targetX, sourceY, targetY, sourceControlX, targetControlX, linkWidth, payload }: LinkProps) => (
   <path d={`M${sourceX},${sourceY} C${sourceControlX},${sourceY} ${targetControlX},${targetY} ${targetX},${targetY}`}
-    fill="none" stroke={payload.source.fill} strokeOpacity={0.35} strokeWidth={Math.max(1, linkWidth)} />
+    fill="none" stroke={payload.fill} strokeOpacity={0.55} strokeWidth={Math.max(1, linkWidth)} />
 );
 
 /** Who crossed each AGS phase line together, where and when; how the groups carried on, divided or stopped. */
@@ -101,7 +104,7 @@ export function Checkpoints() {
       </div>
 
       <section className="frame p-2" aria-label="Flow between phase lines">
-        <h4 className="mb-1 flex items-center gap-1.5 text-[12px]">How the groups carried on from line to line <Help id="flowChart" /></h4>
+        <h4 className="mb-1 flex items-center gap-1.5 text-[12px]">How the groups carried on from phase to phase <Help id="flowChart" /></h4>
         <ResponsiveContainer width="100%" height={230}>
           <Sankey data={flow} sort={false} align="left" nodePadding={12} nodeWidth={9} iterations={0}
             margin={{ top: 4, right: 18, bottom: 4, left: 2 }} node={FlowBlock as never} link={FlowBand as never}>
@@ -111,6 +114,12 @@ export function Checkpoints() {
         </ResponsiveContainer>
         <div className="flex justify-between pr-4 font-mono text-[10px] text-muted-foreground">
           {PHASE_CHECKS.lines.map((L) => <span key={L}>{lineName(L)}</span>)}
+        </div>
+        <div className="mt-1 flex flex-wrap gap-x-2.5 text-[10px] text-muted-foreground">
+          {Object.entries(FORMATION_COLORS).map(([unit, c]) => (
+            <span key={unit} className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-sm" style={{ background: c }} />{unit}</span>
+          ))}
+          <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-sm" style={{ background: STOPPED }} />other</span>
         </div>
       </section>
 
@@ -160,14 +169,14 @@ export function Checkpoints() {
             )}
             {away.length > 0 && (
               <div className="mt-1.5 text-[11px] leading-relaxed">
-                <span className="flex items-center gap-1 text-muted-foreground">Broke away before line {away[0].to_line} <Help id="breakaway" /></span>
+                <span className="flex items-center gap-1 text-muted-foreground">Broke away before phase {away[0].to_line} <Help id="breakaway" /></span>
                 {away.map((x) => <div key={x.division}><b>{x.division}</b> left <Swatch cid={x.from_group} /> and crossed with <Swatch cid={x.division_went_to} /></div>)}
               </div>
             )}
           </section>
         );
       })}
-      <p className="text-[11px] text-muted-foreground">Start is the 22 June line-up (divisions first recorded later join at the first line they cross). Only one division had crossed line E by 5 August, so the checkpoints stop at line D.</p>
+      <p className="text-[11px] text-muted-foreground">Start is the 22 June line-up (divisions first recorded later join at the first line they cross). Only one division had crossed phase E by 5 August, so the checkpoints stop at phase D.</p>
     </div>
   );
 }

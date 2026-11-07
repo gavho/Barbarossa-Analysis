@@ -85,9 +85,9 @@ export const PHASE_SHIFTS = phase_distributions as {
   ks_D: number; ks_p: number;
 }[];
 export interface CheckGroup { line: string; group: number; divisions: number; sector: string; first: string; median: string; last: string;
-  lonlat: [number, number]; members: string }
+  lonlat: [number, number]; members: string; formations: Record<string, number>; entropy: number | null }
 export interface CheckFlow { from_line: string; from_group: number; to_line: string; to_group: number | null; divisions: number;
-  major: boolean; members: string }
+  major: boolean; members: string; formations: Record<string, number> }
 /** Phase lines as checkpoints: who crossed each line together, where and when (analysis/phase_checkpoints.py). */
 export const PHASE_CHECKS = phase_checkpoints as unknown as {
   lines: string[]; info: Record<string, { k: number; silhouette: number }>; groups: CheckGroup[]; flows: CheckFlow[];

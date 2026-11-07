@@ -71,6 +71,6 @@ describe("ported vector fit and plan comparison", () => {
   });
   it("scores match compare_loa.scores()", () => {
     expect(scores(3, 10, 12)).toEqual({ score_direction: 100, score_route: 100, score_destination: 100, score_overall: 100 });
-    expect(scores(-27.5, 60, 200)).toEqual({ score_direction: 50, score_route: 50, score_destination: 0, score_overall: 33 });
+    expect(scores(-27.5, 60, 200)).toEqual({ score_direction: 44, score_route: 50, score_destination: 0, score_overall: 31 });
   });
 });

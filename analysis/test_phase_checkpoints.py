@@ -9,6 +9,15 @@ sys.path.insert(0, str(Path(__file__).parent))
 import phase_checkpoints as ck  # noqa: E402
 import phase_clusters as pc  # noqa: E402
 
+
+
+def test_entropy_is_0_for_one_formation_and_1_for_four_equal():
+    assert ck.entropy({"6A": 7}) == 0
+    assert ck.entropy({f: 3 for f in ck.FORMATIONS}) == 1
+    assert ck.entropy({"6A": 5, "other": 9}) == 0  # "other" is left out
+    assert ck.entropy({"other": 2}) is None
+
+
 LINE = [(100, 500), (100, -500)]  # north to south at x = 100
 
 

@@ -1,31 +1,31 @@
-from_line,from_group,to_line,to_group,divisions,major,members
-Start,0,A,0.0,7,True,14. Panzer-Division; 25. Infanterie-Division (mot.); 298. Infanterie-Division; 299. Infanterie-Division; 44. Infanterie-Division (Hoch- und Deutschmeister); 56. Infanterie-Division; 62. Infanterie-Division
-Start,0,A,1.0,1,False,SS-Division (mot.) Wiking
-Start,0,A,2.0,1,False,213. Sicherungs-Division
-Start,1,A,0.0,9,True,11. Panzer-Division; 111. Infanterie-Division; 13. Panzer-Division; 16. Panzer-Division; 168. Infanterie-Division; 262. Infanterie-Division; 57. Infanterie-Division; 75. Infanterie-Division; 99. leichte Infanterie-Division
-Start,1,A,1.0,16,True,1. Gebirgs-Division; 100. leichte Infanterie-Division (later 100. Jaeger); 101. leichte Infanterie-Division (later 101. Jaeger); 125. Infanterie-Division; 24. Infanterie-Division; 257. Infanterie-Division; 295. Infanterie-Division; 296. Infanterie-Division; 297. Infanterie-Division; 4. Gebirgs-Division; 454. Sicherungs-Division; 68. Infanterie-Division; 71. Infanterie-Division; 9. Infanterie-Division; 9. Panzer-Division; 97. leichte Infanterie-Division (later 97. Jaeger)
-Start,1,A,3.0,1,False,444. Sicherungs-Division
-A,0,B,0.0,12,True,11. Panzer-Division; 13. Panzer-Division; 14. Panzer-Division; 16. Infanterie-Division (mot.); 168. Infanterie-Division; 25. Infanterie-Division (mot.); 298. Infanterie-Division; 299. Infanterie-Division; 44. Infanterie-Division (Hoch- und Deutschmeister); 62. Infanterie-Division; 99. leichte Infanterie-Division; SS-Division (mot.) Leibstandarte SS Adolf Hitler
-A,0,B,1.0,5,True,111. Infanterie-Division; 16. Panzer-Division; 262. Infanterie-Division; 57. Infanterie-Division; 75. Infanterie-Division
-A,0,B,2.0,1,False,56. Infanterie-Division
-A,1,B,1.0,18,True,1. Gebirgs-Division; 100. leichte Infanterie-Division (later 100. Jaeger); 101. leichte Infanterie-Division (later 101. Jaeger); 125. Infanterie-Division; 132. Infanterie-Division; 24. Infanterie-Division; 257. Infanterie-Division; 295. Infanterie-Division; 296. Infanterie-Division; 297. Infanterie-Division; 4. Gebirgs-Division; 68. Infanterie-Division; 71. Infanterie-Division; 9. Infanterie-Division; 9. Panzer-Division; 94. Infanterie-Division; 97. leichte Infanterie-Division (later 97. Jaeger); SS-Division (mot.) Wiking
-A,1,B,2.0,1,False,454. Sicherungs-Division
-A,2,B,,1,True,213. Sicherungs-Division
-A,2,B,0.0,4,True,113. Infanterie-Division; 60. Infanterie-Division (mot.); 79. Infanterie-Division; 95. Infanterie-Division
-A,2,B,2.0,2,True,294. Infanterie-Division; 98. Infanterie-Division
-A,3,B,,2,True,444. Sicherungs-Division; Wehrmacht 2 Infantry
-B,0,C,,3,True,298. Infanterie-Division; 62. Infanterie-Division; 79. Infanterie-Division
-B,0,C,0.0,7,True,11. Panzer-Division; 13. Panzer-Division; 14. Panzer-Division; 16. Infanterie-Division (mot.); 25. Infanterie-Division (mot.); 60. Infanterie-Division (mot.); SS-Division (mot.) Leibstandarte SS Adolf Hitler
-B,0,C,2.0,6,True,113. Infanterie-Division; 168. Infanterie-Division; 299. Infanterie-Division; 44. Infanterie-Division (Hoch- und Deutschmeister); 95. Infanterie-Division; 99. leichte Infanterie-Division
-B,1,C,0.0,10,True,111. Infanterie-Division; 16. Panzer-Division; 24. Infanterie-Division; 262. Infanterie-Division; 297. Infanterie-Division; 57. Infanterie-Division; 75. Infanterie-Division; 9. Infanterie-Division; 9. Panzer-Division; SS-Division (mot.) Wiking
-B,1,C,1.0,10,True,1. Gebirgs-Division; 100. leichte Infanterie-Division (later 100. Jaeger); 101. leichte Infanterie-Division (later 101. Jaeger); 125. Infanterie-Division; 239. Infanterie-Division; 257. Infanterie-Division; 295. Infanterie-Division; 4. Gebirgs-Division; 94. Infanterie-Division; 97. leichte Infanterie-Division (later 97. Jaeger)
-B,1,C,2.0,4,False,132. Infanterie-Division; 296. Infanterie-Division; 68. Infanterie-Division; 71. Infanterie-Division
-B,2,C,,1,True,56. Infanterie-Division
-B,2,C,2.0,3,True,294. Infanterie-Division; 454. Sicherungs-Division; 98. Infanterie-Division
-C,0,D,,3,True,111. Infanterie-Division; 262. Infanterie-Division; 75. Infanterie-Division
-C,0,D,0.0,14,True,11. Panzer-Division; 13. Panzer-Division; 14. Panzer-Division; 16. Infanterie-Division (mot.); 16. Panzer-Division; 24. Infanterie-Division; 25. Infanterie-Division (mot.); 297. Infanterie-Division; 57. Infanterie-Division; 60. Infanterie-Division (mot.); 9. Infanterie-Division; 9. Panzer-Division; SS-Division (mot.) Leibstandarte SS Adolf Hitler; SS-Division (mot.) Wiking
-C,1,D,,2,True,100. leichte Infanterie-Division (later 100. Jaeger); 239. Infanterie-Division
-C,1,D,0.0,4,True,295. Infanterie-Division; 4. Gebirgs-Division; 94. Infanterie-Division; 97. leichte Infanterie-Division (later 97. Jaeger)
-C,1,D,1.0,4,True,1. Gebirgs-Division; 101. leichte Infanterie-Division (later 101. Jaeger); 125. Infanterie-Division; 257. Infanterie-Division
-C,2,D,,9,True,113. Infanterie-Division; 168. Infanterie-Division; 294. Infanterie-Division; 296. Infanterie-Division; 299. Infanterie-Division; 44. Infanterie-Division (Hoch- und Deutschmeister); 454. Sicherungs-Division; 98. Infanterie-Division; 99. leichte Infanterie-Division
-C,2,D,0.0,4,True,132. Infanterie-Division; 68. Infanterie-Division; 71. Infanterie-Division; 95. Infanterie-Division
+from_line,from_group,to_line,to_group,divisions,major,members,formations
+Start,0,A,0.0,7,True,14. Panzer-Division; 25. Infanterie-Division (mot.); 298. Infanterie-Division; 299. Infanterie-Division; 44. Infanterie-Division (Hoch- und Deutschmeister); 56. Infanterie-Division; 62. Infanterie-Division,"{'6A': 5, 'III PzKo': 2}"
+Start,0,A,1.0,1,False,SS-Division (mot.) Wiking,{'PzGp1(-)': 1}
+Start,0,A,2.0,1,False,213. Sicherungs-Division,{'other': 1}
+Start,1,A,0.0,9,True,11. Panzer-Division; 111. Infanterie-Division; 13. Panzer-Division; 16. Panzer-Division; 168. Infanterie-Division; 262. Infanterie-Division; 57. Infanterie-Division; 75. Infanterie-Division; 99. leichte Infanterie-Division,"{'6A': 4, 'III PzKo': 1, 'PzGp1(-)': 2, '17A': 1, 'other': 1}"
+Start,1,A,1.0,16,True,1. Gebirgs-Division; 100. leichte Infanterie-Division (later 100. Jaeger); 101. leichte Infanterie-Division (later 101. Jaeger); 125. Infanterie-Division; 24. Infanterie-Division; 257. Infanterie-Division; 295. Infanterie-Division; 296. Infanterie-Division; 297. Infanterie-Division; 4. Gebirgs-Division; 454. Sicherungs-Division; 68. Infanterie-Division; 71. Infanterie-Division; 9. Infanterie-Division; 9. Panzer-Division; 97. leichte Infanterie-Division (later 97. Jaeger),"{'6A': 2, 'PzGp1(-)': 1, '17A': 12, 'other': 1}"
+Start,1,A,3.0,1,False,444. Sicherungs-Division,{'other': 1}
+A,0,B,0.0,12,True,11. Panzer-Division; 13. Panzer-Division; 14. Panzer-Division; 16. Infanterie-Division (mot.); 168. Infanterie-Division; 25. Infanterie-Division (mot.); 298. Infanterie-Division; 299. Infanterie-Division; 44. Infanterie-Division (Hoch- und Deutschmeister); 62. Infanterie-Division; 99. leichte Infanterie-Division; SS-Division (mot.) Leibstandarte SS Adolf Hitler,"{'6A': 5, 'III PzKo': 3, 'PzGp1(-)': 3, 'other': 1}"
+A,0,B,1.0,5,True,111. Infanterie-Division; 16. Panzer-Division; 262. Infanterie-Division; 57. Infanterie-Division; 75. Infanterie-Division,"{'6A': 3, 'PzGp1(-)': 1, '17A': 1}"
+A,0,B,2.0,1,False,56. Infanterie-Division,{'6A': 1}
+A,1,B,1.0,18,True,1. Gebirgs-Division; 100. leichte Infanterie-Division (later 100. Jaeger); 101. leichte Infanterie-Division (later 101. Jaeger); 125. Infanterie-Division; 132. Infanterie-Division; 24. Infanterie-Division; 257. Infanterie-Division; 295. Infanterie-Division; 296. Infanterie-Division; 297. Infanterie-Division; 4. Gebirgs-Division; 68. Infanterie-Division; 71. Infanterie-Division; 9. Infanterie-Division; 9. Panzer-Division; 94. Infanterie-Division; 97. leichte Infanterie-Division (later 97. Jaeger); SS-Division (mot.) Wiking,"{'6A': 2, 'PzGp1(-)': 2, '17A': 12, 'other': 2}"
+A,1,B,2.0,1,False,454. Sicherungs-Division,{'other': 1}
+A,2,B,,1,True,213. Sicherungs-Division,{'other': 1}
+A,2,B,0.0,4,True,113. Infanterie-Division; 60. Infanterie-Division (mot.); 79. Infanterie-Division; 95. Infanterie-Division,"{'PzGp1(-)': 1, 'other': 3}"
+A,2,B,2.0,2,True,294. Infanterie-Division; 98. Infanterie-Division,{'other': 2}
+A,3,B,,2,True,444. Sicherungs-Division; Wehrmacht 2 Infantry,{'other': 2}
+B,0,C,,3,True,298. Infanterie-Division; 62. Infanterie-Division; 79. Infanterie-Division,"{'6A': 2, 'other': 1}"
+B,0,C,0.0,7,True,11. Panzer-Division; 13. Panzer-Division; 14. Panzer-Division; 16. Infanterie-Division (mot.); 25. Infanterie-Division (mot.); 60. Infanterie-Division (mot.); SS-Division (mot.) Leibstandarte SS Adolf Hitler,"{'III PzKo': 3, 'PzGp1(-)': 4}"
+B,0,C,2.0,6,True,113. Infanterie-Division; 168. Infanterie-Division; 299. Infanterie-Division; 44. Infanterie-Division (Hoch- und Deutschmeister); 95. Infanterie-Division; 99. leichte Infanterie-Division,"{'6A': 3, 'other': 3}"
+B,1,C,0.0,10,True,111. Infanterie-Division; 16. Panzer-Division; 24. Infanterie-Division; 262. Infanterie-Division; 297. Infanterie-Division; 57. Infanterie-Division; 75. Infanterie-Division; 9. Infanterie-Division; 9. Panzer-Division; SS-Division (mot.) Wiking,"{'6A': 5, 'PzGp1(-)': 3, '17A': 2}"
+B,1,C,1.0,10,True,1. Gebirgs-Division; 100. leichte Infanterie-Division (later 100. Jaeger); 101. leichte Infanterie-Division (later 101. Jaeger); 125. Infanterie-Division; 239. Infanterie-Division; 257. Infanterie-Division; 295. Infanterie-Division; 4. Gebirgs-Division; 94. Infanterie-Division; 97. leichte Infanterie-Division (later 97. Jaeger),"{'17A': 8, 'other': 2}"
+B,1,C,2.0,4,False,132. Infanterie-Division; 296. Infanterie-Division; 68. Infanterie-Division; 71. Infanterie-Division,"{'17A': 3, 'other': 1}"
+B,2,C,,1,True,56. Infanterie-Division,{'6A': 1}
+B,2,C,2.0,3,True,294. Infanterie-Division; 454. Sicherungs-Division; 98. Infanterie-Division,{'other': 3}
+C,0,D,,3,True,111. Infanterie-Division; 262. Infanterie-Division; 75. Infanterie-Division,"{'6A': 2, '17A': 1}"
+C,0,D,0.0,14,True,11. Panzer-Division; 13. Panzer-Division; 14. Panzer-Division; 16. Infanterie-Division (mot.); 16. Panzer-Division; 24. Infanterie-Division; 25. Infanterie-Division (mot.); 297. Infanterie-Division; 57. Infanterie-Division; 60. Infanterie-Division (mot.); 9. Infanterie-Division; 9. Panzer-Division; SS-Division (mot.) Leibstandarte SS Adolf Hitler; SS-Division (mot.) Wiking,"{'6A': 3, 'III PzKo': 3, 'PzGp1(-)': 7, '17A': 1}"
+C,1,D,,2,True,100. leichte Infanterie-Division (later 100. Jaeger); 239. Infanterie-Division,"{'17A': 1, 'other': 1}"
+C,1,D,0.0,4,True,295. Infanterie-Division; 4. Gebirgs-Division; 94. Infanterie-Division; 97. leichte Infanterie-Division (later 97. Jaeger),"{'17A': 3, 'other': 1}"
+C,1,D,1.0,4,True,1. Gebirgs-Division; 101. leichte Infanterie-Division (later 101. Jaeger); 125. Infanterie-Division; 257. Infanterie-Division,{'17A': 4}
+C,2,D,,9,True,113. Infanterie-Division; 168. Infanterie-Division; 294. Infanterie-Division; 296. Infanterie-Division; 299. Infanterie-Division; 44. Infanterie-Division (Hoch- und Deutschmeister); 454. Sicherungs-Division; 98. Infanterie-Division; 99. leichte Infanterie-Division,"{'6A': 3, '17A': 1, 'other': 5}"
+C,2,D,0.0,4,True,132. Infanterie-Division; 68. Infanterie-Division; 71. Infanterie-Division; 95. Infanterie-Division,"{'17A': 2, 'other': 2}"

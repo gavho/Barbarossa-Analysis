@@ -6,6 +6,7 @@ import { dist, length, nearest, resample, type Projection, type Pt } from "./clu
 import { wrap } from "./vectors";
 
 export const NOISE_KM = 20, NOISE_DEG = 10, MIN_COMMON_KM = 100;
+export const DIRECTION_FULL_DEG = 5; // direction score is 100 only within 5° (Sorin, 11-6), stricter than the noise band
 export interface PlanResult { pairs: PlanPair[]; unmatched: number[]; lines: FC }
 
 const dense = (l: Pt[]) => resample(l, Math.max(2, Math.floor(length(l) / 2) + 1)).pts; // every ~2 km
@@ -93,7 +94,7 @@ export function pairLines(planned: Record<string, Pt[]>, clusters: Map<number, P
 const ramp = (v: number, full: number, zero: number) => Math.round(100 * Math.min(1, Math.max(0, (zero - v) / (zero - full))));
 /** Three 0-100 reader scores (100 inside the mapping-error band) and their mean; same as compare_loa.scores(). */
 export function scores(bearingDiff: number, meanGap: number, endGap: number) {
-  const d = ramp(Math.abs(bearingDiff), NOISE_DEG, 45), route = ramp(meanGap, NOISE_KM, 100), dest = ramp(endGap, NOISE_KM, 150);
+  const d = ramp(Math.abs(bearingDiff), DIRECTION_FULL_DEG, 45), route = ramp(meanGap, NOISE_KM, 100), dest = ramp(endGap, NOISE_KM, 150);
   return { score_direction: d, score_route: route, score_destination: dest, score_overall: Math.round((d + route + dest) / 3) };
 }
 

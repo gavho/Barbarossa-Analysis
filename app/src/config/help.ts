@@ -127,7 +127,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   planScores: {
     title: "Plan agreement scores",
-    body: "Three simple 0–100 scores, each 100 when the difference is inside the mapping-error band, so 100 means 'can't be told apart from the plan'. Direction: the start-to-end bearing difference, 100 at 10° or less, 0 at 45°. Route: the average gap along the planned line, 100 at 20 km or less, 0 at 100 km. Destination: the gap between end points, 100 at 20 km or less, 0 at 150 km. Plan agreement is their average. The cut-offs are for reading, not significance tests; the tests are in analysis/STATISTICS.md.",
+    body: "Three simple 0–100 scores, each 100 when the difference is inside the mapping-error band, so 100 means 'can't be told apart from the plan'. Direction: the start-to-end bearing difference, 100 at 5° or less, 0 at 45°. Route: the average gap along the planned line, 100 at 20 km or less, 0 at 100 km. Destination: the gap between end points, 100 at 20 km or less, 0 at 150 km. Plan agreement is their average. The cut-offs are for reading, not significance tests; the tests are in analysis/STATISTICS.md.",
   },
   whyFour: {
     title: "Published 5 or recommended 4",
@@ -143,7 +143,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   naturalzones: {
     title: "Natural breaks between the phase lines",
-    body: "Where the divisions bunched between one planned phase line and the next. Every daily division location (weighted by strength) is placed by how far across its stretch it was — 0% at the western phase line, 100% at the eastern one, measured at its own latitude (before line A: km west of A). Jenks natural breaks then split each stretch into bands: breaks fall where few division-days were spent, so the divisions crossed that ground quickly, and the bands are where they slowed or paused. Each break runs north–south and bends with the phase lines either side. The app uses the fewest bands (2–5) that explain at least 80% of the spread (goodness of variance fit 0.8, the usual rule). Brighter = a larger share of the stretch's division-days. Click a band for its numbers."
+    body: "Where the divisions bunched between one planned phase line and the next. Every daily division location (weighted by strength) is placed by how far across its stretch it was — 0% at the western phase line, 100% at the eastern one, measured at its own latitude (before phase A: km west of A). Jenks natural breaks then split each stretch into bands: breaks fall where few division-days were spent, so the divisions crossed that ground quickly, and the bands are where they slowed or paused. Each break runs north–south and bends with the phase lines either side. The app uses the fewest bands (2–5) that explain at least 80% of the spread (goodness of variance fit 0.8, the usual rule). Brighter = a larger share of the stretch's division-days. Click a band for its numbers."
   },
   frontProfile: {
     title: "Front profile",
@@ -155,15 +155,15 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   checkpoints: {
     title: "Phase lines as checkpoints",
-    body: "Each phase line is treated as a checkpoint. For every Wehrmacht/SS division the app finds where and on which day its track first crossed the line (between the two daily positions either side of it; lines extended straight north and south). Divisions that crossed close together in place and time form a group. A colour is one group: at each later line, a group keeps the colour of the earlier group most of its divisions came from. A Start checkpoint comes first, with its colours running north to south: where the divisions stood on 22 June, so the flow shows how the opening line-up carried on to line A. Divisions first recorded later join at the first line they cross.",
+    body: "Each phase line is treated as a checkpoint. For every Wehrmacht/SS division the app finds where and on which day its track first crossed the line (between the two daily positions either side of it; lines extended straight north and south). Divisions that crossed close together in place and time form a group. A colour is one group: at each later line, a group keeps the colour of the earlier group most of its divisions came from. A Start checkpoint comes first, with its colours running north to south: where the divisions stood on 22 June, so the flow shows how the opening line-up carried on to phase A. Divisions first recorded later join at the first line they cross.",
   },
   checkGroups: {
     title: "How many groups",
     body: "At Start the divisions are grouped by place along the front alone (they share the day). At each line the crossings are grouped by place along the line and by day (k-means on both, scaled alike). The app tries 2 to 5 groups and keeps the number whose groups are most distinct (best silhouette), skipping any split that leaves a division on its own. Fewer divisions reach the later lines, so they have fewer groups.",
   },
   flowChart: {
-    title: "Flow between lines",
-    body: "The first column, Start, is the 22 June line-up: the divisions on the map that day, grouped by where they stood along the front. Each later column is a phase line; each block a group that crossed it, its height the number of divisions. Bands show where a group's divisions crossed the next line: with the same group, with another one (the group divided or merged), or not at all by 5 August (grey). Hover for the numbers.",
+    title: "Flow between phases",
+    body: "The first column, Start, is the 22 June line-up: the divisions on the map that day, grouped by where they stood along the front. Each later column is a phase line; each block a fighting group that crossed it, its height the number of divisions. Bands show where a group's divisions crossed the next phase: with the same group, with another one (the group divided or merged), or not at all by 5 August. Band colour is the greater unit the divisions belonged to (6A, III PzKo, PzGp1(–), 17A; grey = other or unidentified), so the blocks are how the battle was fought and the colours who fought it. Hover a block for its diversity: Shannon entropy over the four greater units divided by its maximum, 0 = one greater unit fighting as itself, 1 = all four equally mixed.",
   },
   breakaway: {
     title: "Broke away",
@@ -195,7 +195,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   phaseStep: {
     title: "Step through the lines",
-    body: "Pick Start to see the 22 June line-up and the bands between the border and line A. Pick a phase line to see only it on the map: the teal dashed line itself; a dot where each division crossed it, coloured by the group it crossed with; arrows showing each group arriving from the line before; and the natural-break bands of the stretches just before and after it, brighter where more divisions spent their days. If the coloured groups keep the same north–south order line after line, the front advanced as one piece; where they jump, it reshaped. The card below says the same in words. All shows every line at once.",
+    body: "Pick Start to see the 22 June line-up and the bands between the border and phase A. Pick a phase line to see only it on the map: the teal dashed line itself; a dot where each division crossed it, coloured by the group it crossed with; arrows showing each group arriving from the line before; and the natural-break bands of the stretches just before and after it, brighter where more divisions spent their days. If the coloured groups keep the same north–south order line after line, the front advanced as one piece; where they jump, it reshaped. The card below says the same in words. All shows every line at once.",
   },
   frontShape: {
     title: "How the front changed at the line",

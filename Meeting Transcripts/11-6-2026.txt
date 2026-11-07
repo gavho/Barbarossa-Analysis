@@ -1,0 +1,713 @@
+Barbarossa — Meeting Transcript
+November 6, 2026 (1:08:42)
+Participants: Sorin Adam Matei, Gavin Broderic Ho
+
+—   Sorin Adam Matei started transcription —
+[0:03] Sorin Adam Matei: Computer, so you know one thing we discussed about was the...
+[0:12] Sorin Adam Matei: Yeah, so the...
+[0:15] Sorin Adam Matei: the distance, the delta between the lines of movement, lines of operations, you know, intended versus realized, right? And you know, and generate some, like a list of observations, right, about
+[0:24] Gavin Broderic Ho: Hum.
+[0:27] Gavin Broderic Ho: Yes.
+[0:36] Sorin Adam Matei: pairs, basically, right? Yeah, that's one thing. And as we discussed, we said for some things, you know, the story will be pretty simple, for other stories will be a little bit more complex, right? All right, so that's one thing. Now.
+[0:37] Gavin Broderic Ho: Yes.
+[0:52] Gavin Broderic Ho: Mhm.
+[0:55] Sorin Adam Matei: A question: Where are we with that? So, how are we gonna go about that?
+[0:59] Gavin Broderic Ho: So right now, can you see my screen? This is what I've done. So I've taken our pairs, the white dotted lines are the phase lines that Rob drew, and then these are our clusters. And I've basically created like a score.
+[1:04] Sorin Adam Matei: Yes.
+[1:10] Sorin Adam Matei: Hum.
+[1:18] Gavin Broderic Ho: for like the direction, the destination, and the route or like the fit from the main line to Rob's line. And then just kind of calculated an average like this isn't like, this is more of a.
+[1:25] Sorin Adam Matei: Hum.
+[1:29] Sorin Adam Matei: Hum.
+[1:37] Gavin Broderic Ho: Test rather than like.
+[1:41] Gavin Broderic Ho: It's not like.
+[1:44] Gavin Broderic Ho: I was trying to put this into a, because originally I think I showed you, we had our vectors.
+[1:55] Sorin Adam Matei: Ga.
+[1:55] Gavin Broderic Ho: We had the vectors and I used a bunch of different methods to like, there wasn't a simple way of just like determining if it was like fit to plan or if it was close to plan. I just had a bunch of like bearings and distances along like.
+[1:58] Sorin Adam Matei: Simplified, yeah.
+[2:13] Sorin Adam Matei: Yeah.
+[2:16] Gavin Broderic Ho: the line. So I tried simplifying that into this where it essentially like it creates a score for direction, route, and destination.
+[2:28] Sorin Adam Matei: That's plenty good. That's plenty good. I'm fine with that, right? So let's, so, so in terms of reporting these, you know, we look at them, you know, pair by pair. So that's the first, that's the 17th Army, right? And the direction was, which one is that? Is that the
+[2:29] Gavin Broderic Ho: Okay.
+[2:46] Gavin Broderic Ho: Hsieh.
+[2:50] Sorin Adam Matei: The top, the bottom one, the bottom one, right?
+[2:52] Gavin Broderic Ho: Yeah, yeah.
+[2:54] Gavin Broderic Ho: Yeah, 17th Army.
+[2:56] Sorin Adam Matei: Yeah, okay. So your conclusion there when you look at the numbers is that...
+[3:02] Sorin Adam Matei: The.
+[3:04] Sorin Adam Matei: The direction was 100%, the destination was 100%, but the route, the way they went there was 75%, right? Basically. I mean, on a scale of 0 to 100, you know, they were like 75%. Okay, very good. The second one,
+[3:12] Gavin Broderic Ho: Yeah, yeah.
+[3:20] Gavin Broderic Ho: Yeah, yeah.
+[3:24] Sorin Adam Matei: Okay, let me go to the next one.
+[3:29] Sorin Adam Matei: That's the Panther group, right?
+[3:31] Gavin Broderic Ho: Yeah, yeah, enter group one.
+[3:32] Sorin Adam Matei: the Panzer Group one, right? There, the destination was kind of way off, although the route and the direction was as intended, you know, the destination wasn't. And, you know, this is perfectly okay because what I'm trying to, what I will try to say here
+[3:44] Gavin Broderic Ho: Mhm.
+[3:54] Sorin Adam Matei: is that from a lines of operation perspective, you know, what they intended to do is to close that gap neatly did not happen because the Seven Panzer group did not reach its destination optimally, basically, right? That's...
+[4:13] Sorin Adam Matei: Now, looking at the Northern.
+[4:17] Sorin Adam Matei: Units, okay.
+[4:19] Sorin Adam Matei: There we have the the tool thing that's the third pants are grouped there, yeah.
+[4:25] Gavin Broderic Ho: Yeah, heard Panzer Core, I think that's what Rob had it, yeah.
+[4:28] Sorin Adam Matei: Or, car, car, right, right, right.
+[4:32] Sorin Adam Matei: Is that it?
+[4:33] Gavin Broderic Ho: Yeah, yeah. So the way the, like the route is calculated, like I basically put like, I think for this is like a 20 kilometer, if all the divisions stayed within a certain distance of the planned route that Rob had.
+[4:34] Sorin Adam Matei: Yeah.
+[4:39] Sorin Adam Matei: Yeah.
+[4:43] Sorin Adam Matei: Yeah.
+[4:48] Sorin Adam Matei: Yeah, yeah, you know, actually they did behave as is planned. However, the units that were supposed to cover their flank, right, that is the most important, which is
+[5:02] Sorin Adam Matei: the 2nd or whatever army, you know, 6th army, right? 6th army, northern, the northernmost, 6th army, right?
+[5:09] Gavin Broderic Ho: Yeah.
+[5:09] Sorin Adam Matei: There, we have the Sixth Army.
+[5:14] Sorin Adam Matei: in the direction, well, here, this with the direction is, there's a problem, you see here with the direction. And I don't know how to solve this because the direction is for the most part, but not, right?
+[5:28] Sorin Adam Matei: Right, it is up to a point, but not right. This global measure doesn't capture bends in the direction, right?
+[5:35] Gavin Broderic Ho: Yeah, it's going from like start to end bearing as if it was just one vector.
+[5:41] Sorin Adam Matei: Yes. One vector, right? Yeah, yeah, yeah, yeah, yeah. So, you know, this day again would have, you know, fit the bill, but you know, we, we, we, we lack this.
+[5:54] Sorin Adam Matei: this nuance, right? So everything you've done is perfect. The only question is if we can somehow capture these.
+[6:07] Sorin Adam Matei: in our deviations along the way, right?
+[6:13] Gavin Broderic Ho: Here, let me go.
+[6:16] Sorin Adam Matei: You see, if this were a regression, you know, we have these elbow regressions, if you know, segmented regressions, right? It kind of looks at how the data on the response variable kind of is distributed. And if it sees that it's distributed in two different ways, it kind of gives you an estimate for each.
+[6:37] Sorin Adam Matei: So obviously, you know, for the 6th Army, the fit between...
+[6:43] Sorin Adam Matei: Oh, I have the solution. I have the solution. Can you put the phase lines here?
+[6:48] Gavin Broderic Ho: Yeah.
+[6:56] Sorin Adam Matei: Ah.
+[7:04] Sorin Adam Matei: Okay, so the northerly, so that, you know, they start from there and this starts from there.
+[7:20] Sorin Adam Matei: No, actually, the phases don't overlap that neatly.
+[7:24] Gavin Broderic Ho: Yeah.
+[7:24] Sorin Adam Matei: So first of all, we again, let's report the data the way it is. However, I do have a question. Now, when you look at direction, right?
+[7:39] Sorin Adam Matei: Well, this direction just like a east-west direction, or is it a bearing?
+[7:46] Gavin Broderic Ho: It's the bearing.
+[7:47] Sorin Adam Matei: Yeah, well, tell me honest.
+[7:51] Sorin Adam Matei: I think that, you know, for the 6th Army, the bearing, if you look at, if you connect the first dot to the last dot, right, you'll have a bearing that is kind of northeasterly, kind of, east, east, northeast, something like that, you know what I mean?
+[7:59] Gavin Broderic Ho: Yeah.
+[8:10] Gavin Broderic Ho: Hsieh.
+[8:11] Sorin Adam Matei: While the intended is, it's easterly, right? I mean, there is a northerly drift in the 6th Army's direction, right? Even if you...
+[8:24] Sorin Adam Matei: Kind of, you know, you know, force it to be that way, right?
+[8:30] Sorin Adam Matei: Even if you force, you know, that line to be IA One Direction.
+[8:35] Gavin Broderic Ho: Yeah, but also part of it is I have a, what is it?
+[8:43] Gavin Broderic Ho: I have a like margin of error, which is...
+[8:50] Gavin Broderic Ho: Oh yeah, so direction, it's, if it varies less than 10 degrees, it is still, like I have it set as a 10 degree.
+[9:01] Gavin Broderic Ho: Like the way I did a route and destination, it has like a 20 kilometer radius. I did the same thing with the direction.
+[9:10] Gavin Broderic Ho: Cause like there's obviously going.
+[9:11] Sorin Adam Matei: So it can be within. Can we lower that to 5 degrees?
+[9:16] Gavin Broderic Ho: Yeah, I can try.
+[9:19] Gavin Broderic Ho: But yeah, I do still...
+[9:20] Sorin Adam Matei: This is.
+[9:22] Gavin Broderic Ho: Need to...
+[9:24] Gavin Broderic Ho: Because this method doesn't really cover the bend.
+[9:29] Gavin Broderic Ho: Like, or like a directness, I don't...
+[9:30] Sorin Adam Matei: Yeah.
+[9:34] Sorin Adam Matei: Yeah, you know what, let's do it this way. Let's move to 5 degrees. And actually, let's try this. Let's compare, you know what, let's compare the direction, right? Let's compare the fit between the lines of operation, the realized line of operation,
+[9:54] Sorin Adam Matei: Between phase two and phase three, right?
+[10:01] Sorin Adam Matei: Yeah, so let's do this. So everything stays the way it is. Let's move, let's lower the bar to 5% and report that. You know, we're going to report that, right?
+[10:15] Sorin Adam Matei: And then...
+[10:18] Sorin Adam Matei: Let's do an in-depth analysis for the Sixth Army and for the First Panzer Korps.
+[10:27] Sorin Adam Matei: And the in-depth analysis for the 5th arm, for the 6th arm, you should look at.
+[10:34] Sorin Adam Matei: Ah, the...
+[10:37] Sorin Adam Matei: Of 2 lines.
+[10:40] Sorin Adam Matei: As they evolve between phase two and three, and for the...
+[10:45] Sorin Adam Matei: Third Panzer Core as it evolves between phase three and four.
+[10:53] Sorin Adam Matei: Just report those. I only need that. I don't need anything else for now.
+[10:57] Gavin Broderic Ho: Okay, wait, you said for the...
+[11:01] Gavin Broderic Ho: The third Panzer core, this red one.
+[11:05] Sorin Adam Matei: Yes, for the red one we need three and four, right?
+[11:09] Gavin Broderic Ho: Okay, face three and four.
+[11:11] Sorin Adam Matei: So we want to compare, you know, the red line, you know, as it kind of goes up north, right? With the line that is straight E, right?
+[11:21] Gavin Broderic Ho: Yeah, like as in just cut off between these two phases. Okay.
+[11:24] Sorin Adam Matei: Yeah, yes, yes. We just need to look at this. And then we're going to look at the lines between two. Yeah.
+[11:35] Gavin Broderic Ho: Okay.
+[11:38] Sorin Adam Matei: And, yeah.
+[11:41] Sorin Adam Matei: So.
+[11:41] Gavin Broderic Ho: Okay, that makes sense.
+[11:42] Sorin Adam Matei: You know, if you can write, I mean, if you can, I'm not, you know, you can actually ask Codex or whatever you use. It's like, you know, write a narrative of the fit between the lines pairwise, right, using the three dimensions, right? And explain if the, you know, intended versus are.
+[12:03] Sorin Adam Matei: You know, aligned or not, you know, and ask, yeah, and for each pair, globe all globally, right? And then, and then report, you know, the same.
+[12:05] Gavin Broderic Ho: Yeah.
+[12:11] Gavin Broderic Ho: Yeah, yeah.
+[12:19] Sorin Adam Matei: Store report the same relationships by looking for 6th army for the 6th army only between line of phase lines two and three, and for the first answer.
+[12:35] Sorin Adam Matei: group between phase three and four.
+[12:38] Gavin Broderic Ho: Mhm.
+[12:39] Sorin Adam Matei: That's it. And the rest, you know, well, you know, we'll deal with it, right?
+[12:44] Gavin Broderic Ho: Yeah.
+[12:46] Sorin Adam Matei: Okay, so this is one thing, right? Okay, good. Now, let's get to, let's look at this arrival at phase line.
+[12:46] Gavin Broderic Ho: Yeah.
+[12:58] Gavin Broderic Ho: Okay, oh yeah, here one thing I noticed, well, one thing I did, I when I took away the divisions that didn't move and rebuilt the clusters, it did like I also ran the same calculations I did there on these four.
+[13:12] Sorin Adam Matei: Okay.
+[13:18] Gavin Broderic Ho: which it did improve the fit on a lot of them.
+[13:23] Gavin Broderic Ho: So like, as you could see, like it would it basically just fit them more north because the divisions that were like Garrison stuck at the beginning that were still being grouped in the clusters removed. I don't know. So I mean, that's also.
+[13:23] Sorin Adam Matei: Okay.
+[13:34] Sorin Adam Matei: Hum.
+[13:37] Sorin Adam Matei: Hum.
+[13:39] Sorin Adam Matei: Well, actually, I don't want to do that because we want to look at the entirety of the story, right? You know, the divisions were supposed to be a part of the story. They were not. Well, that, you know, you see what I mean? We're looking for what kind of held them back, right? In fact, some divisions were left
+[13:42] Gavin Broderic Ho: Okay.
+[13:58] Sorin Adam Matei: back and did not participate means that they could not, you know, you know, they, you know, they kind of weighed the operation toward the root of the line of operation, right? Kind of held things back there, which is perfectly okay. All right.
+[14:15] Gavin Broderic Ho: Yeah, but it also.
+[14:19] Gavin Broderic Ho: I mean, it, it's kind of like...
+[14:22] Gavin Broderic Ho: when we're modeling the movement, it is skewing the actual divisions that were in the operation from what is being shown on the screen. Like it's just essentially like I think removing the outliers would be helpful for the plan versus the actual analysis, but.
+[14:39] Sorin Adam Matei: Yeah.
+[14:42] Sorin Adam Matei: Show me, show me the is this the version without the those are divisions is that.
+[14:47] Gavin Broderic Ho: Yeah.
+[14:49] Gavin Broderic Ho: And then this is with this is the ones we've been doing.
+[14:54] Gavin Broderic Ho: Because I...
+[14:54] Sorin Adam Matei: Try again.
+[14:56] Sorin Adam Matei: It's weird and without.
+[15:05] Sorin Adam Matei: Yeah, kind of. You know, to tell you honest, the change is not that dramatic.
+[15:09] Gavin Broderic Ho: Yeah, it's not very dramatic.
+[15:11] Sorin Adam Matei: It's not, it's not. Listen, then when you have to explain a million things and say, I took this, I took that, you know, that that's where you, you know, you get tied up in knots that you don't want to be tied up in. And, you know, the trick of these things is that you need to explain, you know what I mean? Everything you do. And then when you get an explanation, why did you do that? Why didn't you do that? You just keep it simple and...
+[15:22] Gavin Broderic Ho: Hum, OK.
+[15:27] Gavin Broderic Ho: Yeah, yeah.
+[15:33] Sorin Adam Matei: Straight, OK.
+[15:33] Gavin Broderic Ho: Okay.
+[15:35] Sorin Adam Matei: Alright, now let's see here.
+[15:39] Sorin Adam Matei: The next thing that we want to look again, you know, let's look at the arrival at lines.
+[15:46] Sorin Adam Matei: Arrival.
+[15:52] Gavin Broderic Ho: Oh yeah, here.
+[15:54] Gavin Broderic Ho: Go to...
+[16:04] Gavin Broderic Ho: So, the way this...
+[16:07] Gavin Broderic Ho: s s.
+[16:08] Gavin Broderic Ho: So all the lines have...
+[16:12] Gavin Broderic Ho: These are the lines put in here and it's basically you can adjust the count, well the range in which a division is considered at the.
+[16:24] Gavin Broderic Ho: Phase.
+[16:25] Sorin Adam Matei: Yeah, yeah.
+[16:26] Gavin Broderic Ho: And then it just performs the percentages of those divisions.
+[16:30] Sorin Adam Matei: Yeah, yeah, so.
+[16:32] Sorin Adam Matei: So again, Gavin, what we want here is first to report the raw data, right? You know, within 10 kilometers or past. Right. And which is what you have here, right?
+[16:40] Gavin Broderic Ho: Mm-hmm.
+[16:43] Gavin Broderic Ho: 10 or I mean you can adjust it to whatever.
+[16:46] Sorin Adam Matei: I think we did, we said 10, yeah, if I remember.
+[16:49] Gavin Broderic Ho: I okay.
+[16:51] Sorin Adam Matei: Yeah, well, let's just keep that. Okay, so we have this, right? But I want this in a document, right? This needs to be in a, you know, in a very, listen, I want to be brutally honest with you. Rob, you know, has, you know, he doesn't always understand these things. I mean, he has his issue, his issues, right? You know,
+[16:56] Gavin Broderic Ho: Yeah.
+[17:07] Gavin Broderic Ho: Yeah, yeah.
+[17:11] Sorin Adam Matei: If I show him this, you know, he gets easily confused. And he starts asking all kinds of questions that might or might not be relevant. Because he gets hung up on little details that he can't understand, right? Missing at the same time the things that he cannot understand.
+[17:27] Gavin Broderic Ho: Yeah, yeah, no, I, I get it, IA.
+[17:29] Sorin Adam Matei: You've seen him in action before. So I mean, no, he's my friend. He's our senior author. He's a smart man in so many ways. But, you know, there's a gap of perception. Maybe I should put it that way. The gap of understanding and perception of these things, right? And whenever, you know, you give him too much information, he
+[17:45] Gavin Broderic Ho: Hum.
+[17:49] Sorin Adam Matei: tends to either focus on the wrong things or to discount what he's seeing. Well, if you give him a paper, a simple paper and say, hey, which is something he's used to, then that would be easier. So here, instead of showing, I mean, I will show him this maybe at some point, but instead of that, you know, just having a simple blow-by-blow account of.
+[18:08] Sorin Adam Matei: what percent of units were at or past the phase line using our, you know, 10% border, that would be perfect. Okay, you know, let's just do that. Yeah.
+[18:17] Gavin Broderic Ho: Mhm.
+[18:20] Gavin Broderic Ho: Yeah, yeah. No, I have all this new analysis I've added in the GitHub. There is black and white charts of things made. I can easily like build out a narrative for it.
+[18:31] Sorin Adam Matei: Okay, good, good, good. Yeah, put those in a paper, put those in a paper. Exactly right. So, but you know, between me and you so that I see, I see what I see what I see, right? So for, you know, for the first phase line, 90%, right?
+[18:36] Gavin Broderic Ho: Yeah.
+[18:42] Gavin Broderic Ho: Hum.
+[18:50] Sorin Adam Matei: Is that 90%? You know, it's what's the where's the number 'cause I cannot see.
+[18:50] Gavin Broderic Ho: Yeah.
+[18:53] Gavin Broderic Ho: AD.
+[18:54] Gavin Broderic Ho: It just depends on the day.
+[18:57] Gavin Broderic Ho: So like...
+[18:57] Sorin Adam Matei: But the date when they were supposed to be there, right?
+[19:01] Gavin Broderic Ho: Yeah, which is 30th.
+[19:05] Gavin Broderic Ho: June.
+[19:09] Gavin Broderic Ho: Yeah, there.
+[19:09] Sorin Adam Matei: Yeah, stop, right? Yeah, actually, no, it's less. It's less. For 30th of June for the first phase, they were...
+[19:16] Gavin Broderic Ho: 61%.
+[19:17] Sorin Adam Matei: Sixty-one. OK, good. Now let's advance to the next line.
+[19:22] Gavin Broderic Ho: Which is the 7th of July.
+[19:26] Gavin Broderic Ho: Which they, yeah, the first divisions were early.
+[19:28] Sorin Adam Matei: Okay, now.
+[19:31] Sorin Adam Matei: Now we are looking now at the second line B, right? Yeah. And there the number goes down.
+[19:34] Gavin Broderic Ho: Yes.
+[19:38] Gavin Broderic Ho: Mhm.
+[19:39] Sorin Adam Matei: Yeah, that goes to what? To 50%? 49%, all right. Now let's go to line C.
+[19:41] Gavin Broderic Ho: Forty-nine percent, yeah.
+[19:49] Gavin Broderic Ho: This just had mid-July as the plan. There wasn't a specific date.
+[19:54] Sorin Adam Matei: Let's put July 15th, then.
+[19:58] Gavin Broderic Ho: Okay, 47%.
+[20:00] Sorin Adam Matei: They're going even slightly lower, right?
+[20:04] Gavin Broderic Ho: Yeah.
+[20:05] Sorin Adam Matei: And the last one would be...
+[20:09] Gavin Broderic Ho: Ah.
+[20:11] Gavin Broderic Ho: Says after mid-July.
+[20:14] Sorin Adam Matei: I'll just put, you know, let's put 25th of July.
+[20:23] Gavin Broderic Ho: Forty-seven percent.
+[20:25] Sorin Adam Matei: About the same, right?
+[20:27] Gavin Broderic Ho: Yeah.
+[20:28] Sorin Adam Matei: All right, and there's another line.
+[20:32] Gavin Broderic Ho: Yeah, the final line.
+[20:33] Sorin Adam Matei: And that was for what?
+[20:36] Gavin Broderic Ho: Just as late July.
+[20:39] Gavin Broderic Ho: Which?
+[20:39] Sorin Adam Matei: Stop, stop at, stop at, you know, the 20th 30th.
+[20:43] Gavin Broderic Ho: Yeah, so none of the divisions came within 10 kilometers of it.
+[20:49] Sorin Adam Matei: Okay, oh, zero.
+[20:51] Gavin Broderic Ho: Yeah.
+[20:52] Sorin Adam Matei: So, Dean is completely the...
+[20:55] Sorin Adam Matei: They missed the target.
+[20:56] Gavin Broderic Ho: Like.
+[20:57] Gavin Broderic Ho: Yeah, they did not reach it.
+[20:59] Sorin Adam Matei: Okay, so here, you know, Gavin, what I want here...
+[21:03] Sorin Adam Matei: is a line chart, not a line chart, the bar chart, right? A simple bar chart. Bars are percentages of units arrived within 10 kilometers or passed.
+[21:07] Gavin Broderic Ho: Mhm.
+[21:16] Sorin Adam Matei: the phase line for one, two, three, 4, 5, right? You know, phases, right? So it'll be as many bars, as many phases. On the y-axis, we have percentage.
+[21:17] Gavin Broderic Ho: Yeah.
+[21:30] Gavin Broderic Ho: Mhm.
+[21:30] Sorin Adam Matei: On the x-axis, we have the labels of the bars. Yeah. Now, we will play a little bit with this. I don't know how, you know, Rob will define that. You know, for now, mid-July should be 15, actually 15 to 30th.
+[21:34] Gavin Broderic Ho: Yeah.
+[21:52] Sorin Adam Matei: that should be 15 to 30 at what's 15 to 7, 15, it should be 22nd of July, right? The third one, it should be 22nd of July, because that's in the middle, right?
+[22:06] Gavin Broderic Ho: Yeah.
+[22:08] Sorin Adam Matei: Yeah.
+[22:13] Gavin Broderic Ho: Okay.
+[22:13] Sorin Adam Matei: And the last one, it should be 30th of July.
+[22:16] Gavin Broderic Ho: Yeah.
+[22:17] Sorin Adam Matei: Okay, this is very simple. Yep. All right, good. Now, this is the first cut, right? This is the rough cut, right?
+[22:19] Gavin Broderic Ho: Yes.
+[22:26] Sorin Adam Matei: But then we can look at each phase by phase to see what was the distribution within each phase, right?
+[22:35] Gavin Broderic Ho: Hum.
+[22:36] Sorin Adam Matei: And with that...
+[22:39] Sorin Adam Matei: We have phase one.
+[22:43] Sorin Adam Matei: Now we're looking at natural breaks, yeah.
+[22:46] Gavin Broderic Ho: Yeah, here.
+[23:02] Gavin Broderic Ho: Around to see all of.
+[23:04] Sorin Adam Matei: Hum.
+[23:06] Sorin Adam Matei: Ogsps.
+[23:08] Gavin Broderic Ho: Hum.
+[23:08] Sorin Adam Matei: Well, let's look at each of them separately, because otherwise I'll get very confused very quick.
+[23:15] Gavin Broderic Ho: Okay, yeah, so this is just the start. This isn't like they haven't even reached a phase line yet.
+[23:19] Sorin Adam Matei: CISTAR.
+[23:22] Sorin Adam Matei: Yeah, well, okay, not interested. I'm interested in the natural breaks of the first phase, right?
+[23:29] Gavin Broderic Ho: Yeah, so that is these three.
+[23:30] Sorin Adam Matei: So, where's the first phase? Where's the first phase?
+[23:33] Gavin Broderic Ho: That is these three on the right in between. This is the first phase line.
+[23:38] Sorin Adam Matei: Okay, all right, good. Now, which date are we looking at?
+[23:44] Gavin Broderic Ho: Ah.
+[23:47] Gavin Broderic Ho: So this would be.
+[23:51] Sorin Adam Matei: So, you know, set it for the date when we want.
+[23:53] Gavin Broderic Ho: Yeah, yeah, yeah, it is.
+[23:57] Gavin Broderic Ho: To July.
+[24:09] Gavin Broderic Ho: No, June, sorry.
+[24:13] Gavin Broderic Ho: And Gary.
+[24:29] Gavin Broderic Ho: Okay, so this is, it goes hand in hand with like, it's not a specific, it wouldn't be a...
+[24:40] Gavin Broderic Ho: I don't know if I did this right, so...
+[24:43] Sorin Adam Matei: Yeah, let me let me explain what I had in mind.
+[24:45] Gavin Broderic Ho: Yeah.
+[24:46] Sorin Adam Matei: So, for this date, for July 20th, and actually hide this, hide this stuff.
+[24:53] Sorin Adam Matei: Hide the bands and bring the dots up.
+[24:56] Gavin Broderic Ho: Okay.
+[25:04] Sorin Adam Matei: Like the, where the actual divisions were. Perfect. Okay. Okay, now, so the deal is this.
+[25:11] Sorin Adam Matei: So these dots, right, you know, they are not dimensioning, you know, east-west dimension, let's say, on an east-west bearing, strict, strict east-west, right?
+[25:20] Gavin Broderic Ho: Mhm.
+[25:21] Sorin Adam Matei: You know, they have a distribution actually, right? Yeah, I just, you know, we slice the, you know, we slice this distribution east-west into bands, right? Of frequency bands, right? And we say, you know, first we look at the average. You always start with the average or something like that, right? And say,
+[25:44] Sorin Adam Matei: Well, actually, we don't start with the average. We look at the distribution and say, you know, for example, you know, a band is here to the right, you know, most extreme right, right? So that's a first natural break, you know, because those two cases are so well isolated from everything else, right? And that will be when we count the nose.
+[26:02] Sorin Adam Matei: You know, 5%.
+[26:05] Sorin Adam Matei: And then there should be another band, you know, that starts from where, you know, from the gap. It kind of starts from the middle of the gap and goes to, you know, do you see there's a separation now between some of the dots that are on the...
+[26:22] Sorin Adam Matei: on this phase line, right? And you know, go to the left a little bit.
+[26:25] Gavin Broderic Ho: Mhm.
+[26:29] Sorin Adam Matei: Not too much, too much, too much. There, there, there. You know, go up north, north-south. Good. Kind of, you see, see that? There's a gap there. You see the gap? Yeah, yeah. So there probably will be another natural break there, right, between the cluster of units to the right, right, and the ones to the left.
+[26:37] Gavin Broderic Ho: Yeah, like...
+[26:49] Sorin Adam Matei: right? So we have the two strays here at the right, then we have the next group, right? And then for the rest, I don't know how the fates would want it to be, right? There might not be another natural break because the distance between the units is so orderly.
+[26:50] Gavin Broderic Ho: Yeah.
+[27:08] Sorin Adam Matei: right? And so monotonous that you cannot find another break, or maybe there will be another break. But basically, you would expect one, two, you know, 3 bands or maybe 4 bands, right?
+[27:22] Sorin Adam Matei: Now, with this, what you then do, then you can say something like this, right? In terms of the units that were on target and passed, instead of using the 10% random, you know, measure, right? You basically say, well, you know, the ones that were on target.
+[27:40] Sorin Adam Matei: on target and past are the ones that are in the top or the easternmost natural break bins, right?
+[27:52] Sorin Adam Matei: And everything else is behind.
+[27:54] Sorin Adam Matei: right? And this will give us a different way of looking at the problem, right?
+[28:02] Sorin Adam Matei: Yep, that's what this is meant to do, basically.
+[28:02] Gavin Broderic Ho: Okay.
+[28:06] Gavin Broderic Ho: Okay.
+[28:08] Sorin Adam Matei: This is, yeah, now, now let me take another look at what you did, right, so...
+[28:15] Sorin Adam Matei: So for the 20th of July, right, because this is what this looks like. Okay, so you, you know, okay, so what you did here is this, the way I see it, right? You know, you have one, two, three, 4, 5, 6 bins, right?
+[28:30] Gavin Broderic Ho: Mhm.
+[28:31] Sorin Adam Matei: Right? Now, the question is, if this segmentation followed the logic that I asked you to apply, right? If it does, then we're cool, right? We are really cool, right? If by the end of the day, and this is very important, for example,
+[28:50] Sorin Adam Matei: This bin, the third bin from the right, yeah, one, two, the dark green one, right?
+[29:00] Gavin Broderic Ho: Mhm.
+[29:00] Sorin Adam Matei: Now, if that for that being the distribution of the cases indeed follow the phase line, right?
+[29:07] Gavin Broderic Ho: Yeah.
+[29:09] Sorin Adam Matei: by the distribution of the elements, well, that is okay. And I can live with that. And all I have to do now is to look at the proportion of units, right, that fall into these three bins, right? Now, I have my doubts that your procedure looked at the true natural breaks.
+[29:22] Gavin Broderic Ho: Yes.
+[29:29] Sorin Adam Matei: It might be true natural breaks, but kind of imposing as a criterion.
+[29:33] Gavin Broderic Ho: It is more imposed.
+[29:35] Sorin Adam Matei: The line, you know, you know what I mean? The line, the face line. Actually, we're not interested in what shape the face line has.
+[29:38] Gavin Broderic Ho: Yeah, yeah.
+[29:44] Gavin Broderic Ho: Hum.
+[29:45] Sorin Adam Matei: That is, you know, the line, the idea line they should have been at. What we want to see is how these units were spread, right?
+[29:55] Gavin Broderic Ho: Mhm.
+[29:56] Sorin Adam Matei: in space, right, in the direction in which we wanted them to, we wanted to follow them. And actually, you know what, the bearing you should, you know, create this distribution should not be east-west straight. Actually, it should be
+[30:15] Sorin Adam Matei: Like the general bearing of the movement of everything, right?
+[30:19] Sorin Adam Matei: Right. So you kind of have to kind of calculate what the general bearing was for everybody, you know, beginning to end, right?
+[30:20] Gavin Broderic Ho: Hum.
+[30:26] Sorin Adam Matei: Whatever that was, it probably doesn't matter much because it's east-west, you know, bottom line, but it could be northerly, more, you know, southerly, God knows, but it does matter.
+[30:39] Sorin Adam Matei: Yeah, so you know, imagine that you know, looking at the distribution across, you know, this, this, this line, right?
+[30:46] Sorin Adam Matei: Yeah.
+[30:48] Gavin Broderic Ho: Yeah.
+[30:50] Gavin Broderic Ho: So the goal that you're trying to get when you read this map that you're talking about, what are you, what information are you trying to understand by looking at it?
+[30:56] Sorin Adam Matei: Yes.
+[31:00] Sorin Adam Matei: Well, you see, I want to see where the frequency clumps are relative to the phase line, right? So the units, as they are at this point, right, they are in clumps, you know, some of them farther away, some of them more kind of tightly connect, you know, closer together.
+[31:20] Sorin Adam Matei: And some of them spread out, you know, toward the tail. Actually, that's what you see, right? But I cannot tell you how many clumps we have, right? We have one clump, 2 clumps, 3 clumps, 5 clumps, you know what I mean? And I'm not looking at the complicated, you know, 3 multidimensional clump cluster problem. I'm looking at the very simple distribution on a line.
+[31:25] Gavin Broderic Ho: Hsieh.
+[31:41] Sorin Adam Matei: Right.
+[31:42] Gavin Broderic Ho: Hum.
+[31:43] Sorin Adam Matei: Right.
+[31:45] Sorin Adam Matei: You know, this is very similar to, you know...
+[31:50] Sorin Adam Matei: Well, you know, to anything like, you know, having a, you know, you know, if you look at the literature, you know, the literature, the documentation for natural Jenks breaks for creating ramps, color ramps, right, in GIS, you'll get the idea from there right away, right? Because what you have is sometimes you have this distribution of...
+[32:02] Gavin Broderic Ho: Mhm.
+[32:07] Gavin Broderic Ho: Mhm.
+[32:11] Sorin Adam Matei: proportions, right, or of intensities in thematic maps, right? You have all these polygons, right, with their own values, right? With values. Let's say that we're looking at, oh, God knows, corn productivity, right, per farm.
+[32:32] Sorin Adam Matei: right? Bushels per acre per farm in Indiana, right? Right. Now, each farm will have a different break, you know, productivity, right? You can't decide to divide this corn productivity
+[32:51] Sorin Adam Matei: into very, you know, straight and narrow, you know, bottom 20, middle, you know, 60, top 20, right? And that's it. And you make the bottom 20 green, middle, yellow, and top red, let's just say.
+[33:10] Sorin Adam Matei: Yeah.
+[33:11] Gavin Broderic Ho: Hum.
+[33:11] Sorin Adam Matei: But is that how the, you know, that will kind of, you know, kind of mess it up because there might be just a very few farms who have very, very high productivity, right? And then most of them have very, very low productivity, right? And within the low productivity, then there's some one other break, right?
+[33:32] Gavin Broderic Ho: Mhm.
+[33:32] Sorin Adam Matei: You know what I mean? So instead of, which you would end up with a solution is like 10%, 50%, 30%, right, and whatever is left, right? So the natural break method will display the information in a very different way.
+[33:45] Gavin Broderic Ho: Yeah, yeah.
+[33:53] Gavin Broderic Ho: Mhm.
+[33:53] Sorin Adam Matei: Right, so we have the same problem in terms of closeness, if you want, from the to the, or you know, to this phase line, right?
+[34:05] Gavin Broderic Ho: Yeah, yeah.
+[34:07] Sorin Adam Matei: Yeah, only that's on either side.
+[34:07] Gavin Broderic Ho: Okay.
+[34:10] Gavin Broderic Ho: Okay.
+[34:18] Sorin Adam Matei: Now, this should not be very different from what we tried with what we did just previously. You know, it would be about the same thing, but what we did previously is more like this, you know, top 20, middle 60, bottom 20, you know what I mean?
+[34:29] Gavin Broderic Ho: Hum, yeah.
+[34:30] Sorin Adam Matei: We just say, well, that's what it is, folks, right? You know, give me the ones that are 10, but maybe the data is not distributed that way, right?
+[34:38] Gavin Broderic Ho: Mhm.
+[34:40] Sorin Adam Matei: When we say that we have 60% that are within 10 and above, right, for this phase line. Now, let's imagine that we have two situations, two phase lines, where the units are in both situations 60%, right, within 10 and above.
+[34:59] Sorin Adam Matei: Right? Now, what if in one of the situations, you know, this, you know, 50% of the units are in the band, in the 10 kilometer band between, you know, the beginning and the phase line, right?
+[34:59] Gavin Broderic Ho: Hum.
+[35:13] Sorin Adam Matei: While in the other one, you have most of the units far away from the phase line. You know what I mean? The 2 look the same, but they are not the same, right? One is barely achieving the goal, while the other one is beating the goal.
+[35:21] Gavin Broderic Ho: Hum.
+[35:24] Gavin Broderic Ho: Yeah, yeah.
+[35:33] Sorin Adam Matei: You know, by far.
+[35:34] Gavin Broderic Ho: Mhm.
+[35:39] Gavin Broderic Ho: Okay.
+[35:47] Sorin Adam Matei: All right.
+[35:48] Gavin Broderic Ho: Yeah, yeah.
+[35:50] Gavin Broderic Ho: Okay, I will work on that.
+[35:55] Sorin Adam Matei: And thank you for, you know, looking into this so, so assiduously. You know, this was, this is a good start, but now I hope now you get the idea a little bit better, yeah?
+[36:01] Gavin Broderic Ho: Hum.
+[36:05] Gavin Broderic Ho: Yeah, yeah, yeah.
+[36:07] Sorin Adam Matei: Yeah, and actually you don't need to create bands as much as, you know, actually color code if you want or, you know, create, you know, kind of contours again around the units that are part of these bins, because what you need to create is bins, right? Like value bits, right?
+[36:14] Gavin Broderic Ho: Hsieh.
+[36:25] Gavin Broderic Ho: Yeah.
+[36:33] Gavin Broderic Ho: Okay.
+[36:34] Sorin Adam Matei: Alright.
+[36:36] Sorin Adam Matei: Okay, now this looks really exciting, this last part.
+[36:42] Gavin Broderic Ho: The.
+[36:45] Gavin Broderic Ho: Oh, this stuff.
+[36:47] Sorin Adam Matei: Yeah. Now, do you have anything else to say about this conversation we just had?
+[36:47] Gavin Broderic Ho: Yes.
+[36:54] Gavin Broderic Ho: No, not at the moment. I'm...
+[36:59] Gavin Broderic Ho: I'm just trying to think about how I will go about this, but I don't know. If I have questions, I'll ask you. I mean...
+[37:06] Sorin Adam Matei: Yeah, again, you know, there should be a Python, you know, script somewhere that this, and again, don't overcomplicate it for yours, for the sake of your sanity, right? You know, what do you need to do there? This is a two-part problem, actually, Gavin. Part A is simple.
+[37:10] Gavin Broderic Ho: Yeah, yeah. Hum.
+[37:26] Sorin Adam Matei: you know, finding the script to partition the distribution of the data, right, right, into bins using only one dimension, right? Using the, you know, whatever, you know, east-west dimension. Now, you can do it two-dimensional too, right?
+[37:46] Sorin Adam Matei: and kind of create bins in two-dimensional space. If it's simple and you can understand it, that's fine too, right? But that's the first step. You know, it's basically you want...
+[37:50] Gavin Broderic Ho: Mhm.
+[37:59] Sorin Adam Matei: units, right, into groups, basically, right, based on their frequency relative to a uniform dimension, right? And the most uniform dimension could be east-west direction, you know, so you have a segment of X number of kilometers.
+[38:19] Sorin Adam Matei: you know, given this number of kilometers, you know, what is the distribution of the units within these kilometers, right? That's the one thing. And once you get that, you have the, then we will, you know, have our, you know, our phase line, right? And then we use the phase line to basically separate
+[38:38] Sorin Adam Matei: Right? You know, the groups now, right?
+[38:42] Gavin Broderic Ho: Hum.
+[38:43] Sorin Adam Matei: and say, you know, these are the groups that are to the right. You know, they have achieved whatever they have achieved. And here, we're not going to use a 10 kilometer thing. We're basically going to look at, let's say that there's a middle group, right? There's a middle group that is on either side, right, of the, but it's not 10 kilometers.
+[39:02] Sorin Adam Matei: 30 kilometers, right?
+[39:05] Sorin Adam Matei: Well, you know, we're gonna say that, you know, we had, you know, you know, we have a, well, we can actually get into kind of a qualitative explanation now. You know, it's, you know, actually, they kind of achieved the goal, but there was a lot of variability in how they achieved it, right? Because the units were all clustered together in this big group of units, but they were, you know, with, you know, within.
+[39:28] Sorin Adam Matei: 30 or kilometers to the east and to the west, right?
+[39:33] Sorin Adam Matei: So it was a kind of messy kind of situation. And actually, the units that were clearly passed are these ones here, and they are only 10%, right? So let's say, like 60% of the units were on the phase line, but with a great amount of variability, right?
+[39:53] Sorin Adam Matei: And the ones that really achieved the goal were only 10%.
+[39:58] Gavin Broderic Ho: Okay.
+[40:00] Sorin Adam Matei: And you know, okay, good. All right, yeah.
+[40:03] Gavin Broderic Ho: Yeah, that makes sense.
+[40:05] Sorin Adam Matei: All right. Thank you.
+[40:08] Sorin Adam Matei: Alright, so we're done with this, right?
+[40:11] Gavin Broderic Ho: Yeah, yeah.
+[40:13] Sorin Adam Matei: Okay, now here, I'm looking at this beautiful, I really love this chart, Talianos.
+[40:18] Gavin Broderic Ho: Yeah, here it, uh, let me hide all this first. Yeah, yeah, I'll make it, I'll make it.
+[40:20] Sorin Adam Matei: Can you all make it? Can you make it a central feature? And give me a second. I need to use the rest of it.
+[40:27] Gavin Broderic Ho: Yep, all good.
+[41:41] Gavin Broderic Ho: Okay.
+[41:42] Sorin Adam Matei: Okay, so, Iran, explain, you know, tell me what what you what you did here.
+[41:46] Gavin Broderic Ho: Yeah, yeah.
+[41:48] Gavin Broderic Ho: Yeah, so the way this works is for each phase line, I basically, I took the groups, this is the groups from the like Wikipedia, the actual divisions, and I created from the clusters we have.
+[42:07] Gavin Broderic Ho: groups that then have checkpoints where they cross each phase line. And that kind of the whole point is trying to figure out where the group started to mix and divisions used to split off in different directions and join other groups. So like whenever a like all these dots are divisions.
+[42:23] Sorin Adam Matei: Mhm.
+[42:28] Gavin Broderic Ho: from one of the colored groups crossing the phase line at a point in time. The average like location for those group is put here as like a checkpoint and that's what like 9 divisions are technically like right there. So the way when they move from phase line to phase line.
+[42:45] Sorin Adam Matei: And.
+[42:48] Gavin Broderic Ho: those numbers will shift around depending on the direction that the divisions are now being like regrouped into. So you can kind of like, I don't know if you were to look at this, like some of these divisions, like, like this is kind of showing where the Panzer groups mixed a lot, where some of the.
+[42:56] Sorin Adam Matei: Hum.
+[43:07] Sorin Adam Matei: Hum.
+[43:07] Gavin Broderic Ho: Panzer groups were in on different movements, and then they went south or then came back north. And that's kind of like if you go through the groups, you can notice that there's some of these divisions that are just hopping in between phase lines, joining different groups throughout the operation. But for the most part, it's pretty...
+[43:15] Sorin Adam Matei: Hum.
+[43:27] Gavin Broderic Ho: uniform, like after the first phase line, like the bulk of...
+[43:30] Sorin Adam Matei: Hum.
+[43:34] Gavin Broderic Ho: The red group, which is here, is...
+[43:37] Sorin Adam Matei: A first answer group, is that the first answer?
+[43:40] Gavin Broderic Ho: This is the first Panzer and the third Panzer core, because they are both, that's where if you looked on the phases, they're, yeah, they're combined. So that's the majority of the red here. And then they split off at the end when they get to line C, that's when they started to move south.
+[43:45] Sorin Adam Matei: Okay.
+[43:48] Sorin Adam Matei: Yeah, they are combined, you know.
+[44:01] Gavin Broderic Ho: While some of them continued towards Kiev.
+[44:06] Gavin Broderic Ho: But I didn't like...
+[44:09] Gavin Broderic Ho: I would need to make adjustment if you like this because like line E isn't even calculated because none of the divisions ever even make it to the final line.
+[44:18] Sorin Adam Matei: Yeah, yeah, yeah. Now, let me ask you this.
+[44:19] Gavin Broderic Ho: But this could go, yeah.
+[44:22] Sorin Adam Matei: Yeah, let me, okay, you go, go ahead.
+[44:24] Gavin Broderic Ho: Let's say if you wanted, like I can, this can be broken down into like the groups and then the divisions in the groups and you could see how that deferred from like the initial plan. Like if you go through here, it's kind of labeled out by the star on like what divisions split away from certain groups when you click on these.
+[44:45] Gavin Broderic Ho: But.
+[44:45] Sorin Adam Matei: Hum.
+[44:46] Sorin Adam Matei: Yeah, now the thing is that we need to do this synthetically, you know, like being able to drill down is important, but even more importantly is to be able to follow the story, right? So now let's go back to the flow chart, right? Now, the first bar here to the left.
+[44:57] Gavin Broderic Ho: Mhm.
+[45:05] Sorin Adam Matei: The first bar here to the left, that is what, what that's the the date of that's that's June 22nd, right? I'm looking at this, yeah, so you have...
+[45:07] Gavin Broderic Ho: Yeah.
+[45:13] Gavin Broderic Ho: Yeah.
+[45:15] Gavin Broderic Ho: Yeah, that's at the very start.
+[45:16] Sorin Adam Matei: So, you there, you have...
+[45:20] Sorin Adam Matei: Okay, so now we have two groupings there, right?
+[45:23] Gavin Broderic Ho: E.
+[45:25] Sorin Adam Matei: Okay, now what do those groupings represent? Do they represent the cluster, the cluster paths, the way we calculated them?
+[45:32] Gavin Broderic Ho: Yeah, so, but, but...
+[45:36] Gavin Broderic Ho: So between each phase, we basically recalculated clusters to pick out which divisions were swapping between cluster groups.
+[45:47] Gavin Broderic Ho: Does that make sense?
+[45:48] Sorin Adam Matei: I see. So when you look, okay, so when you did it this way, you basically, for the first phase, there were two actually fighting groups, basically, not four or five, the way we identified them, right? Okay. All right. Then when we
+[45:58] Gavin Broderic Ho: Yeah, yeah.
+[46:01] Gavin Broderic Ho: Yeah.
+[46:03] Gavin Broderic Ho: Yeah.
+[46:04] Gavin Broderic Ho: Yeah.
+[46:08] Sorin Adam Matei: From the third phase, in the third phase, they fought as three different groups, basically.
+[46:14] Gavin Broderic Ho: Hsieh.
+[46:15] Sorin Adam Matei: And then, for the fourth phase...
+[46:19] Sorin Adam Matei: There were still three different groups, right?
+[46:21] Gavin Broderic Ho: Yeah, yeah.
+[46:23] Sorin Adam Matei: Only toward the end they were three. So basically they fought us two or three different groups, which is good, you know, in between. Okay. All right, good. Now.
+[46:31] Gavin Broderic Ho: Hsieh.
+[46:36] Sorin Adam Matei: And we said that we would do this, do it this way because we wanted to see how, you know, the units were swapped between phases of the battle, right? Yeah. Okay. Now, while this is very cool.
+[46:46] Gavin Broderic Ho: Yeah, yeah.
+[46:49] Gavin Broderic Ho: Hsieh.
+[46:55] Sorin Adam Matei: I think that we need to do it two ways. We need to do it globally too, not just face by face, but we need to do it globally too. Then I'm thinking, how the heck would that even look like?
+[47:00] Gavin Broderic Ho: Mmh.
+[47:11] Sorin Adam Matei: Well, actually, does not do a part.
+[47:13] Gavin Broderic Ho: Yeah, I don't.
+[47:14] Sorin Adam Matei: Because you cannot, you know, say, you know, here, you know, the units switched from here to there, right? Yeah, okay, all right, all right. Well...
+[47:20] Gavin Broderic Ho: Yeah.
+[47:23] Gavin Broderic Ho: I mean, I think there would be a way to compare our original clusters when they were all the phases to what we have, and then maybe be able to pull context out of that comparison, but...
+[47:30] Sorin Adam Matei: Hum.
+[47:36] Sorin Adam Matei: But that would be difficult. That would be difficult.
+[47:38] Gavin Broderic Ho: Yeah.
+[47:39] Sorin Adam Matei: Okay, well, this will add another dimension to the story. But that's okay. So with this, we, the story, we will, you know, this will be like another dimension of the story. This kind of, you know, we'll do everything we did up to this point, the way we discussed, but when we get to this point, we have to kind of reset.
+[47:53] Gavin Broderic Ho: Yeah.
+[48:00] Sorin Adam Matei: the expectations of the audience, right? Say, listen, up to this point, for the most part, we've looked at how the battle flowed along these five, 4 lines of advance, you know, lines of operations and how, you know, the units moved from face to face along these lines.
+[48:02] Gavin Broderic Ho: Yes, yes.
+[48:19] Sorin Adam Matei: Right, and you know we calculate this line looking at the flow of the entire battle, and we realized that there were four different ways. However, when we look at how the battle, you know, flowed between face to face, actually the units fought more grouped.
+[48:20] Gavin Broderic Ho: Mhm.
+[48:25] Gavin Broderic Ho: Mhm.
+[48:38] Sorin Adam Matei: than these four lines, right? They are four lines when you look up everything, because there was a lot of exchanges of units between these fighting groups from face to face, right? Which creates in between situations, as we can see. But from face to face, we had...
+[48:42] Gavin Broderic Ho: Hsieh.
+[48:58] Sorin Adam Matei: you know, two to three fighting groups, right? And the fighting groups for, you know, the fighting groups basically formed and really formed
+[49:16] Sorin Adam Matei: Around, you know, the infantry units to the south in the 17th Army and the Panzer Group, no, and...
+[49:27] Sorin Adam Matei: Well, actually, the pencil groups are the yellow ones, correct?
+[49:31] Sorin Adam Matei: For the the the red ones.
+[49:34] Gavin Broderic Ho: It is so.
+[49:38] Sorin Adam Matei: Or they're not, I cannot, we cannot designate it that way, can we?
+[49:38] Gavin Broderic Ho: Yeah.
+[49:42] Gavin Broderic Ho: Yeah, no, no.
+[49:44] Sorin Adam Matei: Okay, alright.
+[49:47] Sorin Adam Matei: Okay, so we have...
+[49:54] Sorin Adam Matei: Yeah, okay. So now we should not tell it that way. So we had actually actual fighting groups, we had, you know, two to three for the most part. When we had four, you know, the 4th one was always kind of a marginal, marginal show.
+[50:11] Gavin Broderic Ho: It would we.
+[50:13] Gavin Broderic Ho: It was a...
+[50:15] Gavin Broderic Ho: I think we had about four main groups. I think the fifth one was...
+[50:21] Gavin Broderic Ho: But in here, when we do the grouping between phases, that's where we really see the third Panzer core and the other Panzer group merged together.
+[50:34] Gavin Broderic Ho: And that's why we have three main groups throughout basically this whole.
+[50:34] Sorin Adam Matei: Hum.
+[50:39] Gavin Broderic Ho: Operations.
+[50:41] Sorin Adam Matei: Now.
+[50:43] Sorin Adam Matei: Okay, so one thing we can say that, you know, they fought as three, you know, although they are four, they mostly fought as three groups, you know, with one kind of ancillary, right? Now, that's one thing. But then, you know, there's the swap of units that's really interesting that we should be able to tell in a...
+[50:48] Gavin Broderic Ho: Yeah, yeah.
+[50:51] Gavin Broderic Ho: Hum.
+[50:54] Gavin Broderic Ho: Yeah.
+[51:02] Sorin Adam Matei: kind of synthetic manner too, you know what I mean?
+[51:06] Gavin Broderic Ho: Yeah, yeah.
+[51:08] Sorin Adam Matei: So, one thing we would like to say is that, you know, that up to the lines to up to line.
+[51:20] Sorin Adam Matei: Ciee, right?
+[51:22] Gavin Broderic Ho: Mhm.
+[51:23] Sorin Adam Matei: We had these 24, you know, units, right, fighting together. And I don't know what those are.
+[51:26] Gavin Broderic Ho: Yeah.
+[51:31] Gavin Broderic Ho: Line, line B, yeah, that's like this whole list of all the divisions in it, but...
+[51:41] Sorin Adam Matei: Yeah.
+[51:44] Sorin Adam Matei: Yeah, well, okay. So we have those divisions.
+[51:49] Sorin Adam Matei: Well, actually, those we need to kind of, you know, kind of figure out if, you know, they are kind of a variety of things or they are the same thing. You know what I mean? Actually, here we kind of, we need to kind of look at their, what they belong to. I mean, are these three groups, by the way, made of every, you know, of several?
+[51:58] Gavin Broderic Ho: Hum.
+[52:09] Sorin Adam Matei: You know, greater units or are they the same greater unit?
+[52:13] Gavin Broderic Ho: There.
+[52:13] Sorin Adam Matei: Based.
+[52:15] Gavin Broderic Ho: They're the same, like, what do you mean, like the main divisions?
+[52:19] Sorin Adam Matei: That, like, like the 7th part, you know, for example, the bottom, the blue is go back to the chart.
+[52:27] Gavin Broderic Ho: Yeah.
+[52:28] Sorin Adam Matei: So, the the the flows in the chart are these organized on a north-south direction.
+[52:38] Gavin Broderic Ho: Yeah.
+[52:39] Sorin Adam Matei: Okay, so blue, right? Blue would have to be the 17th Army.
+[52:44] Gavin Broderic Ho: Yeah, 17th Army.
+[52:47] Sorin Adam Matei: All right, now, so, you know, blue 17 Army for the most part, right? Especially as it flowed from phase one to phase two. So those 19 divisions, right, that arrive at phase A, right, at line A, right? Actually, can you change line to phase? Because we need to be consistent, you know, throughout, it should be phase.
+[52:52] Gavin Broderic Ho: Hsieh.
+[53:07] Gavin Broderic Ho: Yeah, yeah.
+[53:10] Sorin Adam Matei: All the time, so...
+[53:10] Gavin Broderic Ho: Okay.
+[53:13] Sorin Adam Matei: So those 19 units that derive there at phase A, are they still from the 17? I imagine. I hope. I don't know. Yeah.
+[53:20] Gavin Broderic Ho: Yeah, yeah. They know it would be just by the clustering in how south they are.
+[53:26] Sorin Adam Matei: Okay.
+[53:28] Sorin Adam Matei: Yeah, okay. So now the color here has to do with how they fought together in the cluster. It has nothing to do with who they were, right?
+[53:35] Gavin Broderic Ho: Yes.
+[53:38] Gavin Broderic Ho: Yes.
+[53:39] Sorin Adam Matei: Yeah, yeah, yeah. So we have this and this and this and that. So we need to look at it. But how about we did it the other way, Gavin? Can we create a flow chart like this looking at?
+[53:54] Sorin Adam Matei: The units of these four units, Fourth Army, Panzer Army, Panzer Korps, Sixth Army, right?
+[54:03] Gavin Broderic Ho: Yeah, that should be doable.
+[54:05] Sorin Adam Matei: Let's flip it that way, right?
+[54:08] Gavin Broderic Ho: Okay.
+[54:09] Sorin Adam Matei: And...
+[54:11] Sorin Adam Matei: Ah.
+[54:15] Sorin Adam Matei: Basically.
+[54:17] Gavin Broderic Ho: As in like showing this.
+[54:26] Sorin Adam Matei: You know what?
+[54:27] Gavin Broderic Ho: Okay, I, I think.
+[54:31] Gavin Broderic Ho: So you're saying like this group of 24 instead of it just being one group, we then split the 24 into...
+[54:39] Sorin Adam Matei: Yes, yes. Now, you know what? Let's use colors, right? Let's use colors for units, for these greater units. That's what I call them, right? So, you know, keep the structure the way it is, right? The structure is the structure of the battle.
+[54:40] Gavin Broderic Ho: It's units.
+[54:44] Gavin Broderic Ho: Yeah.
+[54:50] Gavin Broderic Ho: Yes, okay, yeah.
+[54:55] Gavin Broderic Ho: Yeah.
+[54:58] Sorin Adam Matei: But the color should not designate the whatever, the greater, whatever you're doing here. The color should be actually affiliated with the greater units. It should be 4 colors in this chart.
+[54:58] Gavin Broderic Ho: Hum.
+[55:19] Sorin Adam Matei: Right, one for the Sixth Army, one for the Third Panzer Corps, one for the First Panzer.
+[55:19] Gavin Broderic Ho: Yeah.
+[55:29] Sorin Adam Matei: A group and one for the 17th army, basically.
+[55:33] Gavin Broderic Ho: Yeah, I know what you mean now.
+[55:36] Sorin Adam Matei: You know what I mean? And with that, we'll be able to see, you know, how the battle flowed, right? And one thing we could do, and this is quite simple, is to calculate, you know, what's called, you know, the diversity of units within each of these fighting groups.
+[55:37] Gavin Broderic Ho: Yeah, just.
+[55:42] Gavin Broderic Ho: Mhm.
+[55:57] Sorin Adam Matei: s s.
+[56:03] Sorin Adam Matei: We can use something like, you know, entropy, you know what I mean?
+[56:07] Gavin Broderic Ho: Yeah, yeah.
+[56:09] Sorin Adam Matei: Sure, you know, it's very small numbers, but you know, we can calculate them. It's everything is, if it's, you know, in a in a battle, in an effective battle group, right? You know, the armies are all represented equally. It's, you know, it's maximum entropy, right? You know, that's a hodgepodge, right? That's a...
+[56:26] Gavin Broderic Ho: Hum.
+[56:28] Sorin Adam Matei: That's really hodgepodge. If it's dominated by only one group, it means that in that phase, for that group, that group, you know, they fight organically as the unit they are meant to.
+[56:40] Gavin Broderic Ho: Hsieh.
+[56:42] Sorin Adam Matei: Yeah, that's what we need here.
+[56:44] Sorin Adam Matei: That's what we need.
+[56:44] Gavin Broderic Ho: Yeah, that makes sense.
+[56:46] Sorin Adam Matei: And that's what we need. So, you know, the visual, do the visual, but the visual is the visual. You know, the visuals, I'm not a great fan of visualization, to tell you honest, as a way of analyzing stuff. Visualization could be quite deceiving. Actually, the numbers don't lie. Numbers, you know, colors do lie, numbers don't, right? So for...
+[57:05] Gavin Broderic Ho: Yeah, yeah.
+[57:06] Sorin Adam Matei: For each phase line and for each actual battle group, identify for that phase line, you know, calculate the degree of diversity, unit diversity, right? Using as base, you know, the...
+[57:20] Gavin Broderic Ho: Mhm.
+[57:25] Sorin Adam Matei: belonging to one of the three or four units.
+[57:30] Gavin Broderic Ho: Mhm, that makes sense.
+[57:31] Sorin Adam Matei: And it's very simple. The formula is very simple. It's P log P, right?
+[57:35] Gavin Broderic Ho: Yeah, yeah.
+[57:36] Sorin Adam Matei: you know, sum of P log P, right? You take the proportion, you know, and multiply by the log of that proportion, right?
+[57:45] Gavin Broderic Ho: Yeah.
+[57:47] Sorin Adam Matei: for the number of units you have, right? So for each, you'll have, you know, 4 units, you know, then you know, you just, you know, proportion of the first unit out of total multiplied by the log of its proportion plus P log P, P log P, boom, and at the end you get a...
+[57:51] Gavin Broderic Ho: Mhm.
+[58:06] Sorin Adam Matei: a log. Now, you'll have to normalize them all, right, all the time. You need to calculate maximum entropy, right, for each group so that you get, you know, this entropy on a scale of 0 to 1.
+[58:20] Gavin Broderic Ho: Mhm.
+[58:21] Sorin Adam Matei: Right, otherwise, you know, P log P varies with the number of units, right?
+[58:27] Gavin Broderic Ho: Yeah.
+[58:28] Sorin Adam Matei: You realize, right, mathematically.
+[58:30] Gavin Broderic Ho: Yeah, yeah.
+[58:32] Sorin Adam Matei: Well, I did not forget everything type.
+[58:36] Sorin Adam Matei: I've learned, I used to teach, I used to teach the stuff.
+[58:39] Gavin Broderic Ho: Hum.
+[58:41] Sorin Adam Matei: Yeah, yeah, this will be fun when we get to the bottom of it.
+[58:42] Gavin Broderic Ho: Yeah, yeah.
+[58:46] Gavin Broderic Ho: Yeah, I think this is really cool.
+[58:49] Sorin Adam Matei: All right.
+[58:50] Gavin Broderic Ho: Okay.
+[58:50] Sorin Adam Matei: And this will tell us, you know, these they fought as one as or fought as many crazy lunatics.
+[58:57] Gavin Broderic Ho: Yeah, yeah.
+[59:08] Gavin Broderic Ho: Mhm.
+[59:18] Gavin Broderic Ho: Hsieh.
+[59:19] Sorin Adam Matei: All right, this might take a little bit of explanation, but that's how it is.
+[59:23] Gavin Broderic Ho: Yeah.
+[59:24] Sorin Adam Matei: All right, boss, so see how much of this you can do by the time we meet with Rob. And a day in advance, send me, not to everybody, just send me this document so that I can absorb it, learn it, because I want to give a, you know, on an account of what we've been trying to do. You know, there's a little bit of a disconnect now between what we're doing, Rob, Rob's gone, you know.
+[59:29] Gavin Broderic Ho: Hum.
+[59:41] Gavin Broderic Ho: Yep, makes sense.
+[59:46] Sorin Adam Matei: way out there, he's been writing stuff. I saw that. I'm almost done. It's like, well, I don't know what you mean you're almost done.
+[59:54] Gavin Broderic Ho: Yes.
+[59:55] Sorin Adam Matei: We're not done, you know, but, but you know, such as the joys of collaborations, right?
+[59:59] Gavin Broderic Ho: Okay.
+[1:00:04] Sorin Adam Matei: All right. I appreciate it very much and clock every minute you spend on this. I am eternally grateful for your engagement and trust.
+[1:00:05] Gavin Broderic Ho: Yeah, yeah.
+[1:00:11] Gavin Broderic Ho: Yeah, yeah, no problem. This has been a ride.
+[1:00:13] Sorin Adam Matei: In.
+[1:00:16] Sorin Adam Matei: Yeah, yeah, yeah, and listen, you know, now this site actually, you know, this is even cooler than the Arc GIS site. Arc GIS site is cool, but this is even cooler. So again, using Cla to generate these.
+[1:00:24] Gavin Broderic Ho: Yeah.
+[1:00:26] Gavin Broderic Ho: Yeah, IA.
+[1:00:30] Gavin Broderic Ho: Yeah, yeah, that's what I've been using for coding.
+[1:00:32] Sorin Adam Matei: That's awesome.
+[1:00:35] Sorin Adam Matei: Now, how do you feel about it? You know, does Cla obey? Does it listen to you closely? Do you, or you know, does it, does it, you know, does it, does it end up, you know, giving you stuff?
+[1:00:42] Gavin Broderic Ho: Yeah, yeah, IA.
+[1:00:47] Gavin Broderic Ho: No, no, I, I don't know. I've been working like a lot with it. Like I, I, I don't know. I've kind of mastered what I feel like.
+[1:00:57] Gavin Broderic Ho: What I need to like...
+[1:00:59] Gavin Broderic Ho: fully get what I want as efficiently as possible. Like there's a lot of like...
+[1:01:02] Sorin Adam Matei: Okay.
+[1:01:05] Gavin Broderic Ho: Skills and like setting up the way it like works through problems. I'm giving it and I know enough of like the coding like domain to be able to articulate exactly what it should be doing and not doing anything extra. It's been, I know I've been using it for like modding video games and just like.
+[1:01:12] Sorin Adam Matei: Yeah, yeah.
+[1:01:27] Gavin Broderic Ho: everything in my life because now it's like so easy like I can just...
+[1:01:29] Sorin Adam Matei: Yeah, dear.
+[1:01:31] Sorin Adam Matei: Do you do you use MD? Do you use MD markup? Do you use markup files?
+[1:01:36] Gavin Broderic Ho: Yeah, yeah, yeah, you just do markup files and you could set skills. There's like tons of repos online to do very specific skill sets that you can just like kind of merge into a big like master plan or agent that you have. Like I have it set up so like it will delegate like lower models to.
+[1:01:58] Gavin Broderic Ho: simpler task and I'll have like 10 agents running the code at once and then there's ones checking it. It's really...
+[1:02:06] Sorin Adam Matei: But then, do you, where did you get the money to do all this?
+[1:02:09] Gavin Broderic Ho: No, I just use it on my, I just have the Claude subscription. I just, it's the $20 a month subscription. I mean.
+[1:02:12] Sorin Adam Matei: And the what again?
+[1:02:17] Sorin Adam Matei: You're kidding me, it, and it it allows you to do all that with $20 a month.
+[1:02:21] Gavin Broderic Ho: Yeah, yeah. And Plaud is like one of the few that isn't like an unlimited subscription. So I will run out on a weekly limit, but I feel like I've gotten so good at like token efficiency that I have been able to, like I've rarely hit my limit, but I'm getting there when I'm doing a bunch of different projects.
+[1:02:42] Gavin Broderic Ho: But...
+[1:02:42] Sorin Adam Matei: Yeah, if you are running out the money and you need a little bit of money for that, let me know. You know, one thing you can do is to add a few more hours there, you know what I mean? On account. Oh yeah. Just don't overcharge me.
+[1:02:47] Gavin Broderic Ho: Yeah.
+[1:02:53] Gavin Broderic Ho: Yeah.
+[1:02:55] Gavin Broderic Ho: Yeah, yeah.
+[1:02:58] Gavin Broderic Ho: Yeah, yeah.
+[1:02:59] Sorin Adam Matei: Now, let me show you what I've been doing. And actually, I did not use very high skills. I used low skills, actually, in very loose coding, loose instructions. But, you know, there's this data set called Iraqi War Diary Reports. You know, so
+[1:03:08] Gavin Broderic Ho: Mhm.
+[1:03:17] Gavin Broderic Ho: Hum.
+[1:03:18] Sorin Adam Matei: If you remember WikiLeaks, remember WikiLeaks, you know, some kid, a lowly intelligence analyst, army intelligence army, enlisted. You know, he transferred to public domain all the after action reports written by the units.
+[1:03:21] Gavin Broderic Ho: Yeah, yeah.
+[1:03:39] Sorin Adam Matei: active in Iraq between 2004 and 2009, right? About 170,000 reports, right? Now, each report, I mean, it's unremarkable. I mean, the reports are not nothing, you know, dramatic, you know, there's like...
+[1:03:43] Gavin Broderic Ho: Yeah.
+[1:03:49] Gavin Broderic Ho: Hum.
+[1:03:57] Sorin Adam Matei: You know, we went to, you know, you know, to the to the souk, to the bazaar, because we heard that somebody was playing with fireworks. We found a kid playing with fireworks, nothing happened. Or we were sent there, boom, a bomb exploded under our under our Humvee. You know, two of us, you know, got
+[1:04:18] Sorin Adam Matei: one dead, one died, end of story, right? So for each, you know how the military is, for each incident, there was a date, there was a place, and the description, nothing else, right?
+[1:04:22] Gavin Broderic Ho: Hum.
+[1:04:31] Sorin Adam Matei: But then, you know, after nine years, you get 170,000 such reports, right? You know, which is quite interesting, you know, which actually gives you an idea of, you know, how the insurgency work, because, you know, some of the reports are tagged with actual attack indicators, you know, bomb,
+[1:04:50] Sorin Adam Matei: shooting and all that. So this kind of tells you what really happened. So what I did here, you know, it's rather simple. I did a cluster analysis, right? And where you know, can break the big clusters into smaller clusters, but by the end of the day, what you get are these eight.
+[1:04:52] Gavin Broderic Ho: Hum.
+[1:05:10] Sorin Adam Matei: Main clusters right of the war in Iraq over these five, whatever, five years, right? And actually, as you can see, not only the Baghdad one is truly obvious, the other ones, you know, Mosul, you know, it's really small, Basra, Basra, right, Baghdad.
+[1:05:17] Gavin Broderic Ho: Hum.
+[1:05:29] Sorin Adam Matei: Dialia and Mosul, right? So, you know, it kind of gives you an idea, you know, where the war was and how it kind of flowed and all that. And what's really interesting is that, you know, obviously there was a national insurgency throughout, because you see all these dots, there was a lot of stuff, but the focal points were...
+[1:05:48] Sorin Adam Matei: You know, in only four or five and eight places, right? So the big question here is, how was this national insurgency?
+[1:05:58] Sorin Adam Matei: lifted right by these eight places. You know, what's the relationship? You know, and there's something that I'm still working on trying to understand, basically. But I did this in two afternoons.
+[1:06:09] Gavin Broderic Ho: Yeah.
+[1:06:12] Gavin Broderic Ho: Yeah, that's awesome.
+[1:06:14] Sorin Adam Matei: And it's really cool. I mean, there's a lot of information here, you know, it's like, you know, you can go month by month and see, you know, how many concentrations there were in each month, you know, what percent of the reports were in that concentration. And these concentrations are where the insurgency was at that point in time.
+[1:06:32] Sorin Adam Matei: So anyway, maybe we'll look at this at some other point, you know, like see if there are things. You know, I'll tell you honestly, I wish you did something a little bit more adventurous with your life, right? You know, I mean, as you as you learn all these things, you know, keep in mind that there's all kinds of organizations out there that are.
+[1:06:32] Gavin Broderic Ho: Yeah.
+[1:06:34] Gavin Broderic Ho: No, that's really cool.
+[1:06:38] Gavin Broderic Ho: Yeah, yeah.
+[1:06:47] Gavin Broderic Ho: Hum.
+[1:06:53] Sorin Adam Matei: die to have your skills. I don't know if they pay well or not. Maybe this company, as small as it is, probably pays a lot better than all these other people. All right, boss. Okay.
+[1:06:54] Gavin Broderic Ho: Yeah, yeah.
+[1:07:04] Gavin Broderic Ho: Yeah, yeah.
+[1:07:07] Sorin Adam Matei: So, you know, send me something before this meeting with Rob and Greg, which is next week, and I'll tell you when it is. You are invited too, right?
+[1:07:15] Gavin Broderic Ho: Yeah, yeah, I think I'm already on it.
+[1:07:18] Sorin Adam Matei: on Tuesday or on Tuesday.
+[1:07:19] Gavin Broderic Ho: Oh, wait.
+[1:07:22] Gavin Broderic Ho: Oh, next Tuesday?
+[1:07:23] Sorin Adam Matei: s s.
+[1:07:24] Gavin Broderic Ho: Okay.
+[1:07:26] Sorin Adam Matei: Now, if it's too early, I can move it a little bit.
+[1:07:27] Gavin Broderic Ho: Hum.
+[1:07:30] Gavin Broderic Ho: Okay, yeah, I am at a conference Monday and Tuesday, like all day, so I...
+[1:07:34] Sorin Adam Matei: Okay.
+[1:07:37] Sorin Adam Matei: OK.
+[1:07:38] Gavin Broderic Ho: Don't know if I will have time to get all this done on like Sunday.
+[1:07:43] Sorin Adam Matei: Yeah, I know I don't want you to.
+[1:07:44] Gavin Broderic Ho: And yeah, I won't even be able to make the Tuesday meeting because of that conference.
+[1:07:48] Sorin Adam Matei: Yeah, well...
+[1:07:50] Sorin Adam Matei: Send me something by then, okay? If I mean, it's the bare, this bare bones outline of what we discussed, right?
+[1:07:53] Gavin Broderic Ho: Okay.
+[1:08:00] Gavin Broderic Ho: Yeah.
+[1:08:01] Sorin Adam Matei: Don't try to do everything, just, you know, bare bones information, one a little bit for each, right? Actually, you know, for this flow chart, don't try to kind of sort it out, just dump the flow chart in this document, right? At the end, it's like, you know, this is what we've done so far, right? And I'll explain what we would like to do next and how will that.
+[1:08:14] Gavin Broderic Ho: Okay.
+[1:08:17] Gavin Broderic Ho: Okay.
+[1:08:21] Sorin Adam Matei: Work, yeah.
+[1:08:22] Gavin Broderic Ho: Yep, sounds good.
+[1:08:23] Sorin Adam Matei: Send me something by Monday, right, Monday evening, with whatever you could, you know, you could muster, yeah?
+[1:08:27] Gavin Broderic Ho: Mhm.
+[1:08:30] Gavin Broderic Ho: Okay, okay.
+[1:08:32] Sorin Adam Matei: Thank you so very much. You're the best.
+[1:08:34] Gavin Broderic Ho: Yeah, no problem. Thank you.
+[1:08:36] Sorin Adam Matei: Bye.
+[1:08:37] Gavin Broderic Ho: Bye.
+—   Sorin Adam Matei stopped transcription —

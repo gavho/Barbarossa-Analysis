@@ -119,15 +119,16 @@ weighted Jenks natural breaks into the fewest bands (2–5) with goodness of var
 (100 times) for a 95% interval on each break.
 
 **Stability (descriptive).**
-- Checkpoint groups at line A (k = 4): bootstrap Jaccard 0.92, 0.88, 0.96, 1.00
-- Checkpoint groups at line B (k = 3): bootstrap Jaccard 0.88, 0.76, 0.91
-- Checkpoint groups at line C (k = 3): bootstrap Jaccard 0.95, 0.99, 0.93
-- Checkpoint groups at line D (k = 2): bootstrap Jaccard 0.86, 0.69
-- Natural breaks across Frontier-A (3 bands): -122 km (95% -161 to -107); -57 km (95% -84 to -47)
-- Natural breaks across A-B (3 bands): 29 % (95% 27 to 34); 63 % (95% 61 to 67)
+- Checkpoint groups at Start (22 June line-up) (k = 2): bootstrap Jaccard 1.00, 1.00
+- Checkpoint groups at line A (k = 4): bootstrap Jaccard 0.89, 0.85, 0.95, 1.00
+- Checkpoint groups at line B (k = 3): bootstrap Jaccard 0.86, 0.73, 0.89
+- Checkpoint groups at line C (k = 3): bootstrap Jaccard 0.96, 0.99, 0.95
+- Checkpoint groups at line D (k = 2): bootstrap Jaccard 0.86, 0.67
+- Natural breaks across Frontier-A (3 bands): -122 km (95% -161 to -107); -57 km (95% -86 to -47)
+- Natural breaks across A-B (3 bands): 29 % (95% 27 to 35); 63 % (95% 61 to 67)
 - Natural breaks across B-C (3 bands): 38 % (95% 31 to 41); 71 % (95% 66 to 73)
-- Natural breaks across C-D (3 bands): 36 % (95% 33 to 39); 67 % (95% 64 to 70)
-- Natural breaks across D-E (3 bands): 25 % (95% 20 to 33); 55 % (95% 48 to 62)
+- Natural breaks across C-D (3 bands): 36 % (95% 33 to 39); 67 % (95% 63 to 70)
+- Natural breaks across D-E (3 bands): 25 % (95% 20 to 33); 55 % (95% 49 to 61)
 
 ## Limits — please keep with the results
 - **Small n.** 44–51 divisions; tests have little power, so "not significant" is weak evidence of no effect.

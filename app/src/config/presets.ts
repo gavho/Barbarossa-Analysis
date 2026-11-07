@@ -102,6 +102,9 @@ export const BRANCH_COLORS: Category[] = [
   { value: "Security", color: "#C2A84A" },
   { value: "Cavalry", color: "#7A5C8F" },
 ];
+/** The four planned lines of operation (greater units) for the phase flow chart; other divisions are grey. */
+export const FORMATION_COLORS: Record<string, string> = { "6A": "#149ECE", "III PzKo": "#ED5151", "PzGp1(-)": "#FC921F", "17A": "#A7C636" };
+
 export const CLUSTER_COLORS: Category[] = [
   { value: 0, color: "#ED5151" },
   { value: 1, color: "#149ECE" },
