@@ -119,3 +119,16 @@ describe("AGOL refresh paging", () => {
     await expect(fetchAll("https://x/FeatureServer/0", true, async (u, p = {}) => (p.returnIdsOnly ? { objectIds: Array.from({ length: 9 }) } : fetcher(u, p)))).rejects.toThrow(/2500 of 9/);
   });
 });
+
+describe("one analysis view owns the map", () => {
+  it("showOnly leaves just its layers on; showDefaults brings back the unit view", async () => {
+    const { get, set, initialState, showOnly, showDefaults, styleOf } = await import("@/state/store");
+    const { layersFor, preset } = await import("@/config/presets");
+    set({ ...initialState, page: "frontier" });
+    const ids = layersFor("frontier", false).map((d) => d.id);
+    showOnly(["breakdots", "checklines"]);
+    expect(ids.filter((id) => styleOf(get(), id).visible).sort()).toEqual(["breakdots", "checklines"]);
+    showDefaults();
+    expect(ids.filter((id) => styleOf(get(), id).visible !== preset("frontier", get().mode, id).visible)).toEqual([]);
+  });
+});

@@ -36,15 +36,19 @@ def flow_chart(path):
     nodes = {}  # (line, group or 'stop') -> [column, value, colour]
     for j, L in enumerate(cols):
         for g in sorted((g for g in d["groups"] if g["line"] == L), key=lambda g: -g["lonlat"][1]):
-            nodes[(L, g["group"])] = [j, g["divisions"], GROUP_COLORS[g["group"] % 5]]
-        stop = sum(f["divisions"] for f in d["flows"] if f["to_line"] == L and f["to_group"] is None)
-        if stop:
-            nodes[(L, "stop")] = [j, stop, GREY]
+            nodes[(L, g["group"])] = [j, g["divisions"], GROUP_COLORS[g["group"] % 5], g["formations"]]
+        stopped = [f for f in d["flows"] if f["to_line"] == L and f["to_group"] is None]
+        if stopped:
+            counts = {}
+            for f in stopped:
+                for u, n in f["formations"].items():
+                    counts[u] = counts.get(u, 0) + n
+            nodes[(L, "stop")] = [j, sum(counts.values()), GREY, counts]
     scale, pad, width, gap = 1.0, 3.0, 0.06, 1.0
     y, top = {}, {}
     for j in range(len(cols)):
         cursor = 0.0
-        for k, (col, v, _) in nodes.items():
+        for k, (col, v, _, _) in nodes.items():
             if col == j:
                 y[k] = cursor
                 cursor += v * scale + pad
@@ -63,8 +67,13 @@ def flow_chart(path):
             codes = [MplPath.MOVETO, MplPath.CURVE4, MplPath.CURVE4, MplPath.CURVE4, MplPath.LINETO,
                      MplPath.CURVE4, MplPath.CURVE4, MplPath.CURVE4, MplPath.CLOSEPOLY]
             ax.add_patch(PathPatch(MplPath(verts, codes), fc=FORMATION_COLORS.get(unit, GREY), alpha=0.6, lw=0))
-    for k, (j, v, colour) in nodes.items():
-        ax.add_patch(plt.Rectangle((j * gap, y[k]), width, v * scale, fc=colour, lw=0))
+    for k, (j, v, colour, parts) in nodes.items():
+        ax.add_patch(plt.Rectangle((j * gap, y[k]), width * 0.3, v * scale, fc=colour, lw=0))  # the group's map colour
+        top = y[k]
+        for unit in [*FORMATION_COLORS, "other"]:  # the block split by greater unit, like the bands leaving it
+            h = parts.get(unit, 0) / sum(parts.values()) * v * scale
+            ax.add_patch(plt.Rectangle((j * gap + width * 0.35, top), width * 0.65, h, fc=FORMATION_COLORS.get(unit, GREY), lw=0))
+            top += h
         ax.text(j * gap + width + 0.015, y[k] + v * scale / 2, str(v), va="center", fontsize=7)
     for j, L in enumerate(cols):
         ax.text(j * gap + width / 2, -2, "Start (22 Jun)" if L == "Start" else f"Phase {L}", ha="center", va="bottom", fontsize=8)
@@ -75,6 +84,49 @@ def flow_chart(path):
     ax.set_ylim(max(y[k] + nodes[k][1] for k in nodes) + 2, -6)
     ax.axis("off")
     fig.tight_layout()
+    fig.savefig(path, dpi=300)
+    plt.close(fig)
+
+
+def fig_loa_overview(path):
+    """Section 1 at a glance: one panel per planned line, Rob's plan dashed and the matched realized route solid, the
+    phase lines for reference, and the stretch compared in depth drawn thick. Black and white, readable at 150 mm."""
+    import sys
+    sys.path.insert(0, str(A))
+    import compare_loa as c
+    import phase_clusters as pc
+    from shapely.geometry import Point
+    planned, clusters = c.planned_lines(), c.cluster_lines(c.CLUSTERINGS["DV"])
+    match = pd.read_csv(A / "loa_frontier" / "pairs.csv").query("clustering == 'DV'").set_index("planned").cluster
+    lines = pc.phase_lines()
+    towns = {n: c.to_km(Point(lon, lat)) for n, (lat, lon) in c.CITIES.items()}
+    plt.rcParams.update({"font.size": 8, "pdf.fonttype": 42})
+    fig, axes = plt.subplots(2, 2, figsize=(150 / 25.4, 118 / 25.4), sharex=True, sharey=True)
+    for ax, p in zip(axes.flat, ["6A", "III PzKo", "PzGp1(-)", "17A"]):
+        real = clusters[int(match[p])]  # pairs.csv holds unit names in other rows, so the column is text
+        for L in ("1", "2", "3", "4"):
+            xy = np.array(lines[L][1:-1])
+            ax.plot(*xy.T, color="0.7", lw=0.8)
+            ax.text(*xy[0], f" {L}", color="0.45", fontsize=7, va="bottom")
+        if p in c.SUBSTRETCHES:
+            w, e = c.SUBSTRETCHES[p]
+            stretch = real.intersection(pc.east_polygon(lines[w]).difference(pc.east_polygon(lines[e])))
+            for part in getattr(stretch, "geoms", [stretch]):
+                ax.plot(*np.array(part.coords).T, color="0.55", lw=5, solid_capstyle="round", zorder=1)
+            ax.text(0.02, 0.04, f"thick: phases {w}-{e}, compared in depth", transform=ax.transAxes, fontsize=7)
+        ax.plot(*np.array(planned[p].coords).T, color="black", lw=1.3, ls=(0, (4, 2)), zorder=2)
+        ax.plot(*np.array(real.coords).T, color="black", lw=1.5, zorder=3)
+        for n, t in towns.items():
+            ax.plot(t.x, t.y, "o", color="0.4", ms=2.5)
+            ax.text(t.x + 6, t.y + 5, n, fontsize=6.5, color="0.35")
+        ax.set_title(NAMES[p], fontsize=9, fontweight="bold")
+        ax.set_aspect("equal")
+        ax.set_xticks([])
+        ax.set_yticks([])
+    handles = [plt.Line2D([], [], color="black", lw=1.3, ls=(0, (4, 2))), plt.Line2D([], [], color="black", lw=1.5),
+               plt.Line2D([], [], color="0.7", lw=0.8)]
+    fig.legend(handles, ["Planned line (Rob)", "What the divisions did", "Phase lines 1-4"], loc="lower center", ncol=3, frameon=False)
+    fig.tight_layout(rect=(0, 0.05, 1, 1))
     fig.savefig(path, dpi=300)
     plt.close(fig)
 
@@ -116,7 +168,8 @@ def main():
     pairs = pd.read_csv(A / "loa_frontier" / "pairs.csv").query("clustering == 'DV'")
     sub = pd.read_csv(A / "loa_frontier" / "substretch.csv")
     arrival = pd.read_csv(ROOT / "figures" / "arrival" / "arrival.csv")
-    breaks = pd.read_csv(A / "phase_distributions" / "breaks_by_phase_summary.csv")
+    jsum = pd.read_csv(A / "phase_distributions" / "jenks_by_phase_summary.csv", dtype={"phase": str})
+    jbins = pd.read_csv(A / "phase_distributions" / "jenks_by_phase.csv", dtype={"phase": str})
     ent = pd.read_csv(A / "phase_checkpoints" / "entropy.csv")
     flow_chart(OUT / "flow_chart.png")
 
@@ -159,23 +212,33 @@ def main():
                       "reading of vague planning dates ('mid-July', 'after mid-July', 'late July').")
 
     # 3. Natural breaks
-    doc.add_heading("3. How the divisions were spread around each phase line", level=2)
-    doc.add_paragraph("The 10 km rule treats a phase reached by a few divisions far beyond it the same as one reached by "
-                      "many just short of it. So on each planned date every division's position is measured along the general "
-                      "direction of the whole advance, and natural (Jenks) breaks split that one line of positions into "
-                      "groups where the gaps are. A group is 'past' when all its divisions are past the phase line, 'straddling' "
-                      "when it has divisions on both sides, 'behind' when none have reached it.")
-    doc.add_picture(str(A / "phase_distributions" / "breaks_by_phase.png"), width=Mm(140))
-    table(doc, pd.DataFrame({"Phase": breaks.phase, "Date": breaks.date, "Divisions": breaks.divisions,
-                             "Groups": breaks.classes, "Past %": breaks.past, "Straddling %": breaks.straddling,
-                             "Behind %": breaks.behind}))
-    doc.add_paragraph("Only at phase 3 did a whole group get clearly past the line (on 22 July). At phases 1, 2 and 4 the lead group "
-                      "straddled the line: the goal was reached, but loosely, with divisions spread on both sides.")
+    doc.add_heading("3. Natural breaks at each phase line", level=2)
+    doc.add_paragraph("The 10 km rule gives one number per phase line; it cannot tell a line barely reached by a crowd "
+                      "from one clearly beaten by a group. So, on each planned date, every division is placed on one line: "
+                      "its distance along the general direction of the whole advance (bearing 101 degrees). Jenks natural "
+                      "breaks then cut that line where the divisions clump, into the fewest bins that explain at least 90% "
+                      "of the spread. Only then is each bin read against the phase line: past (all its divisions had "
+                      "crossed), straddling (some had) or behind (none had). Bins are numbered from the front.")
+    doc.add_picture(str(A / "phase_distributions" / "jenks_by_phase.png"), width=Mm(150))
+    a10 = arrival.set_index("phase").arrived_pct
+    for r in jsum.itertuples():
+        b = jbins[jbins.phase == r.phase].sort_values("bin")
+        bins_txt = "; ".join(f"bin {x['bin']}: {x['divisions']} divisions, {x['past']} past ({x['class']})" for x in b.to_dict("records"))
+        doc.add_paragraph(f"Phase {r.phase} ({pd.Timestamp(r.date):%d %b}), {r.bins} bins: {bins_txt}. In all, {r.past}% of "
+                          f"divisions were in bins clearly past the line, {r.straddling}% straddling it and {r.behind}% behind "
+                          f"(the 10 km rule: {a10[int(r.phase)]}%).", style="List Bullet")
+    table(doc, pd.DataFrame({"Phase": jbins.phase, "Bin": jbins.bin, "km along the advance": [f"{x}-{y}" for x, y in zip(jbins.from_km, jbins.to_km)],
+                             "Divisions": jbins.divisions, "Past the line": jbins.past, "Class": jbins["class"]}))
+    doc.add_paragraph("So most of each phase was reached loosely: the bins around each line hold divisions on both sides of "
+                      "it. Only a front bin was clearly past: 3 divisions at phase 1, 15 at phase 2 and 13 at phase 3. "
+                      "Phase 4 was met by about half of the leading bin, and phase 5 by none.")
 
-    # 4. Fighting groups
-    doc.add_heading("4. Fighting groups from phase to phase", level=2)
+    # 4. Groups of divisions
+    doc.add_heading("4. Groups of divisions", level=2)
+    doc.add_heading("4a. Crossing groups: who crossed each phase line together", level=3)
     doc.add_paragraph("At each phase line, divisions that crossed it close together in place and time form a fighting group "
-                      "(blocks, numbers = divisions). Bands show where each group's divisions went next, coloured by the "
+                      "(blocks, numbers = divisions; each block is split by greater unit, with the group's map colour as a thin "
+                      "strip on its left). Bands show where each group's divisions went next, coloured by the "
                       "greater unit they belonged to (grey bands: other or unidentified divisions; grey blocks: divisions that did not reach the next phase line by 5 August). Diversity is the entropy of the greater units within a group, scaled "
                       "0-1: 0 = one greater unit fighting as itself, 1 = all four equally mixed.")
     doc.add_picture(str(OUT / "flow_chart.png"), width=Mm(150))
@@ -187,6 +250,21 @@ def main():
                       "two to three groups (III Panzer Corps merged with Panzer Group 1), with an occasional small fourth. The "
                       "southern group stays mostly 17th Army (diversity near 0 by phases 3 and 4); the northern group mixes "
                       "6th Army and the panzer formations (diversity about 0.8 to 0.95).")
+
+    doc.add_heading("4b. Local groups: who stood together, day by day", level=3)
+    doc.add_paragraph("A second way of grouping, independent of the phase lines: on every day from 22 June to 5 August, two "
+                      "divisions belong to the same group when they stood within 30 km of each other, directly or through a "
+                      "chain of neighbours (30 km is one and a half times the mapping error). A group keeps its identity while "
+                      "it shares most of its divisions with the day before, so the figure shows groups forming, holding, "
+                      "splitting and merging. Most lasted only a few days; the ones that held together for ten days or more were:")
+    doc.add_picture(str(A / "phase_distributions" / "groups_daily.png"), width=Mm(150))
+    daily = pd.read_csv(A / "phase_distributions" / "groups_daily.csv")
+    life = daily.groupby("id").agg(first=("date", "min"), last=("date", "max"), days=("date", "size"), peak=("divisions", "max"),
+                                    dominant=("dominant", lambda x: x.mode()[0])).query("days >= 10").sort_values("first")
+    for r in life.itertuples():
+        who = {"other": "Unidentified divisions", "mixed": "Mixed formations"}.get(r.dominant, NAMES.get(r.dominant, r.dominant))
+        doc.add_paragraph(f"{who}: {pd.Timestamp(r.first):%d %b} to {pd.Timestamp(r.last):%d %b} ({r.days} days, up to "
+                          f"{r.peak} divisions).", style="List Bullet")
 
     # 5. Done so far
     doc.add_heading("5. What we have done so far", level=2)

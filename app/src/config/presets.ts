@@ -3,7 +3,7 @@ import type { PageId } from "./regions";
 export type Mode = "instant" | "progressive";
 export type LayerKind = "circle" | "line" | "fill" | "heatmap";
 export type LayerId =
-  | "areas" | "ellipses" | "heat" | "geo" | "dv" | "geovec" | "dvvec" | "phaseavg" | "phasepieces" | "checklines" | "checkpaths" | "checkdots" | "naturalzones" | "matchplan" | "matchreal" | "paths" | "points"
+  | "areas" | "ellipses" | "heat" | "geo" | "dv" | "geovec" | "dvvec" | "phaseavg" | "phasepieces" | "checklines" | "checkpaths" | "checkdots" | "spreadsurface" | "spreadgroups" | "breakdots" | "jenksdots" | "jenkslines" | "matchplan" | "matchreal" | "paths" | "points"
   | "plan_phase" | "plan_advance" | "plan_pocket";
 
 /** How the timeline filters a layer: by mode (day), always one day (exact), a start..end span, started-by, or not at all. */
@@ -76,11 +76,15 @@ export const PHASE_LAYERS: LayerDef[] = [
     fields: ["method", "stretch", "cluster", "divisions", "silhouette", "bearing", "loo_km", "directness"] },
   { id: "matchplan", title: "Plan vs Actual · Planned Lines", kind: "line", time: "none", cluster: "none", fields: ["name", "badge"] },
   { id: "matchreal", title: "Plan vs Actual · Matched Groups", kind: "line", time: "none", cluster: "none", fields: ["name", "cluster", "badge"] },
-  { id: "naturalzones", title: "Natural Breaks · Between Phase Lines", kind: "fill", time: "none", cluster: "none",
-    fields: ["stretch", "band", "share", "divisions", "from", "to"] },
   { id: "checklines", title: "Checkpoint · Phase Lines", kind: "line", time: "none", cluster: "none", fields: ["line_id", "name", "planned_date"] },
   { id: "checkpaths", title: "Checkpoint · Group Paths", kind: "line", time: "none", cluster: "none", fields: ["group", "from_line", "to_line", "divisions"] },
   { id: "checkdots", title: "Checkpoint · Crossings", kind: "circle", time: "none", cluster: "none", fields: ["division", "line", "date", "group"] },
+  { id: "spreadsurface", title: "Local Groups · Density", kind: "fill", time: "none", cluster: "none", fields: ["date", "level"] },
+  { id: "spreadgroups", title: "Local Groups · Outlines", kind: "fill", time: "none", cluster: "none", fields: ["date", "group", "divisions", "dominant"] },
+  { id: "jenksdots", title: "Natural Breaks · Divisions", kind: "circle", time: "none", cluster: "none", fields: ["division", "phase", "date", "bin", "class", "km"] },
+  { id: "jenkslines", title: "Natural Breaks · Break Lines", kind: "line", time: "none", cluster: "none", fields: ["phase", "km"] },
+  { id: "breakdots", title: "Local Groups · Divisions", kind: "circle", time: "none", cluster: "none",
+    fields: ["division", "phase", "date", "group", "km", "formation"] },
 ];
 
 /** Which tab of the left bar a layer is listed under. */
@@ -88,7 +92,7 @@ export type LayerGroup = "units" | "clusters" | "phases" | "plan";
 export const groupOf = (id: string): LayerGroup =>
   id === "dv" || id === "geo" || id.endsWith("vec") ? "clusters"
     : id.startsWith("plan_") || id.startsWith("match") ? "plan"
-    : id.startsWith("phase") || id.startsWith("check") || id === "naturalzones" ? "phases" : "units";
+    : id.startsWith("phase") || id.startsWith("check") || id.startsWith("spread") || id.startsWith("jenks") || id === "breakdots" ? "phases" : "units";
 
 export const layersFor = (page: PageId, plan: boolean): LayerDef[] =>
   page === "home" ? HOME_LAYERS
@@ -102,6 +106,11 @@ export const BRANCH_COLORS: Category[] = [
   { value: "Security", color: "#C2A84A" },
   { value: "Cavalry", color: "#7A5C8F" },
 ];
+/** Natural-break groups read against the phase line: all past it, on both sides, none past it. */
+export const BREAK_COLORS: Category[] = [
+  { value: "past", color: "#46a758" }, { value: "straddling", color: "#e0b52b" }, { value: "behind", color: "#8b9099" },
+];
+
 /** The four planned lines of operation (greater units) for the phase flow chart; other divisions are grey. */
 export const FORMATION_COLORS: Record<string, string> = { "6A": "#149ECE", "III PzKo": "#ED5151", "PzGp1(-)": "#FC921F", "17A": "#A7C636" };
 
@@ -115,6 +124,8 @@ export const CLUSTER_COLORS: Category[] = [
   { value: 6, color: "#2EC4B6" },
   { value: 7, color: "#E7298A" },
 ];
+/** Gap-based groups on a phase's planned date, numbered from the front; 0 = a lone division (no neighbour within the gap). */
+export const GROUP_COLORS: Category[] = [{ value: 0, color: "#8b9099" }, ...CLUSTER_COLORS.map((c) => ({ value: Number(c.value) + 1, color: c.color }))];
 export const POSTURE_COLORS: Record<string, string> = {
   Move: "#5E8FD0",
   Reserve: "#77B484",
@@ -179,15 +190,23 @@ export function preset(page: PageId, mode: Mode, id: LayerId): LayerStyle {
       return { ...base, color: "#e6e6e6", size: [2.6, 2.6], dash: true };
     case "matchreal":
       return { ...base, colorMode: "category", colorField: "cluster", categories: CLUSTER_COLORS, size: [3.6, 3.6], labels: true };
-    case "naturalzones":
-      return { ...base, opacity: 0.55, colorMode: "ramp", colorField: "share", ramp: [[20, "#1f2a36"], [30, "#6b5a24"], [40, "#e0b52b"], [50, "#ffe27a"]],
-        outline: "#e0b52b" };
     case "checklines":
       return { ...base, color: "#00c2a8", size: [2, 2], labels: true, dash: true };
     case "checkpaths":
       return { ...base, colorMode: "category", colorField: "group", categories: CLUSTER_COLORS, size: [4, 4], labels: true };
     case "checkdots":
       return { ...base, colorMode: "category", colorField: "group", categories: CLUSTER_COLORS, size: [4.5, 4.5], outline: "rgba(0,0,0,0.6)" };
+    case "breakdots":
+      return { ...base, colorMode: "category", colorField: "colour", categories: GROUP_COLORS, size: [5.5, 5.5], outline: "rgba(0,0,0,0.7)" };
+    case "jenksdots":
+      return { ...base, colorMode: "category", colorField: "bin", categories: GROUP_COLORS, size: [5.5, 5.5], outline: "rgba(0,0,0,0.7)" };
+    case "jenkslines":
+      return { ...base, color: "#e4e6e9", size: [1.6, 1.6], dash: true };
+    case "spreadsurface":
+      return { ...base, opacity: 0.45, colorMode: "ramp", colorField: "level", ramp: [[0.35, "#5d6f88"], [1, "#9aae5a"], [2, "#e0b52b"], [4, "#ffe27a"]],
+        outline: "rgba(0,0,0,0)" };
+    case "spreadgroups":
+      return { ...base, opacity: 0.1, colorMode: "category", colorField: "colour", categories: GROUP_COLORS, labels: true };
     case "plan_pocket":
       return { ...base, visible: true, color: "#1c1c1c", size: [2.5, 2.5], dash: true };
   }

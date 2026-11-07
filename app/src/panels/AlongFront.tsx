@@ -1,7 +1,4 @@
-import { Map as MapIcon } from "lucide-react";
 import { PHASE_CHECKS, PHASE_PROFILES } from "@/data";
-import { setStyle, styleOf, useStore } from "@/state/store";
-import { cn } from "@/lib/utils";
 import { ChartCard } from "./Charts";
 import { color } from "./Phases";
 
@@ -32,8 +29,6 @@ const TownsNote = () => (
 
 /** One panel per stretch: where the division-days were along the front, the previous stretch dashed. */
 export function FrontProfile() {
-  const s = useStore();
-  const onMap = styleOf(s, "naturalzones").visible;
   const peak = Math.max(...profiles.flatMap((p) => p.share));
   const outline = (share: number[], x0: number) => {
     const pts = share.map((v, j) => `${x0 + (v / peak) * (colW - 8)},${yOf(lo + bin_km * (j + 0.5))}`);
@@ -55,10 +50,6 @@ export function FrontProfile() {
         })}
       </svg>
       <TownsNote />
-      <button onClick={() => { setStyle("naturalzones", { visible: !onMap }); setStyle("checklines", { visible: !onMap }); }} aria-pressed={onMap}
-        className={cn("mt-1.5 flex items-center gap-1 rounded-[var(--radius)] border px-2 py-1 text-[11px]", onMap ? "border-primary bg-primary/15" : "border-border hover:bg-muted")}>
-        <MapIcon size={12} /> {onMap ? "Natural breaks on map" : "Show natural breaks on map"}
-      </button>
     </ChartCard>
   );
 }

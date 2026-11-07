@@ -1,13 +1,13 @@
 import { create } from "zustand";
 import type { FC } from "@/data";
 import { EMBEDDED, type Dataset } from "@/data";
-import { preset, styleKey, type LayerId, type LayerStyle, type Mode } from "@/config/presets";
+import { layersFor, preset, styleKey, type LayerId, type LayerStyle, type Mode } from "@/config/presets";
 import { timeWindow, type PageId, type RegionId } from "@/config/regions";
 import type { Filters } from "@/map/expressions";
 import type { ClusterSettings } from "@/lib/cluster";
 
 export type Theme = "tactical" | "period";
-export type RightTab = "charts" | "table" | "info" | "days" | "plan" | "oob" | "vectors" | "phases";
+export type RightTab = "charts" | "table" | "info" | "days" | "plan" | "oob" | "vectors" | "phases" | "groups";
 export interface PhaseView { method: "DV" | "GEO"; stretch: string } // stretch "all" or a name like "1-2"
 
 export interface View { center: [number, number]; zoom: number; bearing: number; pitch: number }
@@ -46,7 +46,9 @@ export interface State {
   userLayers: UserLayer[];
   data: Dataset;
   phase: PhaseView;
-  phaseStep: string; // Phases tab stepper: "all" or a phase line letter
+  phaseStep: string; // Phases tab stepper: "all", "Start" or a phase number
+  phaseSection: "breaks" | "method"; // which Phases-tab view owns the map
+  groupsSection: "crossing" | "local"; // which Groups-tab view owns the map
   clusters: Partial<Record<RegionId, ClusterSettings>>; // live cluster settings per theatre; missing = published
   layerTab: string; // left bar: units / clusters / phases / plan / mine
   planFocus: string | null; // planned line shown alone on the map, or all
@@ -80,6 +82,8 @@ export const initialState: State = {
   data: EMBEDDED,
   phase: { method: "DV", stretch: "all" },
   phaseStep: "all",
+  phaseSection: "breaks",
+  groupsSection: "crossing",
   clusters: {},
   layerTab: "units",
   planFocus: null,
@@ -99,6 +103,23 @@ export function setStyle(id: LayerId, patch: Partial<LayerStyle>) {
   const s = get();
   const key = styleKey(s.page, s.mode, id);
   set({ styles: { ...s.styles, [key]: { ...styleOf(s, id), ...patch } } });
+}
+
+/** One analysis view owns the map: these layers on, every other data layer of the page off. The basemap and the
+ * header's plan overlay are left alone. Styling is kept; only visibility changes. */
+export function showOnly(ids: readonly LayerId[]) {
+  const s = get();
+  const styles = { ...s.styles };
+  for (const { id } of layersFor(s.page, false)) styles[styleKey(s.page, s.mode, id)] = { ...styleOf(s, id), visible: ids.includes(id) };
+  set({ styles });
+}
+
+/** Leaving an analysis view: every data layer back to its default visibility (the plain unit view), styling kept. */
+export function showDefaults() {
+  const s = get();
+  const styles = { ...s.styles };
+  for (const { id } of layersFor(s.page, false)) styles[styleKey(s.page, s.mode, id)] = { ...styleOf(s, id), visible: preset(s.page, s.mode, id).visible };
+  set({ styles });
 }
 
 export function resetStyle(id?: LayerId) {

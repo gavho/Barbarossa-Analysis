@@ -1,5 +1,5 @@
 import type { GeoJSONSource, LayerSpecification, Map as MLMap } from "maplibre-gl";
-import { COUNTRIES, MILESTONES, PHASE_CHECKS, PHASE_PROFILES, PHASES, PLAN_MATCH, type FC } from "@/data";
+import { COUNTRIES, MILESTONES, PHASE_CHECKS, PHASE_PROFILES, PHASES, PLAN_MATCH, LOCAL_GROUPS, type FC } from "@/data";
 import { HEAT_RAMP, layersFor, type LayerDef, type LayerId, type LayerStyle } from "@/config/presets";
 import { styleOf, type State } from "@/state/store";
 import { regionOf } from "@/state/clusters";
@@ -25,24 +25,37 @@ function phaseData(s: State, id: "phaseavg" | "phasepieces"): FC {
   return phaseCache.get(key)!;
 }
 
-type StepLayer = "checklines" | "checkdots" | "checkpaths" | "naturalzones";
+type StepLayer = "checklines" | "checkdots" | "checkpaths" | "jenksdots" | "jenkslines";
 const stepCache = new Map<string, FC>();
-/** Checkpoint and natural-break layers for the Phases stepper ("all" = everything): the chosen phase line, its crossings,
- * the group arrows arriving at it, and the natural-break bands of the stretches either side of it. */
+const EMPTY: FC = { type: "FeatureCollection", features: [] };
+/** Layers for the Phases steppers ("all" = everything): the chosen phase line, its crossings, the group arrows arriving
+ * at it, and the divisions on its planned date. */
 function stepData(step: string, id: StepLayer): FC {
   const all = { checklines: MILESTONES.AGS_PhaseLines, checkdots: PHASE_CHECKS.crossings, checkpaths: PHASE_CHECKS.ribbons,
-    naturalzones: PHASE_PROFILES.zones }[id];
-  if (step === "all") return all;
+    jenksdots: PHASE_PROFILES.jenks.dots, jenkslines: PHASE_PROFILES.jenks.breaklines }[id];
+  if (step === "all") return id.startsWith("jenks") ? EMPTY : all; // each phase has its own date: overlaid, they would mislead
   const key = `${id}|${step}`;
   if (!stepCache.has(key)) {
     const keep = (p: Record<string, unknown>) =>
       id === "checklines" ? String(p.line_id).toUpperCase() === step
         : id === "checkdots" ? p.line === step
         : id === "checkpaths" ? p.to_line === step
-        : String(p.stretch).split("-").includes(step === "Start" ? "Frontier" : step); // "1-2" borders phases 1 and 2; Start opens "Frontier-1"
+        : p.phase === step; // the natural-break layers
     stepCache.set(key, { type: "FeatureCollection", features: all.features.filter((f) => keep(f.properties ?? {})) });
   }
   return stepCache.get(key)!;
+}
+
+type SpreadLayer = "spreadsurface" | "spreadgroups" | "breakdots";
+const dailyCache = new Map<string, FC>();
+/** The daily groups for the timeline's date (empty outside 22 June - 5 August). */
+function dailyData(date: string, id: SpreadLayer): FC {
+  const key = `${id}|${date}`;
+  if (!dailyCache.has(key)) {
+    const all = { spreadsurface: LOCAL_GROUPS.surface, spreadgroups: LOCAL_GROUPS.outlines, breakdots: LOCAL_GROUPS.dots }[id];
+    dailyCache.set(key, { type: "FeatureCollection", features: all.features.filter((f) => f.properties?.date === date) });
+  }
+  return dailyCache.get(key)!;
 }
 
 const matchCache = new Map<string, FC>();
@@ -63,7 +76,8 @@ function matchData(s: State, id: "matchplan" | "matchreal"): FC {
 export function sourceData(s: State, id: LayerId): FC | null {
   if (id === "matchplan" || id === "matchreal") return matchData(s, id);
   if (id === "phaseavg" || id === "phasepieces") return phaseData(s, id);
-  if (id === "checklines" || id === "checkdots" || id === "checkpaths" || id === "naturalzones") return stepData(s.phaseStep, id);
+  if (id === "spreadsurface" || id === "spreadgroups" || id === "breakdots") return dailyData(s.date, id); // local groups follow the timeline
+  if (id === "checklines" || id === "checkdots" || id === "checkpaths" || id === "jenksdots" || id === "jenkslines") return stepData(s.phaseStep, id);
   if (id === "plan_phase") return MILESTONES.AGS_PhaseLines;
   if (id === "plan_advance") return MILESTONES.AGS_AdvanceLines;
   if (id === "plan_pocket") return MILESTONES.AGS_SmallPocketCOA;
@@ -103,7 +117,7 @@ function specs(def: LayerDef, st: LayerStyle, s: State, src: string): LayerSpeci
       break;
     case "fill":
       out.push({ ...base, type: "fill", layout, paint: { "fill-color": colorExpr(st) as never, "fill-opacity": st.opacity } });
-      out.push({ ...base, id: `${def.id}-outline`, type: "line", layout, paint: { "line-color": st.outline ?? st.color, "line-width": 1 } });
+      out.push({ ...base, id: `${def.id}-outline`, type: "line", layout, paint: { "line-color": (st.outline ?? colorExpr(st)) as never, "line-width": 1 } });
       break;
     case "heatmap":
       out.push({ ...base, type: "heatmap", layout, paint: {
@@ -118,7 +132,7 @@ function specs(def: LayerDef, st: LayerStyle, s: State, src: string): LayerSpeci
   const label = labelText(def.id);
   if (label && st.labels !== false && (st.labels || def.id === "areas")) {
     out.push({ ...base, id: `${def.id}-labels`, type: "symbol",
-      layout: { ...layout, "symbol-placement": "line", "text-field": label as never, "text-font": FONT, "text-size": 11, "text-letter-spacing": 0.05,
+      layout: { ...layout, "symbol-placement": def.id === "spreadgroups" ? "point" : "line", "text-field": label as never, "text-font": FONT, "text-size": 11, "text-letter-spacing": 0.05,
         ...(def.id.endsWith("vec") || def.id === "phaseavg" || def.id === "checkpaths" || def.id === "matchreal" ? { "text-size": 22, "symbol-spacing": 70, "text-keep-upright": false, "text-allow-overlap": true } : {}) },
       paint: { "text-color": cssVar("--foreground"), "text-halo-color": cssVar("--background"), "text-halo-width": 1.5 } });
   }
@@ -131,6 +145,7 @@ function labelText(id: LayerId): unknown {
   if (id === "dv" || id === "geo") return ["case", ["==", ["%", ["to-number", ["get", "Day_Index"], 0], 7], 1], ["slice", ["to-string", ["get", "Date"]], 5], ""];
   if (id === "plan_phase" || id === "checklines") return ["concat", "PHASE ", ["get", "line_id"]];
   if (id === "areas") return ["upcase", ["get", "Region"]];
+  if (id === "spreadgroups") return ["get", "label"];
   if (id === "dvvec" || id === "geovec" || id === "phaseavg" || id === "checkpaths" || id === "matchreal") return "›"; // arrowheads show the direction of travel
   return null;
 }
@@ -252,6 +267,6 @@ export function syncLayers(map: MLMap, s: State) {
 
 /** Layer ids that respond to clicks, top-most first. */
 export function clickableLayers(map: MLMap): string[] {
-  const ids = ["unit-points", "points", "paths", "matchreal", "matchplan", "checkdots", "checkpaths", "checklines", "naturalzones", "phaseavg", "phasepieces", "dvvec", "geovec", "dv", "geo", "ellipses", "plan_phase", "plan_advance", "plan_pocket", "areas"];
+  const ids = ["unit-points", "points", "paths", "matchreal", "matchplan", "jenksdots", "breakdots", "spreadgroups", "checkdots", "checkpaths", "checklines", "phaseavg", "phasepieces", "dvvec", "geovec", "dv", "geo", "ellipses", "plan_phase", "plan_advance", "plan_pocket", "areas"];
   return ids.filter((id) => map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== "none");
 }

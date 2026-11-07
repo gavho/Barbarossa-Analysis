@@ -141,10 +141,6 @@ export const HELP: Record<string, { title: string; body: string }> = {
     title: "Matched groups",
     body: "The average path of the realized group paired with each planned line, for the clustering chosen in the Vectors tab (published 5 or recommended 4), with arrows in the direction of travel.",
   },
-  naturalzones: {
-    title: "Natural breaks between the phase lines",
-    body: "Where the divisions bunched between one planned phase line and the next. Every daily division location (weighted by strength) is placed by how far across its stretch it was — 0% at the western phase line, 100% at the eastern one, measured at its own latitude (before phase 1: km west of it). Jenks natural breaks then split each stretch into bands: breaks fall where few division-days were spent, so the divisions crossed that ground quickly, and the bands are where they slowed or paused. Each break runs north–south and bends with the phase lines either side. The app uses the fewest bands (2–5) that explain at least 80% of the spread (goodness of variance fit 0.8, the usual rule). Brighter = a larger share of the stretch's division-days. Click a band for its numbers."
-  },
   frontProfile: {
     title: "Front profile",
     body: "One panel per stretch between phase lines, north at the top. The shape is where the divisions spent their days along the front (share of division-days, weighted by strength); the dashed outline is the stretch before, for comparison. Solid line: the centre of weight. The axis is latitude only, so a town named beside it marks how far north, not that the front was there.",
@@ -177,6 +173,34 @@ export const HELP: Record<string, { title: string; body: string }> = {
     title: "Checkpoint group paths",
     body: "For a group that carries on from one line to the next, a straight arrow from where its divisions crossed the first line (their average crossing point) to where they crossed the next. It shows which way the group went, not its route.",
   },
+  naturalBreaks: {
+    title: "Natural breaks",
+    body: "Sorin's question: on the day a phase line was meant to be reached, how were the divisions spread around it? Three steps. 1) Put every division on one line: its distance along the general direction of the whole advance (the bearing from the divisions' average 22 June position to their average last position), not along the phase line, whose shape plays no part here. 2) Jenks natural breaks cut that line where the divisions clump, as for a GIS colour ramp: the fewest bins that explain at least 90% of the spread (Sorin expected three or four). Bins are numbered from the front. 3) Only then read each bin against the phase line: past (every division in it had crossed), straddling (some had) or behind (none had). The percentages are shares of divisions. The phase lines run at an angle to the advance, so a bin can straddle the line: its southern divisions past it, its northern ones short.",
+  },
+  jenksdots: {
+    title: "Natural breaks: divisions",
+    body: "Each division where it stood on the selected phase's planned date, coloured by its natural-break bin (bin 1 = furthest along the advance). Click one for its bin and whether it was past the phase line.",
+  },
+  jenkslines: {
+    title: "Natural breaks: break lines",
+    body: "Where Jenks cut the divisions' positions along the direction of advance, drawn as straight lines across the front at right angles to the advance. They are straight on purpose: the breaks come from where the divisions clumped, not from the phase line's shape.",
+  },
+  breakdots: {
+    title: "Local groups: divisions",
+    body: "Each division where it stood on the timeline's date, coloured by its local group (grey = a lone division with no neighbour within 30 km). Press Play to watch the groups form, merge and split. Click one for its group.",
+  },
+  flowOverTime: {
+    title: "Groups through time",
+    body: "The same grouping as on the planned dates (divisions within 30 km of a neighbour), done for every day from 22 June to 5 August. Each column is a day; each bar a group, north at the top, its height the number of divisions. Bands join a group to the next day's groups by the divisions they share, so a group that holds together runs across as one band, a split fans out and a merge fans in. A group keeps its number while it holds together (it shares most divisions with yesterday's group); a group that forms anew gets a new number. Strong colours mark the groups that held together for 10 days or more, labelled by their main formation where they end; the rest stay faint. By formation colours each group by its majority greater unit (grey = mixed or unidentified). Click a day, or press Play on the timeline, to see that day on the map.",
+  },
+  spreadgroups: {
+    title: "Local groups: outlines",
+    body: "Each local group on the timeline's date: a 15 km circle around every division in it, joined. Circles touch when divisions are within 30 km, so the outline is the group. Labelled with the group's number and its divisions.",
+  },
+  spreadsurface: {
+    title: "Local groups: density",
+    body: "Where the divisions were concentrated on the timeline's date: every division spread as a smooth 15 km bump and the bumps added up, in divisions per 1,000 km². Yellower bands are denser; the faintest is half a lone division's peak, so every division shows.",
+  },
   checkdots: {
     title: "Crossings",
     body: "Where each division's track first crossed a phase line, coloured by the group it crossed with. Click one for the division and day.",
@@ -195,7 +219,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   phaseStep: {
     title: "Step through the lines",
-    body: "Pick Start to see the 22 June line-up and the bands between the border and phase 1. Pick a phase line to see only it on the map: the teal dashed line itself; a dot where each division crossed it, coloured by the group it crossed with; arrows showing each group arriving from the line before; and the natural-break bands of the stretches just before and after it, brighter where more divisions spent their days. If the coloured groups keep the same north–south order line after line, the front advanced as one piece; where they jump, it reshaped. The card below says the same in words. All shows every line at once.",
+    body: "Pick Start to see the 22 June line-up. Pick a phase line to see only it on the map: the teal dashed line itself; a dot where each division crossed it, coloured by the group it crossed with; and arrows showing each group arriving from the line before. All shows every line at once.",
   },
   frontShape: {
     title: "How the front changed at the line",

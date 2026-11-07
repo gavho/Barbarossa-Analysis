@@ -3,7 +3,7 @@ import { Eye, EyeOff, Focus } from "lucide-react";
 import type { Feature, LineString } from "geojson";
 import { CLUSTER_COLORS } from "@/config/presets";
 import { mapRef } from "@/map/MapView";
-import { set, setStyle, styleOf, useStore } from "@/state/store";
+import { set, setStyle, showOnly, styleOf, useStore } from "@/state/store";
 import { Help } from "@/ui/Help";
 import { Segmented } from "@/ui/Segmented";
 import { cn } from "@/lib/utils";
@@ -27,7 +27,7 @@ export function Vectors() {
   const active = kind === "dv" ? s.filters.dv : s.filters.geo;
 
   const focus = (f: Feature) => {
-    if (!style.visible) setStyle(id, { visible: true });
+    if (!style.visible) showOnly([id]);
     set({ selection: { layer: id, title: kind === "dv" ? "Directional Vector Cluster Vectors" : "Geometric Cluster Vectors", props: { ...f.properties } } });
     const c = (f.geometry as LineString).coordinates;
     const xs = c.map((p) => p[0]), ys = c.map((p) => p[1]);
@@ -43,7 +43,7 @@ export function Vectors() {
             items={[{ value: "dv", label: "Directional vector" }, { value: "geo", label: "Geometric" }]} />
           <Help id={kind} />
         </div>
-        <button onClick={() => setStyle(id, { visible: !style.visible })} aria-pressed={style.visible}
+        <button onClick={() => (style.visible ? setStyle(id, { visible: false }) : showOnly([id]))} aria-pressed={style.visible}
           className={cn("flex items-center gap-1 rounded-[var(--radius)] border px-2 py-1 text-[12px]", style.visible ? "border-primary bg-primary/15" : "border-border hover:bg-muted")}>
           {style.visible ? <Eye size={13} /> : <EyeOff size={13} />} {style.visible ? "On map" : "Show on map"}
         </button>

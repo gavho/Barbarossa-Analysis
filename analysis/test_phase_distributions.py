@@ -53,6 +53,25 @@ def test_bins_are_past_behind_or_straddling():
     assert pd_.classify_bins(bins, past) == {0: "behind", 1: "straddling", 2: "past"}
 
 
+
+def test_groups_chain_neighbours_within_30_km():
+    xy = np.array([[0, 0], [25, 0], [50, 10], [120, 0]])  # the first three chain in steps under 30 km; the last is 70 km out
+    lab = pd_.link_groups(xy)
+    assert lab[0] == lab[1] == lab[2] != lab[3]
+
+
+def test_stricter_fit_needs_more_bins():
+    y = np.array([0, 2, 4, 50, 52, 54, 100, 101, 140, 150, 160], float)  # clumps that a 3-class cut blurs
+    k8, _, _ = pd_.natural_breaks(y, np.ones(len(y)))
+    k9, _, gvf = pd_.natural_breaks(y, np.ones(len(y)), gvf_min=0.99)
+    assert k9 > k8 and gvf >= 0.99
+
+
+def test_an_id_only_continues_yesterdays_group():
+    prev = {"a": 0, "b": 0, "c": 1}  # yesterday: a, b in group 0; c in group 1
+    ids, nxt = pd_.fresh_ids(np.array([0, 0, 1, -1]), ["a", "b", "x", "y"], prev, 5)
+    assert list(ids) == [0, 0, 5, -1] and nxt == 6  # x shares nothing with yesterday's group 1, so it gets a new id
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

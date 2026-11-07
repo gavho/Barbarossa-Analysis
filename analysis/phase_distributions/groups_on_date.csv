@@ -1,0 +1,28 @@
+phase,date,group,sector,divisions,formations,diversity,median_km,min_km,max_km,past,class,y,x_km
+1,1941-06-30,A,north-centre,6,"6A 4, other 2",0.0,-20,-59,-5,0,behind,91,-20
+1,1941-06-30,B,centre,3,"PzGp1(-) 1, 17A 1, other 1",0.5,-68,-88,-57,0,behind,55,-68
+1,1941-06-30,C,south-centre,23,"17A 11, 6A 7, PzGp1(-) 3, III PzKo 1, other 1",0.81,-2,-70,34,11,straddling,9,-2
+2,1941-07-07,A,north,2,6A 2,0.0,-74,-79,-70,0,behind,132,-74
+2,1941-07-07,B,north-centre,6,"6A 3, III PzKo 3",0.5,28,6,47,6,past,62,28
+2,1941-07-07,C,north-centre,4,"other 2, 6A 1, PzGp1(-) 1",0.5,-51,-77,-36,0,behind,59,-51
+2,1941-07-07,D,centre,2,PzGp1(-) 2,0.0,78,75,81,2,past,2,78
+2,1941-07-07,E,south-centre,8,"6A 5, PzGp1(-) 2, 17A 1",0.65,39,18,61,8,past,-30,39
+2,1941-07-07,F,south,4,17A 4,0.0,-62,-66,-44,0,behind,-57,-62
+2,1941-07-07,G,south,3,"17A 2, PzGp1(-) 1",0.46,-8,-11,12,1,straddling,-90,-8
+3,1941-07-22,A,north,2,17A 2,0.0,45,35,55,2,past,70,45
+3,1941-07-22,B,north,9,"other 5, 6A 4",0.0,-56,-80,-11,0,behind,66,-56
+3,1941-07-22,C,north-centre,7,"6A 3, III PzKo 2, PzGp1(-) 2",0.78,85,54,103,7,past,32,85
+3,1941-07-22,D,centre,2,PzGp1(-) 2,0.0,136,132,139,2,past,-51,136
+3,1941-07-22,E,south-centre,12,"17A 8, 6A 3, PzGp1(-) 1",0.59,86,54,106,12,past,-96,86
+3,1941-07-22,F,south,2,other 2,,151,141,161,2,past,-176,151
+4,1941-07-25,A,north,4,"6A 3, other 1",0.0,-157,-167,-149,0,behind,108,-157
+4,1941-07-25,B,north,2,6A 2,0.0,-28,-35,-22,0,behind,57,-28
+4,1941-07-25,C,north-centre,7,"17A 3, 6A 2, PzGp1(-) 1, other 1",0.73,-50,-76,-7,0,behind,55,-50
+4,1941-07-25,D,north-centre,2,other 2,,-115,-123,-108,0,behind,53,-115
+4,1941-07-25,E,centre,3,"III PzKo 2, PzGp1(-) 1",0.46,52,25,75,3,past,-24,52
+4,1941-07-25,F,south-centre,17,"17A 9, PzGp1(-) 5, 6A 3",0.72,14,-33,65,13,straddling,-95,14
+4,1941-07-25,G,south,2,other 2,,-61,-63,-59,0,behind,-191,-61
+5,1941-07-30,A,north,3,"6A 2, other 1",0.0,-183,-196,-175,0,behind,110,-183
+5,1941-07-30,B,north-centre,14,"other 5, 6A 4, 17A 3, PzGp1(-) 2",0.77,-38,-129,-22,0,behind,36,-38
+5,1941-07-30,C,south,14,"17A 9, 6A 3, PzGp1(-) 2",0.64,-93,-124,-44,0,behind,-132,-93
+5,1941-07-30,D,south,2,PzGp1(-) 2,0.0,-64,-70,-57,0,behind,-155,-64

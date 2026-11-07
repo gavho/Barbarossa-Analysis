@@ -3,13 +3,13 @@ import type { Feature, LineString } from "geojson";
 import { PHASES } from "@/data";
 import { CLUSTER_COLORS } from "@/config/presets";
 import { mapRef } from "@/map/MapView";
-import { set, setStyle, styleOf, useStore } from "@/state/store";
+import { set, setStyle, showDefaults, showOnly, styleOf, useStore, type State } from "@/state/store";
 import { Help } from "@/ui/Help";
 import { Segmented } from "@/ui/Segmented";
 import { cn } from "@/lib/utils";
 import { compass } from "./Vectors";
-import { Checkpoints } from "./Checkpoints";
 import { FrontProfile, PlacesInLine } from "./AlongFront";
+import { NaturalBreaks } from "./NaturalBreaks";
 
 export const color = (cid: number) => CLUSTER_COLORS.find((c) => c.value === cid)?.color ?? "#888";
 export const Swatch = ({ cid }: { cid: number }) => (
@@ -17,19 +17,28 @@ export const Swatch = ({ cid }: { cid: number }) => (
 );
 export const separation = (sil: number) => (sil >= 0.5 ? "groups clearly separate" : sil >= 0.25 ? "groups fairly separate" : "groups overlap");
 
-/** Phase lines as checkpoints first; the between-the-lines clusters stay below as a method check. */
+type Section = State["phaseSection"];
+
+/** The phase-line analyses, one at a time, each owning the map: Sorin's natural breaks on each planned date, and the
+ * earlier between-the-lines charts kept as a method check. Groupings of divisions live in the Groups tab. */
 export function Phases() {
+  const section = useStore((s) => s.phaseSection);
+  const open = (v: Section) => {
+    if (v !== section) showDefaults();
+    set({ phaseSection: v });
+  };
   return (
     <div className="flex flex-col gap-2.5">
-      <Checkpoints />
-      <details className="frame p-2.5">
-        <summary className="cursor-pointer text-[12px] text-muted-foreground">Method check: charts and groups re-fitted between the lines</summary>
-        <div className="mt-2 flex flex-col gap-2.5">
+      <Segmented<Section> size="sm" value={section} onChange={open}
+        items={[{ value: "breaks", label: "Natural breaks" }, { value: "method", label: "Method check" }]} />
+      {section === "breaks" && <NaturalBreaks />}
+      {section === "method" && (
+        <div className="flex flex-col gap-2.5">
           <FrontProfile />
           <PlacesInLine />
           <BetweenLines />
         </div>
-      </details>
+      )}
     </div>
   );
 }
@@ -41,7 +50,7 @@ function BetweenLines() {
   const visible = styleOf(s, "phaseavg").visible;
   const shown = stretch === "all" ? PHASES.stretches : [stretch];
   const setPhase = (p: Partial<typeof s.phase>) => set({ phase: { ...s.phase, ...p } });
-  const toggleMap = () => setStyle("phaseavg", { visible: !visible }); // division pieces stay in the layer list: drawn by default they bury the group paths
+  const toggleMap = () => (visible ? setStyle("phaseavg", { visible: false }) : showOnly(["phaseavg"])); // division pieces stay in the layer list: drawn by default they bury the group paths
 
   const focus = (f: Feature) => {
     if (!visible) toggleMap();

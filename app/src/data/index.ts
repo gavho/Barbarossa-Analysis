@@ -37,6 +37,7 @@ import phase_clusters from "./phase_clusters.json";
 import phase_distributions from "./phase_distributions.json";
 import phase_checkpoints from "./phase_checkpoints.json";
 import phase_profiles from "./phase_profiles.json";
+import local_groups from "./local_groups.json";
 import plan_match from "./plan_match.json";
 
 export type FC = FeatureCollection;
@@ -95,12 +96,26 @@ export const PHASE_CHECKS = phase_checkpoints as unknown as {
   ribbons: FC; crossings: FC;
 };
 /** Where along the front (north-south km) the divisions were per stretch, with Jenks natural breaks (phase_distributions.py). */
+/** The same grouping on every day (phase_distributions.daily_groups): a group keeps its id while it holds together, so
+ * splits, merges and new groups show as id changes; links count the divisions shared by groups on consecutive days. */
+export interface DailyGroup { date: string; id: number; divisions: number; dominant: string; formations: string; y: number }
+export const LOCAL_GROUPS = local_groups as unknown as {
+  link_km: number; groups: DailyGroup[];
+  links: { from_date: string; from_id: number; to_date: string; to_id: number; divisions: number }[];
+  dots: FC; outlines: FC; surface: FC;
+};
 export const PHASE_PROFILES = phase_profiles as unknown as {
   bin_km: number; bins_from_km: number; towns: { name: string; km: number }[];
   profiles: { stretch: string; share: number[]; mean_km: number; breaks: number[]; gvf: number;
     bands: { band: string; share: number; divisions: number; from: number; to: number; unit: "%" | "km" }[] }[];
   positions: { division: string; stretch: string; km: number }[];
-  zones: FC;
+  /** Sorin's natural breaks on each planned date: Jenks on positions along the general direction of advance, the bins
+   * read against the phase line afterwards (phase_distributions.jenks_on_date). */
+  jenks: { heading: number; gvf_min: number; dots: FC; breaklines: FC;
+    summary: { phase: string; date: string; divisions: number; bins: number; gvf: number; past: number; straddling: number; behind: number;
+      line_from: number; line_to: number }[];
+    bins: { phase: string; date: string; bin: number; from_km: number; to_km: number; divisions: number; past: number;
+      class: "past" | "straddling" | "behind" }[] };
 };
 export interface PlanPair { planned: string; name: string; cluster: number; divisions: number; badge: "on plan" | "near plan" | "off plan";
   sentence: string; mean_offset_km: number; mean_gap_km: number; within50_pct: number; end_gap_km: number; bearing_diff: number;

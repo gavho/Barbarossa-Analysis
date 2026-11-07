@@ -5,7 +5,7 @@ import { PUBLISHED, RECOMMENDED } from "@/lib/cluster";
 import { divisionName, regionOf, settingsOf } from "@/state/clusters";
 import { CLUSTER_COLORS } from "@/config/presets";
 import { mapRef } from "@/map/MapView";
-import { set, setStyle, styleOf, useStore } from "@/state/store";
+import { set, setStyle, showOnly, styleOf, useStore } from "@/state/store";
 import { Help } from "@/ui/Help";
 import { Segmented } from "@/ui/Segmented";
 import { cn } from "@/lib/utils";
@@ -92,7 +92,7 @@ export function PlanMatch() {
   const behind = live.info?.stayedBehind ?? [];
   const f = frame(m.pairs);
   const onMap = styleOf(s, "matchreal").visible;
-  const show = (on: boolean) => LAYERS.forEach((id) => setStyle(id, { visible: on }));
+  const show = (on: boolean) => (on ? showOnly(LAYERS) : LAYERS.forEach((id) => setStyle(id, { visible: false })));
 
   const focus = (p: PlanPair) => {
     set({ planFocus: p.planned });
