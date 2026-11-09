@@ -1,5 +1,6 @@
 import { Crosshair, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import { BREAK_LABELS } from "@/config/presets";
 import { set, unitKey, useStore } from "@/state/store";
 
 const TITLES: Record<string, (p: Record<string, unknown>) => string> = {
@@ -8,7 +9,7 @@ const TITLES: Record<string, (p: Record<string, unknown>) => string> = {
   matchreal: (p) => `Group ${p.cluster} · matched to ${p.name} · ${p.badge}`,
   breakdots: (p) => `${p.division} (${p.formation}) · ${p.date} · ${Number(p.group) >= 0 ? `local group ${Number(p.group) + 1}` : "a lone division"}`,
   spreadgroups: (p) => `Local group ${Number(p.group) + 1} · ${p.divisions} divisions · ${p.dominant} · ${p.date}`,
-  jenksdots: (p) => `${p.division} · ${p.date} · natural-break bin ${p.bin} (${p.class}) · ${p.km} km along the advance · ${p.past ? "past" : "short of"} phase ${p.phase}`,
+  jenksdots: (p) => `${p.division} · ${p.date} · natural-break bin ${p.bin} (${BREAK_LABELS[String(p.class)]}) · ${p.km} km along the advance · ${p.past ? "past" : "short of"} phase ${p.phase}`,
   jenkslines: (p) => `Natural break at ${p.km} km along the advance · phase ${p.phase}`,
   spreadsurface: (p) => `At least ${p.level} divisions per 1,000 km²`,
   checkdots: (p) => (p.line === "Start" ? `${p.division} · position on 22 June (Start)` : `${p.division} · crossed phase ${p.line} on ${p.date}`),
