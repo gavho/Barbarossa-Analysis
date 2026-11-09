@@ -11,83 +11,83 @@
   },
   {
    "kind": "checkpoint",
-   "label": "line A",
+   "label": "phase 1",
    "values": [
-    0.89,
-    0.85,
-    0.95,
+    0.91,
+    0.88,
+    0.96,
     1.0
    ],
-   "text": "Checkpoint groups at line A (k = 4): bootstrap Jaccard 0.89, 0.85, 0.95, 1.00"
+   "text": "Checkpoint groups at phase 1 (k = 4): bootstrap Jaccard 0.91, 0.88, 0.96, 1.00"
   },
   {
    "kind": "checkpoint",
-   "label": "line B",
+   "label": "phase 2",
    "values": [
-    0.86,
-    0.73,
-    0.89
+    0.87,
+    0.78,
+    0.9
    ],
-   "text": "Checkpoint groups at line B (k = 3): bootstrap Jaccard 0.86, 0.73, 0.89"
+   "text": "Checkpoint groups at phase 2 (k = 3): bootstrap Jaccard 0.87, 0.78, 0.90"
   },
   {
    "kind": "checkpoint",
-   "label": "line C",
+   "label": "phase 3",
    "values": [
-    0.96,
+    0.95,
     0.99,
-    0.95
+    0.93
    ],
-   "text": "Checkpoint groups at line C (k = 3): bootstrap Jaccard 0.96, 0.99, 0.95"
+   "text": "Checkpoint groups at phase 3 (k = 3): bootstrap Jaccard 0.95, 0.99, 0.93"
   },
   {
    "kind": "checkpoint",
-   "label": "line D",
+   "label": "phase 4",
    "values": [
-    0.86,
-    0.67
+    0.87,
+    0.7
    ],
-   "text": "Checkpoint groups at line D (k = 2): bootstrap Jaccard 0.86, 0.67"
+   "text": "Checkpoint groups at phase 4 (k = 2): bootstrap Jaccard 0.87, 0.70"
   },
   {
    "kind": "breaks",
-   "label": "Frontier-A",
+   "label": "Frontier-1",
    "unit": "km",
    "values": [
     [
      -122,
-     -161,
-     -107
+     -156,
+     -111
     ],
     [
      -57,
-     -86,
-     -47
+     -81,
+     -48
     ]
    ],
-   "text": "Natural breaks across Frontier-A (3 bands): -122 km (95% -161 to -107); -57 km (95% -86 to -47)"
+   "text": "Natural breaks across Frontier-1 (3 bands): -122 km (95% -156 to -111); -57 km (95% -81 to -48)"
   },
   {
    "kind": "breaks",
-   "label": "A-B",
+   "label": "1-2",
    "unit": "%",
    "values": [
     [
      29,
      27,
-     35
+     34
     ],
     [
      63,
-     61,
-     67
+     60,
+     66
     ]
    ],
-   "text": "Natural breaks across A-B (3 bands): 29 % (95% 27 to 35); 63 % (95% 61 to 67)"
+   "text": "Natural breaks across 1-2 (3 bands): 29 % (95% 27 to 34); 63 % (95% 60 to 66)"
   },
   {
    "kind": "breaks",
-   "label": "B-C",
+   "label": "2-3",
    "unit": "%",
    "values": [
     [
@@ -97,33 +97,33 @@
     ],
     [
      71,
-     66,
+     67,
      73
     ]
    ],
-   "text": "Natural breaks across B-C (3 bands): 38 % (95% 31 to 41); 71 % (95% 66 to 73)"
+   "text": "Natural breaks across 2-3 (3 bands): 38 % (95% 31 to 41); 71 % (95% 67 to 73)"
   },
   {
    "kind": "breaks",
-   "label": "C-D",
+   "label": "3-4",
    "unit": "%",
    "values": [
     [
      36,
      33,
-     39
+     40
     ],
     [
      67,
-     63,
-     70
+     65,
+     71
     ]
    ],
-   "text": "Natural breaks across C-D (3 bands): 36 % (95% 33 to 39); 67 % (95% 63 to 70)"
+   "text": "Natural breaks across 3-4 (3 bands): 36 % (95% 33 to 40); 67 % (95% 65 to 71)"
   },
   {
    "kind": "breaks",
-   "label": "D-E",
+   "label": "4-5",
    "unit": "%",
    "values": [
     [
@@ -133,11 +133,11 @@
     ],
     [
      55,
-     49,
+     48,
      61
     ]
    ],
-   "text": "Natural breaks across D-E (3 bands): 25 % (95% 20 to 33); 55 % (95% 49 to 61)"
+   "text": "Natural breaks across 4-5 (3 bands): 25 % (95% 20 to 33); 55 % (95% 48 to 61)"
   }
  ],
  "n_plan": 1000,

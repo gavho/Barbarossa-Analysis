@@ -123,15 +123,15 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   clusterSettings: {
     title: "Cluster settings",
-    body: "Published: the clusters in the paper (5 per method, every division). Recommended (Frontier): set aside the divisions that moved under 200 km from start to end and form 4 groups, one per planned line. Custom: choose the number of groups for each method (2–8) and the 'set aside' distance. The groups are recomputed in the browser with the paper's methods — directional vector: k-means on each path's end point and centre; geometric: Hausdorff distance with average linkage — and then the cluster paths, filters, charts, table, Vectors cards and planned-vs-actual comparison all follow. 'Clearly separate' / 'fairly separate' / 'overlapping' read the silhouette score (≥ 0.5 / ≥ 0.25 / below). Live results use a simpler map projection than the Python analysis, so a few km and the odd border-line division can differ.",
+    body: "Published: the clusters in the paper (5 per method, every division). One per line (Frontier): set aside the divisions that moved under 200 km from start to end and form 4 groups, one per planned line. Custom: choose the number of groups for each method (2–8) and the 'set aside' distance. The groups are recomputed in the browser with the paper's methods — directional vector: k-means on each path's end point and centre; geometric: Hausdorff distance with average linkage — and then the cluster paths, filters, charts, table, Vectors cards and planned-vs-actual comparison all follow. 'Clearly separate' / 'fairly separate' / 'overlapping' read the silhouette score (≥ 0.5 / ≥ 0.25 / below). Live results use a simpler map projection than the Python analysis, so a few km and the odd border-line division can differ.",
   },
   planScores: {
     title: "Plan agreement scores",
     body: "Three simple 0–100 scores, each 100 when the difference is inside the mapping-error band, so 100 means 'can't be told apart from the plan'. Direction: the start-to-end bearing difference, 100 at 5° or less, 0 at 45°. Route: the average gap along the planned line, 100 at 20 km or less, 0 at 100 km. Destination: the gap between end points, 100 at 20 km or less, 0 at 150 km. Plan agreement is their average. The cut-offs are for reading, not significance tests; the tests are in analysis/STATISTICS.md.",
   },
   whyFour: {
-    title: "Published 5 or recommended 4",
-    body: "The published Frontier clusters use 5 groups, a choice made for the original web maps. Two of them turn out to be divisions that barely advanced (security and rear-area divisions in the west, 22, 76 and 239 ID in the south: 20–190 km, against 400–750 km for most). The data do not single out 5: the separation score (silhouette) is no better at 5 than at 2–3. Recommended: set aside the 7 divisions that moved under 200 km as 'stayed behind' and group the other 44 with the same method into 4, one per planned line. The groups come out balanced (7/11/12/14). Both are offered so the change can be judged (and any other grouping under Custom in the Clusters tab); the evidence is in analysis/loa_frontier/cluster_count.csv.",
+    title: "Published 5 or one per line 4",
+    body: "The published Frontier clusters use 5 groups, a choice made for the original web maps. Two of them turn out to be divisions that barely advanced (security and rear-area divisions in the west, 22, 76 and 239 ID in the south: 20–190 km, against 400–750 km for most). The data do not single out 5: the separation score (silhouette) is no better at 5 than at 2–3. One per line: set aside the 7 divisions that moved under 200 km as 'stayed behind' and group the other 44 with the same method into 4, one per planned line. The groups come out balanced (7/11/12/14). Both are offered so the change can be judged (and any other grouping under Custom in the Clusters tab); the evidence is in analysis/loa_frontier/cluster_count.csv.",
   },
   matchplan: {
     title: "Planned lines",
@@ -139,7 +139,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   matchreal: {
     title: "Matched groups",
-    body: "The average path of the realized group paired with each planned line, for the clustering chosen in the Vectors tab (published 5 or recommended 4), with arrows in the direction of travel.",
+    body: "The average path of the realized group paired with each planned line, for the clustering chosen in the Vectors tab (published 5 or one per line 4), with arrows in the direction of travel.",
   },
   frontProfile: {
     title: "Front profile",
@@ -175,7 +175,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   naturalBreaks: {
     title: "Natural breaks",
-    body: "Sorin's question: on the day a phase line was meant to be reached, how were the divisions spread around it? Three steps. 1) Put every division on one line: its distance along the general direction of the whole advance (the bearing from the divisions' average 22 June position to their average last position), not along the phase line, whose shape plays no part here. 2) Jenks natural breaks cut that line where the divisions clump, as for a GIS colour ramp: the fewest bins that explain at least 90% of the spread (Sorin expected three or four). Bins are numbered from the front. 3) Only then read each bin against the phase line: all past (every division in it had crossed), partly past (some had) or none past (none had). The percentages are shares of divisions. The phase lines run at an angle to the advance, so a bin can be partly past: its southern divisions past it, its northern ones short.",
+    body: "On the day a phase line was meant to be reached, how were the divisions spread around it? Three steps. 1) Put every division on one line: its distance along the general direction of the whole advance (the bearing from the divisions' average 22 June position to their average last position), not along the phase line, whose shape plays no part here. 2) Jenks natural breaks cut that line where the divisions clump, as for a GIS colour ramp: the fewest bins that explain at least 90% of the spread. Bins are numbered from the front. 3) Only then read each bin against the phase line: past (every division in it had crossed), on the line (some had, some had not) or short (none had). The percentages are shares of divisions. The phase lines run at an angle to the advance, so a bin can be on the line with its southern divisions past it and its northern ones short.",
   },
   jenksdots: {
     title: "Natural breaks: divisions",

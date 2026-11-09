@@ -13,14 +13,28 @@ const PHASES = J.summary.map((x) => x.phase);
 const binColour = (b: number) => GROUP_COLORS.find((c) => c.value === b)?.color ?? GROUP_COLORS[0].color;
 
 // One km axis along the general direction of advance for every phase, so the strips can be compared.
-const W = 320, H = 84, PAD = 6, AXIS = 26; // AXIS: room for the km ticks and the axis title
+// Dots on top, a histogram of the same divisions on the same axis below (STEP km per bar), then the axis labels.
+const W = 320, PAD = 6, DOT_B = 58, HIST_T = 64, BASE = 100, H = BASE + 26, STEP = 25;
 const kms = J.dots.features.map((f) => Number(f.properties?.km));
 const xmin = Math.min(...kms, ...J.summary.map((x) => x.line_from)) - 10, xmax = Math.max(...kms, ...J.summary.map((x) => x.line_to)) + 10;
 const xOf = (km: number) => PAD + ((km - xmin) / (xmax - xmin)) * (W - 2 * PAD);
 const jitter = (i: number) => ((i * 37) % 23) / 23; // fixed scatter so dots don't stack
+const bucket = (km: number) => Math.floor((km - xmin) / STEP);
+const tally = (fs: typeof J.dots.features) => {
+  const out = new Map<number, Map<number, number>>(); // bucket -> bin -> divisions
+  for (const f of fs) {
+    const b = bucket(Number(f.properties?.km)), bin = Number(f.properties?.bin), row = out.get(b) ?? new Map<number, number>();
+    out.set(b, row.set(bin, (row.get(bin) ?? 0) + 1));
+  }
+  return out;
+};
+// One bar scale for every phase, so the histograms can be compared.
+const MAXC = Math.max(...PHASES.flatMap((p) => [...tally(J.dots.features.filter((f) => f.properties?.phase === p)).values()]
+  .map((row) => [...row.values()].reduce((a, b) => a + b, 0))));
+const barH = (n: number) => (n / MAXC) * (BASE - HIST_T - 8);
 
-/** Sorin's natural breaks: on a phase's planned date, the divisions on one line along the direction of the whole advance,
- * cut by Jenks where they clump; only then is each bin read against the phase line (all / partly / none past). */
+/** Natural breaks: on a phase's planned date, the divisions on one line along the direction of the whole advance,
+ * cut by Jenks where they clump; only then is each bin read against the phase line (past / on the line / short). */
 export function NaturalBreaks() {
   const step = useStore((s) => s.phaseStep);
   const L = PHASES.includes(step) ? step : PHASES[0];
@@ -57,21 +71,32 @@ export function NaturalBreaks() {
           ))}
         </p>
         <svg viewBox={`0 0 ${W} ${H}`} className="mt-1.5 w-full" role="img" aria-label="Divisions along the direction of advance">
-          <rect x={xOf(sum.line_from)} y={PAD} width={xOf(sum.line_to) - xOf(sum.line_from)} height={H - AXIS - PAD} fill="#00c2a8" fillOpacity={0.15} />
+          <rect x={xOf(sum.line_from)} y={PAD} width={xOf(sum.line_to) - xOf(sum.line_from)} height={BASE - PAD} fill="#00c2a8" fillOpacity={0.15} />
           <text x={(xOf(sum.line_from) + xOf(sum.line_to)) / 2} y={PAD + 7} textAnchor="middle" fontSize={7} fill="#00c2a8">phase {L} line</text>
-          {cuts.map((k) => <line key={k} x1={xOf(k)} x2={xOf(k)} y1={PAD} y2={H - AXIS} stroke="var(--foreground)" strokeWidth={0.8} strokeDasharray="3 2" />)}
+          {cuts.map((k) => <line key={k} x1={xOf(k)} x2={xOf(k)} y1={PAD} y2={BASE} stroke="var(--foreground)" strokeWidth={0.8} strokeDasharray="3 2" />)}
           {dots.map((f, i) => {
-            const cx = xOf(Number(f.properties?.km)), cy = PAD + 12 + jitter(i) * (H - AXIS - PAD - 18), c = binColour(Number(f.properties?.bin));
+            const cx = xOf(Number(f.properties?.km)), cy = PAD + 12 + jitter(i) * (DOT_B - PAD - 14), c = binColour(Number(f.properties?.bin));
             return f.properties?.past ? <circle key={i} cx={cx} cy={cy} r={2.4} fill={c} />
               : <circle key={i} cx={cx} cy={cy} r={2.1} fill="none" stroke={c} strokeWidth={1} />;
           })}
-          <line x1={PAD} x2={W - PAD} y1={H - AXIS} y2={H - AXIS} stroke="var(--border)" />
-          {[0, 200, 400, 600].map((t) => <text key={t} x={xOf(t)} y={H - AXIS + 10} textAnchor="middle" fontSize={9} fill="var(--muted-foreground)">{t} km</text>)}
+          <line x1={PAD} x2={W - PAD} y1={DOT_B + 3} y2={DOT_B + 3} stroke="var(--border)" strokeOpacity={0.5} />
+          <text x={PAD} y={HIST_T + 4} fontSize={7} fill="var(--muted-foreground)">divisions per {STEP} km</text>
+          {[...tally(dots)].map(([b, row]) => {
+            const x = xOf(xmin + b * STEP) + 0.4, w = xOf(xmin + (b + 1) * STEP) - xOf(xmin + b * STEP) - 0.8;
+            let y = BASE;
+            return [...row].sort(([a], [c]) => c - a).map(([bin, n]) => {
+              y -= barH(n);
+              return <rect key={`${b}-${bin}`} x={x} y={y} width={w} height={barH(n)} fill={binColour(bin)} />;
+            }).concat(<text key={`${b}-n`} x={x + w / 2} y={y - 1.5} textAnchor="middle" fontSize={7} fill="var(--muted-foreground)">
+              {[...row.values()].reduce((a, c) => a + c, 0)}</text>);
+          })}
+          <line x1={PAD} x2={W - PAD} y1={BASE} y2={BASE} stroke="var(--border)" />
+          {[0, 200, 400, 600].map((t) => <text key={t} x={xOf(t)} y={BASE + 10} textAnchor="middle" fontSize={9} fill="var(--muted-foreground)">{t} km</text>)}
           <text x={PAD} y={H - 2} fontSize={9} fill="var(--muted-foreground)">← rear (west)</text>
           <text x={W / 2} y={H - 2} textAnchor="middle" fontSize={9} fill="var(--muted-foreground)">along the advance ({J.heading}°)</text>
           <text x={W - PAD} y={H - 2} textAnchor="end" fontSize={9} fill="var(--muted-foreground)">front (east) →</text>
         </svg>
-        <p className="text-[10px] text-muted-foreground">Each circle is a division: filled = past the phase line, open = short of it · colour = bin · dashed = natural break · teal band = where the phase line falls on this axis (it is slanted, so it spans a range)</p>
+        <p className="text-[10px] text-muted-foreground">Top: each circle is a division, filled = past the phase line, open = short of it. Bottom: the same divisions counted every {STEP} km, stacked by bin. Colour = bin · dashed = natural break · teal band = where the phase line falls on this axis (it is slanted, so it spans a range)</p>
 
         <ul className="mt-1.5 flex flex-col gap-0.5 text-[12px]">
           {bins.map((b) => (

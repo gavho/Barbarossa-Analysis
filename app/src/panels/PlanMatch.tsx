@@ -114,7 +114,7 @@ export function PlanMatch() {
       <div className="flex items-center gap-1.5">
         <Segmented<string> size="sm" value={st.preset}
           onChange={(v) => v !== "custom" && set({ clusters: { ...s.clusters, frontier: v === "published" ? PUBLISHED : RECOMMENDED }, planFocus: null })}
-          items={[{ value: "published", label: "Published (5)" }, { value: "recommended", label: "Recommended (4)" },
+          items={[{ value: "published", label: "Published (5)" }, { value: "recommended", label: "One per line (4)" },
             ...(st.preset === "custom" ? [{ value: "custom", label: `Custom (${st.dvK})` }] : [])]} />
         <Help id="whyFour" />
       </div>

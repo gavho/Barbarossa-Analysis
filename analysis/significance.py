@@ -8,6 +8,8 @@ and a Holm correction across the family of tests. Seeded: a re-run gives the sam
   C. Are the clusters real? Gap statistic and silhouette against structureless data; bootstrap stability of each group.
   D. Phase lines: did the front shift at each line (Wilcoxon, paired by division)? Did divisions keep their order
      (Spearman, permutation)? How stable are the checkpoint groups and the natural breaks between the lines (bootstrap)?
+  E. Planned dates: on each phase's planned date, are the natural breaks real gaps, wider than Jenks finds in the same
+     number of positions spread at random over the same stretch?
 
 Run the analyses first (compare_loa.py, phase_distributions.py, phase_checkpoints.py), then:
   python analysis/significance.py            (writes analysis/significance/results.csv and analysis/STATISTICS.md)
@@ -82,7 +84,7 @@ def plan_stat(labels, keys, flines, planned):
 
 def test_plan(f, flines, planned):
     rows = []
-    for name, col in (("Published 5 (DV)", "DV"), ("Recommended 4 (DV4)", "DV4")):
+    for name, col in (("Published 5 (DV)", "DV"), ("One per line 4 (DV4)", "DV4")):
         sub = f[f[col].notna()]
         keys = [k for k in zip(sub.Nation, sub.Branch, sub.Num_Name) if k in flines]
         labels = np.array([int(sub.set_index(["Nation", "Branch", "Num_Name"]).loc[k, col]) for k in keys])
@@ -106,7 +108,7 @@ def cramers_v(table):
 def test_command(f):
     rows = []
     unit = f.Group.map(lambda g: next((u for u, t in c.PLANNED_UNIT.items() if t(g)), None))
-    for name, col in (("Published 5 (DV)", "DV"), ("Published 5 (geometric)", "GEO"), ("Recommended 4 (DV4)", "DV4")):
+    for name, col in (("Published 5 (DV)", "DV"), ("Published 5 (geometric)", "GEO"), ("One per line 4 (DV4)", "DV4")):
         ok = unit.notna() & f[col].notna()
         u, g = unit[ok].values, f.loc[ok, col].astype(int).values
         table = pd.crosstab(g, u)
@@ -177,9 +179,13 @@ def test_clusters(flines):
         tables[name] = g
         best = next((r.k for r, nxt in zip(g.itertuples(), g.iloc[1:].itertuples()) if r.gap >= nxt.gap - nxt.s), int(g.k.iloc[-1]))
         row = g[g.k == k].iloc[0]
+        # the tested k gets its own, larger reference set: with N_REF the p-value cannot go below 1/(N_REF+1)
+        lo, hi = X.min(axis=0), X.max(axis=0)
+        sil_ref = [silhouette_score(R, km(R, k).labels_) for R in (rng.uniform(lo, hi, X.shape) for _ in range(N_PERM // 10))]
         _, jac = stability(X, k)
         rows.append({"family": "C", "test": f"Clusters stronger than in structureless data — k = {k}, {name}", "statistic": "silhouette",
-                     "estimate": round(row.silhouette, 2), "null_median": round(row.sil_null_median, 2), "p": row.sil_p, "n": len(keys),
+                     "estimate": round(row.silhouette, 2), "null_median": round(float(np.median(sil_ref)), 2),
+                     "p": perm_p(row.silhouette, sil_ref, smaller_is_extreme=False), "n": len(keys),
                      "detail": f"gap statistic picks k = {best}; bootstrap Jaccard per group {', '.join(f'{v:.2f}' for v in jac.values())} "
                                f"(>= 0.75 stable, 0.6-0.75 a pattern, < 0.5 dissolves); {N_BOOT} resamples"})
         print(f"  C {name}: k={k} silhouette {row.silhouette:.2f} vs null {row.sil_null_median:.2f}; gap picks k={best}; Jaccard {list(jac.values())}")
@@ -248,6 +254,33 @@ def stability_phase(p, stretches, zs):
     return notes
 
 
+# ---------------------------------------------------------------- E. planned dates
+def break_gaps(v, k):
+    """Share of the stretch left empty at the k-1 Jenks breaks: the gap between the last division before each break and
+    the first after it, summed, over the whole spread. Real clumps leave wide gaps; scattered positions leave narrow ones."""
+    breaks, _ = pdist.jenks(v, np.ones(len(v)), k)
+    v = np.sort(v)
+    return sum(v[v > b].min() - v[v < b].max() for b in breaks) / np.ptp(v)
+
+
+def test_breaks_on_date():
+    """Natural breaks on each planned date (phase_distributions.jenks_on_date): are the gaps at the breaks wider than Jenks
+    finds in as many positions scattered at random (uniformly) over the same stretch of the advance? The goodness of
+    variance fit cannot answer this: scattered positions reach about 0.95 with 4 bins too."""
+    _, summary, plots, *_ = pdist.jenks_on_date()
+    rows = []
+    for (L, day, along, *_rest), s in zip(plots, summary.itertuples()):
+        k, n = int(s.bins), len(along)
+        obs = break_gaps(along, k)
+        null = [break_gaps(rng.uniform(along.min(), along.max(), n), k) for _ in range(N_PERM // 10)]
+        rows.append({"family": "E", "test": f"Natural breaks are real gaps on the phase {L} date", "statistic": f"share of the stretch empty at the {k - 1} breaks",
+                     "estimate": round(obs, 2), "null_median": round(float(np.median(null)), 2), "p": perm_p(obs, null, smaller_is_extreme=False),
+                     "n": n, "detail": f"{day}; {k} bins over {round(float(np.ptp(along)))} km, fit {s.gvf}; {len(null)} random scatters; "
+                                       f"past {s.past}%, on the line {s.straddling}%, short {s.behind}% of divisions"})
+        print(f"  E phase {L}: gaps {obs:.2f} vs {np.median(null):.2f} p={rows[-1]['p']:.4f}")
+    return rows
+
+
 # ---------------------------------------------------------------- write-up
 def fmt_p(p):
     return "< 0.001" if p < 0.001 else f"{p:.3f}"
@@ -258,6 +291,7 @@ def write_md(res, gaps, notes, f):
     cmd = res[res.family == "B"]
     clu = res[res.family == "C"]
     ph = res[res.family == "D"]
+    dates = res[res.family == "E"]
     sig = lambda r: "significant" if r.p_holm < 0.05 else "not significant"
     table = lambda d: "\n".join(f"| {r.test} | {r.statistic} | {r.estimate} | {r.null_median} | {fmt_p(r.p)} | {fmt_p(r.p_holm)} | {r.n} |"
                                 for r in d.itertuples())
@@ -322,7 +356,7 @@ with the small cell counts here where the chi-square approximation is not.
 ## C. Are the clusters real, and how many are there?
 **What it measures.** Whether the directional-vector groups (k-means on each path's end point and centre) are tighter than
 k-means would find in data with no groups at all, and whether each group survives resampling. **Tests.** (1) Silhouette
-against {N_REF} structureless reference data sets drawn uniformly over the same range (one-sided p). (2) Gap statistic
+against {N_PERM // 10} structureless reference data sets ({N_REF} per k in the table) drawn uniformly over the same range (one-sided p). (2) Gap statistic
 (Tibshirani et al. 2001): the smallest k with Gap(k) ≥ Gap(k+1) − s(k+1). (3) Bootstrap stability (Hennig 2007): mean Jaccard
 overlap of each group with its best match after resampling the divisions {N_BOOT} times.
 
@@ -352,6 +386,20 @@ weighted Jenks natural breaks into the fewest bands (2–5) with goodness of var
 
 **Stability (descriptive).**
 {chr(10).join(f"- {n['text']}" for n in notes)}
+
+## E. On the planned dates, are the natural breaks real gaps?
+**What it measures.** On each phase line's planned date, every division's distance along the general direction of the
+advance is split by Jenks natural breaks into the fewest bins explaining at least 90% of the spread; each bin is then read
+against the phase line: past (all its divisions), on the line (some) or short (none). The statistic is the share of the stretch left
+empty at the breaks (the gap between the last division before each break and the first after it, summed).
+**Null hypothesis.** The divisions were scattered at random along that stretch, with no clumps. **Test.** The same
+statistic for {N_PERM // 10} sets of as many uniformly scattered positions over the same range, cut into the same number of
+bins; one-sided p. The goodness of variance fit itself is no test: scattered positions reach about 0.95 with 4 bins too.
+
+{head}
+{table(dates)}
+
+{chr(10).join(f"- {r.test}: {r.detail}" for r in dates.itertuples())}
 
 ## Limits — please keep with the results
 - **Small n.** 44–51 divisions; tests have little power, so "not significant" is weak evidence of no effect.
@@ -388,6 +436,8 @@ def main():
     print("D. phase lines")
     r, notes = test_phases()
     rows += r
+    print("E. planned dates")
+    rows += test_breaks_on_date()
     res = pd.DataFrame(rows)
     res["p_holm"] = holm(res.p.values)
     res.to_csv(OUT / "results.csv", index=False)

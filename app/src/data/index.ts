@@ -109,7 +109,7 @@ export const PHASE_PROFILES = phase_profiles as unknown as {
   profiles: { stretch: string; share: number[]; mean_km: number; breaks: number[]; gvf: number;
     bands: { band: string; share: number; divisions: number; from: number; to: number; unit: "%" | "km" }[] }[];
   positions: { division: string; stretch: string; km: number }[];
-  /** Sorin's natural breaks on each planned date: Jenks on positions along the general direction of advance, the bins
+  /** Natural breaks on each planned date: Jenks on positions along the general direction of advance, the bins
    * read against the phase line afterwards (phase_distributions.jenks_on_date). */
   jenks: { heading: number; gvf_min: number; dots: FC; breaklines: FC;
     summary: { phase: string; date: string; divisions: number; bins: number; gvf: number; past: number; straddling: number; behind: number;

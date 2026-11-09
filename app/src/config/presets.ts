@@ -106,12 +106,12 @@ export const BRANCH_COLORS: Category[] = [
   { value: "Security", color: "#C2A84A" },
   { value: "Cavalry", color: "#7A5C8F" },
 ];
-/** Natural-break groups read against the phase line: all past it, on both sides, none past it. */
+/** Natural-break groups read against the phase line: every division past it, some past (on the line), none past (short). */
 export const BREAK_COLORS: Category[] = [
   { value: "past", color: "#46a758" }, { value: "straddling", color: "#e0b52b" }, { value: "behind", color: "#8b9099" },
 ];
 /** Plain words for those classes (the data keeps the short keys). */
-export const BREAK_LABELS: Record<string, string> = { past: "all past", straddling: "partly past", behind: "none past" };
+export const BREAK_LABELS: Record<string, string> = { past: "past", straddling: "on the line", behind: "short" };
 
 /** The four planned lines of operation (greater units) for the phase flow chart; other divisions are grey. */
 export const FORMATION_COLORS: Record<string, string> = { "6A": "#149ECE", "III PzKo": "#ED5151", "PzGp1(-)": "#FC921F", "17A": "#A7C636" };

@@ -6,7 +6,7 @@ import { dist, length, nearest, resample, type Projection, type Pt } from "./clu
 import { wrap } from "./vectors";
 
 export const NOISE_KM = 20, NOISE_DEG = 10, MIN_COMMON_KM = 100;
-export const DIRECTION_FULL_DEG = 5; // direction score is 100 only within 5° (Sorin, 11-6), stricter than the noise band
+export const DIRECTION_FULL_DEG = 5; // direction score is 100 only within 5° (agreed 11-6), stricter than the noise band
 export interface PlanResult { pairs: PlanPair[]; unmatched: number[]; lines: FC }
 
 const dense = (l: Pt[]) => resample(l, Math.max(2, Math.floor(length(l) / 2) + 1)).pts; // every ~2 km

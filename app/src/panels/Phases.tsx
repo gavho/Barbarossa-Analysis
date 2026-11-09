@@ -19,7 +19,7 @@ export const separation = (sil: number) => (sil >= 0.5 ? "groups clearly separat
 
 type Section = State["phaseSection"];
 
-/** The phase-line analyses, one at a time, each owning the map: Sorin's natural breaks on each planned date, and the
+/** The phase-line analyses, one at a time, each owning the map: natural breaks on each planned date, and the
  * earlier between-the-lines charts kept as a method check. Groupings of divisions live in the Groups tab. */
 export function Phases() {
   const section = useStore((s) => s.phaseSection);

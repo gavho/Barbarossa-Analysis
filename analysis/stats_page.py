@@ -2,8 +2,9 @@
 
 Each question gets a plain answer first, then the numbers with a verdict per row, then a fold-out "How this was worked
 out" with the method, the null hypothesis and the test. A glossary defines every term; the limits close the page.
-Reads what significance.py saved (analysis/significance/results.csv, gaps.csv, notes.json) and
-phase_distributions/natural_breaks.csv, so the page can be rebuilt in a second without re-running the tests.
+Reads what significance.py saved (analysis/significance/results.csv, gaps.csv, notes.json) and the descriptive outputs
+(phase_distributions/natural_breaks.csv, figures/arrival/arrival.csv, loa_frontier/substretch.csv,
+phase_checkpoints/entropy.csv), so the page can be rebuilt in a second without re-running the tests.
 significance.py calls this at the end; on its own: python analysis/stats_page.py
 """
 import json
@@ -116,9 +117,9 @@ def how(*paras):
 
 
 # ---------------------------------------------------------------- page
-def build(res, gaps, meta, nb):
+def build(res, gaps, meta, nb, extra):
     n_plan, n_perm, n_boot, n_ref = meta["n_plan"], meta["n_perm"], meta["n_boot"], meta["n_ref"]
-    fam = {f: res[res.family == f] for f in "ABCD"}
+    fam = {f: res[res.family == f] for f in "ABCDE"}
     sig = lambda r: r.p_holm < ALPHA
     notes = meta["notes"]
 
@@ -183,10 +184,26 @@ def build(res, gaps, meta, nb):
     # natural breaks
     intervals = {n["label"]: n["values"] for n in notes if n["kind"] == "breaks"}
     checkpoints = [n for n in notes if n["kind"] == "checkpoint"]
-    CP_rows = [[escape(n["label"].capitalize()), " ".join(f'<span class="pill {"good" if j >= 0.75 else "mid" if j >= 0.6 else "bad"}">{j:.2f}</span>' for j in n["values"]),
+    CP_rows = [[escape(n["label"][:1].upper() + n["label"][1:]), " ".join(f'<span class="pill {"good" if j >= 0.75 else "mid" if j >= 0.6 else "bad"}">{j:.2f}</span>' for j in n["values"]),
                 f"{sum(j >= 0.75 for j in n['values'])} of {len(n['values'])} stable"] for n in checkpoints]
     NB_rows = [[escape(k.replace("-", " → ")), "; ".join(f"{b} {u} <span class=muted>({lo} to {hi})</span>" for b, lo, hi in v)]
                for k, v, u in ((n["label"], n["values"], n["unit"]) for n in notes if n["kind"] == "breaks")]
+
+    # E. planned dates
+    E_rows = [[f"Phase {r.test.split('phase ')[1].split()[0]}", f"<b>{r.estimate:.0%}</b>", f"{r.null_median:.0%}", r.n, p_text(r.p_holm), chip(sig(r))]
+              for r in fam["E"].itertuples()]
+    E_sig = [r.test.split("phase ")[1].split()[0] for r in fam["E"].itertuples() if sig(r)]
+    arr, jsum, sub, ent = extra["arrival"], extra["jenks"], extra["substretch"], extra["entropy"]
+    W_rows = [[f"Phase {r.phase} ({pd.Timestamp(r.date):%d %b})", f"{arr.set_index('phase').arrived_pct[int(r.phase)]}%", r.bins,
+               f"{r.past}%", f"{r.straddling}%", f"{r.behind}%"] for r in jsum.itertuples()]
+    names = {"6A": "6th Army", "III PzKo": "III Panzer Corps", "PzGp1(-)": "Panzer Group 1 (less III Corps)", "17A": "17th Army"}
+    turn = lambda bd: "on course" if abs(bd) <= 5 else f"{abs(bd)}° further {'south' if bd > 0 else 'north'}"
+    S_rows = [[f"{names[r.planned]}, phases {r.stretch.replace('-', ' → ')}", turn(int(r.straight_bearing_diff)), r.score_direction,
+               f"{round(r.mean_abs_offset_km)} km", f"{r.end_gap_km} km"] for r in sub.itertuples()]
+    mixed = ent.dropna(subset=["entropy"]).query("divisions >= 5")
+    M_rows = [[("Start" if ph == "Start" else f"Phase {ph}"),
+               "; ".join(f"{g.sector} ({g.divisions} div.) <b>{g.entropy:.1f}</b>" for g in grp.itertuples())]
+              for ph, grp in mixed.groupby("phase", sort=False)]
 
     glance = [
         ("Are the computer's groups closer to the planned routes than chance?", "Yes" if A_ok else "Partly", A_ok,
@@ -202,6 +219,9 @@ def build(res, gaps, meta, nb):
          f"Order kept at every line (ρ {min(r.estimate for r in orders):g}–{max(r.estimate for r in orders):g}).", "order"),
         ("Where did divisions bunch between phase lines?", "Described, not tested", None,
          "Natural breaks show where divisions slowed; their positions are steady when resampled.", "bunching"),
+        ("On the planned dates, are the natural breaks real gaps?", ("Only at phase " + ", ".join(E_sig)) if E_sig else "Not clearly",
+         None if E_sig else False,
+         "Jenks always finds breaks; on most dates randomly scattered divisions would leave gaps as wide.", "dates"),
     ]
     glance_html = "".join(
         f'<a class="glance" href="#{a}"><span class="q">{q}</span><span class="verdict {"ok" if ok else "no" if ok is False else "mid"}">{v}</span>'
@@ -228,7 +248,7 @@ def build(res, gaps, meta, nb):
                        "groups; 0.25–0.5 = fairly separate."),
         ("Gap statistic", "Compares how tight the groups are with groups found in made-up data that has no groups at all, for each possible number "
                           "of groups; picks the smallest number after which adding groups stops helping."),
-        ("Made-up data with no groups", f"{n_ref} sets of random points spread evenly over the same area, used as the 'no real groups' benchmark."),
+        ("Made-up data with no groups", f"Sets of random points spread evenly over the same area ({n_perm // 10:,} for the tested number of groups, {n_ref} for each other number), used as the 'no real groups' benchmark."),
         ("Jaccard stability", "Resample the divisions, regroup, and measure how much each group overlaps its best match (0–1). "
                               "0.75 or more = stable; 0.6–0.75 = a real pattern but less sharp; below 0.5 = falls apart."),
         ("Wilcoxon signed-rank test", "Compares each division's position before and after a line, one pair per division, and asks whether the "
@@ -238,7 +258,13 @@ def build(res, gaps, meta, nb):
                                "Above 0.8 = very strong."),
         ("Jenks natural breaks", "Splits values into groups so each group is as tight as possible. Here the breaks fall where few division-days "
                                  "were spent, i.e. ground the divisions crossed quickly."),
-        ("Goodness of variance fit", "How much of the spread the natural-break bands explain (0–1). The app uses the fewest bands reaching 0.8."),
+        ("Goodness of variance fit", "How much of the spread the natural-break bands explain (0–1). The stretch bands use the fewest bands "
+                                     "reaching 0.8, the planned-date bins the fewest reaching 0.9. A high fit alone does not show clumps: "
+                                     "randomly scattered points reach about 0.95 with four bins."),
+        ("Past / on the line / short", "A natural-break bin read against the phase line: every division in it past the line, some past and some short of it, or none past it."),
+        ("10 km rule", "A division counts as having reached a phase line if it is past it or within 10 km of it on the planned date."),
+        ("Mix (normalized entropy)", "How mixed a group is by planned formation, from 0 (one formation only) to 1 (all four in equal numbers). "
+                                     "Divisions of unknown formation are left out."),
         ("Division-days", "One division at one place for one day, weighted by strength (a one-tenth detachment counts a tenth)."),
     ]
 
@@ -304,12 +330,12 @@ lines of advance much more closely than the same divisions put into random group
 <p class="note">Stability: <span class="pill good">0.75+</span> stable · <span class="pill mid">0.60–0.75</span> a pattern, less sharp ·
 <span class="pill bad">below 0.60</span> weak.</p>
 {how(f"The directional-vector groups come from k-means on each division's end point and the centre of its path. "
-     f"<b>Are they real?</b> The silhouette of the real groups was compared with {n_ref} made-up data sets with no groups, spread evenly over "
+     f"<b>Are they real?</b> The silhouette of the real groups was compared with {n_perm // 10:,} made-up data sets with no groups, spread evenly over "
      f"the same area (null hypothesis: no grouping structure). <b>How many?</b> The gap statistic (Tibshirani et al. 2001) and the silhouette "
      f"were computed for 2–6 groups. <b>Stable?</b> The divisions were resampled {n_boot} times and regrouped; each group's overlap with its "
      f"best match is its Jaccard stability (Hennig 2007).",
      "The silhouette favours few groups and the gap statistic more, so the data do not settle the number: the published 5 and the "
-     "recommended 4 (which sets aside divisions that moved under 200 km) are both defensible choices, to be reported as choices.",
+     "one-per-line 4 (which sets aside divisions that moved under 200 km) are both defensible choices, to be reported as choices.",
      gap_tables)}
 </section>
 
@@ -346,8 +372,40 @@ resampled (95% range): narrow strips mean the break is firm.</p>
      "bands (2–5) that explain at least 80% of their spread.",
      f"Divisions were resampled {max(20, n_boot // 3)} times and the breaks recomputed; the 95% range is the middle 95% of those breaks.")}
 <h3>Checkpoint groups</h3>
-<p>The groups of divisions that crossed each phase line together (the Checkpoints panel in the app), tested the same way:</p>
+<p>The groups of divisions that crossed each phase line together (the crossing groups in the app's Groups tab), tested the same way:</p>
 {table(["Phase line", "Stability of each group", ""], CP_rows)}
+</section>
+
+<section id="dates"><h2><span class="tag">E</span>On the planned dates, are the natural breaks real gaps?</h2>
+<p class="answer"><b>{("Only at phase " + ", ".join(E_sig) + ".") if E_sig else "Not clearly."}</b> Jenks always finds breaks; the question is
+whether they fall in real gaps. On each planned date the share of the stretch left empty at the breaks is compared with the same
+measure for divisions scattered at random over the same stretch. {"Elsewhere the" if E_sig else "The"} gaps are no wider than chance
+would leave, so the bins there describe where the divisions stood without showing that they formed separate clumps.</p>
+{table(["Planned date", "Empty at the breaks", "Random scatter", "Divisions", "p (corrected)", ""], E_rows)}
+<p>What the bins show against each phase line (share of divisions in bins that were past, on or short of it), next to the
+simpler 10 km rule:</p>
+{table(["Phase (date)", "10 km rule", "Bins", "Past", "On the line", "Short"], W_rows)}
+{how("On each phase line's planned date, every division is placed on one line: its distance along the general direction of the whole "
+     "advance (the bearing from the divisions' average 22 June position to their average last position). Jenks natural breaks cut that line "
+     "into the fewest bins that explain at least 90% of the spread; only then is each bin read against the phase line.",
+     f"<b>Null hypothesis:</b> the divisions were scattered at random along that stretch. <b>Test:</b> the share of the stretch left empty at the "
+     f"breaks (from the last division before each break to the first after it), against {meta['n_perm'] // 10:,} random scatters of as many "
+     "positions over the same range, cut into the same number of bins. The goodness of variance fit is no test here: scattered positions "
+     "reach about 0.95 with four bins too.",
+     "Dates for phases 3–5 read vague planning dates: 22 July for mid-July, 25 July for after mid-July, 30 July for late July.")}
+</section>
+
+<section id="described"><h2>Described, not tested</h2>
+<p class="answer">Three further results in the app are descriptions: they say what happened, not whether it could be chance.</p>
+<h3>Plan agreement between two phase lines</h3>
+<p>Two stretches of the planned lines compared on their own (0–100 direction score; 100 within 5° of the plan):</p>
+{table(["Stretch", "Heading vs plan", "Direction score", "Average gap", "End gap"], S_rows)}
+<h3>How mixed were the groups that crossed each line together?</h3>
+<p>Groups of five or more divisions, from 0 (one planned formation) to 1 (all four mixed evenly):</p>
+{table(["Line", "Groups (divisions) and mix"], M_rows)}
+<h3>Local groups day by day</h3>
+<p>On every day, divisions within 30 km of each other (directly or through neighbours) form a local group, followed from day to day
+in the Groups tab. The 30 km link is a choice, not an estimate; most groups last a few days.</p>
 </section>
 
 <section id="glossary"><h2>Glossary</h2><dl class="glossary">{"".join(f"<dt>{t}</dt><dd>{d}</dd>" for t, d in glossary)}</dl></section>
@@ -466,7 +524,11 @@ def main():
     gaps = pd.read_csv(SIG / "gaps.csv")
     meta = json.loads((SIG / "notes.json").read_text(encoding="utf8"))
     nb = pd.read_csv(ROOT / "analysis" / "phase_distributions" / "natural_breaks.csv")
-    OUT.write_text(build(res, gaps, meta, nb), encoding="utf8")
+    extra = {"arrival": pd.read_csv(ROOT / "figures" / "arrival" / "arrival.csv"),
+             "jenks": pd.read_csv(ROOT / "analysis" / "phase_distributions" / "jenks_by_phase_summary.csv", dtype={"phase": str}),
+             "substretch": pd.read_csv(ROOT / "analysis" / "loa_frontier" / "substretch.csv"),
+             "entropy": pd.read_csv(ROOT / "analysis" / "phase_checkpoints" / "entropy.csv", dtype={"phase": str})}
+    OUT.write_text(build(res, gaps, meta, nb, extra), encoding="utf8")
     print(f"wrote {OUT}")
 
 

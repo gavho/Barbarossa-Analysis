@@ -34,7 +34,7 @@ export function ClusterSettings({ region }: { region: RegionId }) {
     <section className="frame flex flex-col gap-2 p-2.5" aria-label="Cluster settings">
       <h3 className="display flex items-center gap-1.5 text-[13px]">Cluster settings <Help id="clusterSettings" /></h3>
       <Segmented<Settings["preset"]> size="sm" value={st.preset} onChange={choose}
-        items={[{ value: "published", label: "Published" }, { value: "recommended", label: "Recommended" }, { value: "custom", label: "Custom" }]} />
+        items={[{ value: "published", label: "Published" }, { value: "recommended", label: "One per line" }, { value: "custom", label: "Custom" }]} />
       {st.preset === "published" ? (
         <p className="text-[11px] leading-relaxed text-muted-foreground">The clusters in the paper: 5 per method, every division included.</p>
       ) : (
