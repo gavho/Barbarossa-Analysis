@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import maplibregl, { type Map as MLMap, type MapGeoJSONFeature } from "maplibre-gl";
 import { get, set, useStore } from "@/state/store";
+import { addPoint } from "@/state/lines";
 import { layersFor } from "@/config/presets";
 import { pageBounds } from "@/config/regions";
 import { GLYPHS } from "./basemaps";
@@ -43,7 +44,7 @@ export function MapView() {
     });
     const unsub = useStore.subscribe((now, prev) => {
       if (!ready) return;
-      const keys = ["page", "mode", "date", "theme", "basemap", "styles", "filters", "showPlan", "unit", "userLayers", "data", "phase", "phaseStep", "clusters", "planFocus"] as const;
+      const keys = ["page", "mode", "date", "theme", "basemap", "styles", "filters", "showPlan", "unit", "userLayers", "data", "phase", "phaseStep", "clusters", "planFocus", "phaseDates", "lineEdits"] as const;
       if (keys.some((k) => now[k] !== prev[k])) syncLayers(map, now);
       if (now.page !== prev.page && !now.presenting) {
         markSelected(map, null);
@@ -56,6 +57,7 @@ export function MapView() {
     themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
     map.on("click", (e) => {
+      if (get().drawing) return addPoint([e.lngLat.lng, e.lngLat.lat]);
       const hits = map.queryRenderedFeatures(e.point, { layers: clickableLayers(map) });
       const f = hits[0];
       markSelected(map, f ?? null);
@@ -66,7 +68,7 @@ export function MapView() {
     });
     map.on("mousemove", (e) => {
       const n = map.queryRenderedFeatures(e.point, { layers: clickableLayers(map) }).length;
-      map.getCanvas().style.cursor = n ? "pointer" : "";
+      map.getCanvas().style.cursor = get().drawing ? "crosshair" : n ? "pointer" : "";
     });
     map.on("moveend", () => {
       const c = map.getCenter();

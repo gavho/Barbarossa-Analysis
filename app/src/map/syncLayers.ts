@@ -1,8 +1,9 @@
 import type { GeoJSONSource, LayerSpecification, Map as MLMap } from "maplibre-gl";
-import { COUNTRIES, MILESTONES, PHASE_CHECKS, PHASE_PROFILES, PHASES, PLAN_MATCH, LOCAL_GROUPS, type FC } from "@/data";
+import { COUNTRIES, MILESTONES, PHASE_CHECKS, PHASES, PLAN_MATCH, LOCAL_GROUPS, type FC } from "@/data";
 import { HEAT_RAMP, layersFor, type LayerDef, type LayerId, type LayerStyle } from "@/config/presets";
 import { styleOf, type State } from "@/state/store";
 import { regionOf } from "@/state/clusters";
+import { breaksOf, linesOf } from "@/state/lines";
 import { BASEMAPS, FONT } from "./basemaps";
 import { colorExpr, layerFilter, sizeExpr } from "./expressions";
 
@@ -26,24 +27,25 @@ function phaseData(s: State, id: "phaseavg" | "phasepieces"): FC {
 }
 
 type StepLayer = "checklines" | "checkdots" | "checkpaths" | "jenksdots" | "jenkslines";
-const stepCache = new Map<string, FC>();
+const stepCache = new WeakMap<FC, Map<string, FC>>();
 const EMPTY: FC = { type: "FeatureCollection", features: [] };
-/** Layers for the Phases steppers ("all" = everything): the chosen phase line, its crossings, the group arrows arriving
- * at it, and the divisions on its planned date. */
-function stepData(step: string, id: StepLayer): FC {
-  const all = { checklines: MILESTONES.AGS_PhaseLines, checkdots: PHASE_CHECKS.crossings, checkpaths: PHASE_CHECKS.ribbons,
-    jenksdots: PHASE_PROFILES.jenks.dots, jenkslines: PHASE_PROFILES.jenks.breaklines }[id];
-  if (step === "all") return id.startsWith("jenks") ? EMPTY : all; // each phase has its own date: overlaid, they would mislead
-  const key = `${id}|${step}`;
-  if (!stepCache.has(key)) {
-    const keep = (p: Record<string, unknown>) =>
-      id === "checklines" ? String(p.line_id).toUpperCase() === step
-        : id === "checkdots" ? p.line === step
-        : id === "checkpaths" ? p.to_line === step
-        : p.phase === step; // the natural-break layers
-    stepCache.set(key, { type: "FeatureCollection", features: all.features.filter((f) => keep(f.properties ?? {})) });
+/** Layers for the Phases steppers ("all" = everything): the chosen phase line (as redrawn), its crossings, the group
+ * arrows arriving at it, and the divisions on its chosen date. */
+function stepData(s: State, id: StepLayer): FC {
+  const step = s.phaseStep;
+  if (id === "jenksdots" || id === "jenkslines") { // each phase has its own date: overlaid, they would mislead
+    const b = step === "all" ? null : breaksOf(s, step);
+    return b ? (id === "jenksdots" ? b.dots : b.breaklines) : EMPTY;
   }
-  return stepCache.get(key)!;
+  const all = { checklines: linesOf(s.lineEdits, "phase"), checkdots: PHASE_CHECKS.crossings, checkpaths: PHASE_CHECKS.ribbons }[id];
+  if (step === "all") return all;
+  const memo = stepCache.get(all) ?? stepCache.set(all, new Map()).get(all)!;
+  if (!memo.has(step)) {
+    const keep = (p: Record<string, unknown>) =>
+      id === "checklines" ? String(p.line_id).toUpperCase() === step : id === "checkdots" ? p.line === step : p.to_line === step;
+    memo.set(step, { type: "FeatureCollection", features: all.features.filter((f) => keep(f.properties ?? {})) });
+  }
+  return memo.get(step)!;
 }
 
 type SpreadLayer = "spreadsurface" | "spreadgroups" | "breakdots";
@@ -77,9 +79,9 @@ export function sourceData(s: State, id: LayerId): FC | null {
   if (id === "matchplan" || id === "matchreal") return matchData(s, id);
   if (id === "phaseavg" || id === "phasepieces") return phaseData(s, id);
   if (id === "spreadsurface" || id === "spreadgroups" || id === "breakdots") return dailyData(s.date, id); // local groups follow the timeline
-  if (id === "checklines" || id === "checkdots" || id === "checkpaths" || id === "jenksdots" || id === "jenkslines") return stepData(s.phaseStep, id);
-  if (id === "plan_phase") return MILESTONES.AGS_PhaseLines;
-  if (id === "plan_advance") return MILESTONES.AGS_AdvanceLines;
+  if (id === "checklines" || id === "checkdots" || id === "checkpaths" || id === "jenksdots" || id === "jenkslines") return stepData(s, id);
+  if (id === "plan_phase") return linesOf(s.lineEdits, "phase");
+  if (id === "plan_advance") return linesOf(s.lineEdits, "advance");
   if (id === "plan_pocket") return MILESTONES.AGS_SmallPocketCOA;
   if (s.page === "home") return id === "areas" ? s.data.areas : id === "heat" ? s.data.overview : null;
   const r = regionOf(s, s.page);

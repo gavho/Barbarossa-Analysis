@@ -4,7 +4,7 @@ import { get, initialState, set, toast, useStore, type State } from "@/state/sto
 import { saveFile } from "./export";
 
 const KEYS = ["page", "mode", "date", "speed", "theme", "basemap", "styles", "filters", "showPlan", "unit", "follow",
-  "leftOpen", "rightOpen", "rightTab", "tableLayer", "tableExtentOnly", "stories", "userLayers", "view", "clusters"] as const;
+  "leftOpen", "rightOpen", "rightTab", "tableLayer", "tableExtentOnly", "stories", "userLayers", "view", "clusters", "phaseDates", "lineEdits"] as const;
 type Saved = Pick<State, (typeof KEYS)[number]>;
 
 export interface Workspace extends Partial<Saved> {
@@ -39,6 +39,10 @@ export function applyWorkspace(w: unknown): boolean {
   if (patch.page && !PAGES.has(patch.page)) delete patch.page;
   if (patch.date && !/^\d{4}-\d{2}-\d{2}$/.test(patch.date)) delete patch.date;
   if (patch.userLayers && !Array.isArray(patch.userLayers)) delete patch.userLayers;
+  const isLine = (c: unknown) => Array.isArray(c) && c.every((p) => Array.isArray(p) && p.length === 2 && p.every(Number.isFinite));
+  if (patch.lineEdits && !(["phase", "advance"] as const).every((k) => patch.lineEdits![k] && typeof patch.lineEdits![k] === "object"
+    && Object.values(patch.lineEdits![k]).every(isLine))) delete patch.lineEdits;
+  if (patch.phaseDates && !Object.values(patch.phaseDates).every((d) => typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d))) delete patch.phaseDates;
   set({ ...patch, playing: false, presenting: null, selection: null });
   if (ws.dataSnapshot && ws.dataSnapshot.date !== get().data.source.date)
     toast(`Workspace was saved with data from ${ws.dataSnapshot.date}; now showing ${get().data.source.date}.`, "info");

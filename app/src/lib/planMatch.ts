@@ -110,8 +110,9 @@ export function verdict(name: string, signed: number, gap: number, within50: num
 }
 
 /** Pair each planned line with a live cluster and describe the match, in the shape of plan_match.json. */
-export function matchPlans(avg: Map<number, Pt[]>, members: Map<string, number>, proj: Projection): PlanResult {
-  const planned = Object.fromEntries(Object.entries(PLAN_MATCH.planned).map(([u, ll]) => [u, ll.map(proj.to)]));
+export function matchPlans(avg: Map<number, Pt[]>, members: Map<string, number>, proj: Projection,
+  plannedLL: Record<string, number[][]> = PLAN_MATCH.planned): PlanResult {
+  const planned = Object.fromEntries(Object.entries(plannedLL).map(([u, ll]) => [u, ll.map(proj.to)]));
   const pairing = pairLines(planned, avg);
   const order = Object.keys(pairing).sort((a, b) => planned[a].reduce((s, p) => s + p[1], 0) / planned[a].length - planned[b].reduce((s, p) => s + p[1], 0) / planned[b].length);
   const roster = Object.entries(PLAN_MATCH.roster);
@@ -131,9 +132,9 @@ export function matchPlans(avg: Map<number, Pt[]>, members: Map<string, number>,
     pairs.push({ planned: p, name, cluster: cid, divisions: [...members.values()].filter((c) => c === cid).length, ...v,
       mean_offset_km: Math.round(signed * 10) / 10, mean_gap_km: Math.round(gap * 10) / 10, within50_pct: within50, end_gap_km: endGap,
       bearing_diff: bd, membership_agrees: mine.length > 0 && best === cid, frechet_km: Math.round(frechet(a, b)), ...scores(bd, gap, endGap),
-      profile: prof.map(([s, o]) => [Math.round(s), Math.round(o)]), planned_line: PLAN_MATCH.planned[p] as [number, number][],
+      profile: prof.map(([s, o]) => [Math.round(s), Math.round(o)]), planned_line: plannedLL[p] as [number, number][],
       realized_line: avg.get(cid)!.map(proj.from) });
-    for (const [kind, line] of [["planned", PLAN_MATCH.planned[p]], ["realized", avg.get(cid)!.map(proj.from)]] as const) {
+    for (const [kind, line] of [["planned", plannedLL[p]], ["realized", avg.get(cid)!.map(proj.from)]] as const) {
       feats.push({ type: "Feature", id: feats.length, properties: { kind, planned: p, name, cluster: cid, badge: v.badge },
         geometry: { type: "LineString", coordinates: line as number[][] } });
     }

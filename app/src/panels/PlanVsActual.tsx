@@ -3,6 +3,7 @@ import { MILESTONES } from "@/data";
 import { crossings, REACH_KM } from "@/lib/crossing";
 import { fmtShort } from "@/lib/dates";
 import { set, useStore } from "@/state/store";
+import { linesOf } from "@/state/lines";
 import { cn } from "@/lib/utils";
 import { Help } from "@/ui/Help";
 
@@ -14,10 +15,11 @@ export function PlanVsActual() {
   const data = useStore((s) => s.data);
   const date = useStore((s) => s.date);
   const showPlan = useStore((s) => s.showPlan);
+  const edits = useStore((s) => s.lineEdits);
   const [reach, setReach] = useState(REACH_KM);
   const rows = useMemo(
-    () => (page === "frontier" ? crossings(MILESTONES.AGS_PhaseLines.features, data.regions.frontier.points.features, date, reach) : []),
-    [page, data, date, reach],
+    () => (page === "frontier" ? crossings(linesOf(edits, "phase").features, data.regions.frontier.points.features, date, reach) : []),
+    [page, data, date, reach, edits],
   );
   if (page !== "frontier") return <p className="p-4 text-muted-foreground">The AGS milestones cover the Frontier theater.</p>;
 
@@ -42,7 +44,7 @@ export function PlanVsActual() {
       </label>
       <div className="flex flex-col gap-1.5">
         {rows.map((r) => {
-          const active = MILESTONES.AGS_PhaseLines.features.find((f) => f.properties?.line_id === r.lineId)?.properties;
+          const active = linesOf(edits, "phase").features.find((f) => f.properties?.line_id === r.lineId)?.properties;
           const inWindow = active && date >= active.date_start && date <= active.date_end;
           return (
             <div key={r.lineId} className={cn("frame p-2", inWindow && "ring-1 ring-primary")}>

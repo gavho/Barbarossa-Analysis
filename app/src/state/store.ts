@@ -9,6 +9,7 @@ import type { ClusterSettings } from "@/lib/cluster";
 export type Theme = "tactical" | "period";
 export type RightTab = "charts" | "table" | "info" | "days" | "plan" | "oob" | "vectors" | "phases" | "groups";
 export interface PhaseView { method: "DV" | "GEO"; stretch: string } // stretch "all" or a name like "1-2"
+export type LineKind = "phase" | "advance";
 
 export interface View { center: [number, number]; zoom: number; bearing: number; pitch: number }
 export interface Step { title: string; caption: string; date: string; mode: Mode; view: View | null }
@@ -47,7 +48,10 @@ export interface State {
   data: Dataset;
   phase: PhaseView;
   phaseStep: string; // Phases tab stepper: "all", "Start" or a phase number
-  phaseSection: "breaks" | "method"; // which Phases-tab view owns the map
+  phaseSection: "breaks" | "lines" | "method"; // which Phases-tab view owns the map
+  phaseDates: Record<string, string>; // natural breaks: a phase's date when moved off its planned one
+  lineEdits: Record<LineKind, Record<string, number[][]>>; // redrawn phase lines (by line_id) and advance lines (by unit), lon/lat
+  drawing: { kind: LineKind; id: string } | null; // map clicks add points to this line
   groupsSection: "crossing" | "local"; // which Groups-tab view owns the map
   clusters: Partial<Record<RegionId, ClusterSettings>>; // live cluster settings per theatre; missing = published
   layerTab: string; // left bar: units / clusters / phases / plan / mine
@@ -83,6 +87,9 @@ export const initialState: State = {
   phase: { method: "DV", stretch: "all" },
   phaseStep: "all",
   phaseSection: "breaks",
+  phaseDates: {},
+  lineEdits: { phase: {}, advance: {} },
+  drawing: null,
   groupsSection: "crossing",
   clusters: {},
   layerTab: "units",

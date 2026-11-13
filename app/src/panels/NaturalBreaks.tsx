@@ -1,12 +1,14 @@
-import type { Point } from "geojson";
-import { MapPin } from "lucide-react";
+import type { Feature, Point } from "geojson";
+import { MapPin, RotateCcw } from "lucide-react";
 import { BREAK_COLORS, BREAK_LABELS, GROUP_COLORS } from "@/config/presets";
 import { PHASE_PROFILES } from "@/data";
 import { mapRef } from "@/map/MapView";
-import { set, showOnly, useStore } from "@/state/store";
+import { get, set, showOnly, useStore } from "@/state/store";
+import { breaksOf, plannedDate } from "@/state/lines";
+import { timeWindow } from "@/config/regions";
 import { Help } from "@/ui/Help";
 import { Segmented } from "@/ui/Segmented";
-import { fmtShort } from "@/lib/dates";
+import { addDays, daysBetween, fmtShort } from "@/lib/dates";
 
 const J = PHASE_PROFILES.jenks;
 const PHASES = J.summary.map((x) => x.phase);
@@ -16,11 +18,10 @@ const binColour = (b: number) => GROUP_COLORS.find((c) => c.value === b)?.color 
 // Dots on top, a histogram of the same divisions on the same axis below (STEP km per bar), then the axis labels.
 const W = 320, PAD = 6, DOT_B = 58, HIST_T = 64, BASE = 100, H = BASE + 26, STEP = 25;
 const kms = J.dots.features.map((f) => Number(f.properties?.km));
-const xmin = Math.min(...kms, ...J.summary.map((x) => x.line_from)) - 10, xmax = Math.max(...kms, ...J.summary.map((x) => x.line_to)) + 10;
-const xOf = (km: number) => PAD + ((km - xmin) / (xmax - xmin)) * (W - 2 * PAD);
+const XMIN = Math.min(...kms, ...J.summary.map((x) => x.line_from)) - 10, XMAX = Math.max(...kms, ...J.summary.map((x) => x.line_to)) + 10;
 const jitter = (i: number) => ((i * 37) % 23) / 23; // fixed scatter so dots don't stack
-const bucket = (km: number) => Math.floor((km - xmin) / STEP);
-const tally = (fs: typeof J.dots.features) => {
+const bucket = (km: number) => Math.floor((km - XMIN) / STEP);
+const tally = (fs: Feature[]) => {
   const out = new Map<number, Map<number, number>>(); // bucket -> bin -> divisions
   for (const f of fs) {
     const b = bucket(Number(f.properties?.km)), bin = Number(f.properties?.bin), row = out.get(b) ?? new Map<number, number>();
@@ -28,25 +29,31 @@ const tally = (fs: typeof J.dots.features) => {
   }
   return out;
 };
+const total = (row: Map<number, number>) => [...row.values()].reduce((a, b) => a + b, 0);
 // One bar scale for every phase, so the histograms can be compared.
 const MAXC = Math.max(...PHASES.flatMap((p) => [...tally(J.dots.features.filter((f) => f.properties?.phase === p)).values()]
-  .map((row) => [...row.values()].reduce((a, b) => a + b, 0))));
-const barH = (n: number) => (n / MAXC) * (BASE - HIST_T - 8);
+  .map(total)));
+const WIN = timeWindow("frontier");
 
 /** Natural breaks: on a phase's planned date, the divisions on one line along the direction of the whole advance,
  * cut by Jenks where they clump; only then is each bin read against the phase line (past / on the line / short). */
 export function NaturalBreaks() {
   const step = useStore((s) => s.phaseStep);
+  const phaseDates = useStore((s) => s.phaseDates);
+  const B = useStore((s) => breaksOf(s, PHASES.includes(step) ? step : PHASES[0]));
   const L = PHASES.includes(step) ? step : PHASES[0];
-  const sum = J.summary.find((x) => x.phase === L)!;
-  const bins = J.bins.filter((x) => x.phase === L);
-  const dots = J.dots.features.filter((f) => f.properties?.phase === L);
-  const cuts = J.breaklines.features.filter((f) => f.properties?.phase === L).map((f) => Number(f.properties?.km));
+  const planned = plannedDate(L), date = phaseDates[L] ?? planned;
+  const setDate = (d: string) => {
+    const { [L]: _, ...rest } = phaseDates;
+    set({ phaseDates: d === planned ? rest : { ...rest, [L]: d } });
+  };
+  const live = useStore((s) => date !== planned || (s.lineEdits.phase[L]?.length ?? 0) >= 2);
 
   const show = (p: string) => {
     set({ phaseStep: p });
     showOnly(["jenksdots", "jenkslines", "checklines"]);
-    const pts = J.dots.features.filter((f) => f.properties?.phase === p).map((f) => (f.geometry as Point).coordinates);
+    const pts = (breaksOf(get(), p)?.dots.features ?? []).map((f) => (f.geometry as Point).coordinates);
+    if (!pts.length) return;
     const xs = pts.map((q) => q[0]), ys = pts.map((q) => q[1]);
     mapRef?.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: 50, duration: 800 });
   };
@@ -60,10 +67,33 @@ export function NaturalBreaks() {
         </button>
       </div>
       <Segmented<string> size="sm" value={L} onChange={show} items={PHASES.map((p) => ({ value: p, label: `Phase ${p}` }))} />
+      <label className="flex items-center gap-2 text-[12px]">
+        <span className="shrink-0 text-muted-foreground">Date</span>
+        <input type="range" min={0} max={daysBetween(WIN.start, WIN.end)} value={daysBetween(WIN.start, date)} className="min-w-0 flex-1"
+          onChange={(e) => setDate(addDays(WIN.start, Number(e.target.value)))} aria-label={`Date for phase ${L}`} />
+        <span className="w-12 shrink-0 font-mono">{fmtShort(date)}</span>
+        <button onClick={() => setDate(planned)} disabled={date === planned} title={`Back to the planned date, ${fmtShort(planned)}`}
+          className="shrink-0 rounded p-1 hover:bg-muted disabled:opacity-30" aria-label="Back to the planned date"><RotateCcw size={13} /></button>
+      </label>
+      {B ? <Chart L={L} B={B} live={live} /> : <p className="text-[12px] text-muted-foreground">Fewer than 5 divisions have a position on {fmtShort(date)}.</p>}
+    </div>
+  );
+}
+
+function Chart({ L, B, live }: { L: string; B: NonNullable<ReturnType<typeof breaksOf>>; live: boolean }) {
+  const { summary: sum, bins } = B, dots = B.dots.features, cuts = B.breaklines.features.map((f) => Number(f.properties?.km));
+  // The published axis and bar scale, widened when a moved date or redrawn line reaches past them.
+  const here = dots.map((f) => Number(f.properties?.km));
+  const xmin = Math.min(XMIN, ...here, sum.line_from - 10), xmax = Math.max(XMAX, ...here, sum.line_to + 10);
+  const xOf = (km: number) => PAD + ((km - xmin) / (xmax - xmin)) * (W - 2 * PAD);
+  const maxc = Math.max(MAXC, ...[...tally(dots).values()].map(total));
+  const barH = (n: number) => (n / maxc) * (BASE - HIST_T - 8);
+  return (
+    <>
 
       <section className="frame p-2.5" aria-label={`Natural breaks, phase ${L}`}>
         <p className="flex flex-wrap items-center gap-x-2 text-[12px]">
-          <span className="text-muted-foreground">{fmtShort(sum.date)} · {sum.divisions} divisions in {sum.bins} bins (explain {Math.round(sum.gvf * 100)}%). Divisions in bins that are:</span>
+          <span className="text-muted-foreground">{fmtShort(sum.date)}{live ? " (recomputed)" : ""} · {sum.divisions} divisions in {sum.bins} bins (explain {Math.round(sum.gvf * 100)}%). Divisions in bins that are:</span>
           {BREAK_COLORS.map((c) => (
             <span key={c.value} className="flex items-center gap-1">
               <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: c.color }} />{BREAK_LABELS[c.value]} {sum[c.value as "past"]}%
@@ -82,13 +112,13 @@ export function NaturalBreaks() {
           <line x1={PAD} x2={W - PAD} y1={DOT_B + 3} y2={DOT_B + 3} stroke="var(--border)" strokeOpacity={0.5} />
           <text x={PAD} y={HIST_T + 4} fontSize={7} fill="var(--muted-foreground)">divisions per {STEP} km</text>
           {[...tally(dots)].map(([b, row]) => {
-            const x = xOf(xmin + b * STEP) + 0.4, w = xOf(xmin + (b + 1) * STEP) - xOf(xmin + b * STEP) - 0.8;
+            const x = xOf(XMIN + b * STEP) + 0.4, w = xOf(XMIN + (b + 1) * STEP) - xOf(XMIN + b * STEP) - 0.8;
             let y = BASE;
             return [...row].sort(([a], [c]) => c - a).map(([bin, n]) => {
               y -= barH(n);
               return <rect key={`${b}-${bin}`} x={x} y={y} width={w} height={barH(n)} fill={binColour(bin)} />;
             }).concat(<text key={`${b}-n`} x={x + w / 2} y={y - 1.5} textAnchor="middle" fontSize={7} fill="var(--muted-foreground)">
-              {[...row.values()].reduce((a, c) => a + c, 0)}</text>);
+              {total(row)}</text>);
           })}
           <line x1={PAD} x2={W - PAD} y1={BASE} y2={BASE} stroke="var(--border)" />
           {[0, 200, 400, 600].map((t) => <text key={t} x={xOf(t)} y={BASE + 10} textAnchor="middle" fontSize={9} fill="var(--muted-foreground)">{t} km</text>)}
@@ -107,6 +137,6 @@ export function NaturalBreaks() {
           ))}
         </ul>
       </section>
-    </div>
+    </>
   );
 }

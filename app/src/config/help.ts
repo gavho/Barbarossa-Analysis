@@ -173,6 +173,10 @@ export const HELP: Record<string, { title: string; body: string }> = {
     title: "Checkpoint group paths",
     body: "For a group that carries on from one line to the next, a straight arrow from where its divisions crossed the first line (their average crossing point) to where they crossed the next. It shows which way the group went, not its route.",
   },
+  editLines: {
+    title: "Edit lines",
+    body: "Redraw a phase line or a line of advance to test another reading of the plan. Type the towns it runs through, in order (alternative spellings such as Kiev or Proskurov work), or press Draw on map and click its points; a click near a town snaps to the town. The redrawn line replaces the original on the map and in every analysis the app computes itself: natural breaks, phase-line crossings and planned vs actual. Original puts the published line back.",
+  },
   naturalBreaks: {
     title: "Natural breaks",
     body: "On the day a phase line was meant to be reached, how were the divisions spread around it? Three steps. 1) Put every division on one line: its distance along the general direction of the whole advance (the bearing from the divisions' average 22 June position to their average last position), not along the phase line, whose shape plays no part here. 2) Jenks natural breaks cut that line where the divisions clump, as for a GIS colour ramp: the fewest bins that explain at least 90% of the spread. Bins are numbered from the front. 3) Only then read each bin against the phase line: past (every division in it had crossed), on the line (some had, some had not) or short (none had). The percentages are shares of divisions. The phase lines run at an angle to the advance, so a bin can be on the line with its southern divisions past it and its northern ones short.",
