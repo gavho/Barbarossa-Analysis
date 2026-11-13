@@ -27,6 +27,7 @@ import numpy as np
 import pandas as pd
 from pyproj import Transformer
 from shapely.geometry import LineString, Point
+from shapely.ops import substring
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
@@ -87,12 +88,28 @@ def start_point(track, first_line):
     return pt, 0.0, LineString(first_line).project(pt) - pc.FAR
 
 
+def standardized(df):
+    X = df[["along", "day"]].values
+    X = X[:, X.std(axis=0) > 0]
+    return (X - X.mean(axis=0)) / X.std(axis=0)
+
+
+CLUSTERS4 = ["N", "Central", "South", "South Minor"]
+SPAN_PAD_KM = 8  # a cluster's span on the map reaches this far past its outermost crossings, so one division still shows
+LANE_KM = 12  # clusters are grouped by day as well as place, so their spans can overlap: each is drawn this much further west  # Sorin's four columns, north to south along the line
+
+
+def group4(df):
+    """Exactly four groups of one line's crossings (same k-means as group_line), named north to south."""
+    labels = KMeans(n_clusters=4, random_state=42, n_init=50).fit_predict(standardized(df))
+    order = sorted(set(labels), key=lambda l: df.along[labels == l].mean())
+    return np.array([CLUSTERS4[order.index(l)] for l in labels])
+
+
 def group_line(df):
     """Labels for one line's crossings (columns along, day): best-silhouette k with no single-division group.
     A column with no spread (the Start checkpoint's shared day) is left out."""
-    X = df[["along", "day"]].values
-    X = X[:, X.std(axis=0) > 0]
-    X = (X - X.mean(axis=0)) / X.std(axis=0)
+    X = standardized(df)
     best = None
     for k in K_RANGE:
         if k >= len(df):
@@ -119,6 +136,29 @@ def entropy(counts):
         return None
     p = n[n > 0] / n.sum()
     return round(float(-(p * np.log(p)).sum() / np.log(len(FORMATIONS))), 2) + 0.0  # + 0.0 turns -0.0 into 0.0
+
+
+def shannon(counts):
+    """Shannon entropy (natural log) of the mix of the four greater units; "other" left out, None when there are none."""
+    n = np.array([counts.get(f, 0) for f in FORMATIONS], float)
+    if n.sum() == 0:
+        return None
+    p = n[n > 0] / n.sum()
+    return float(-(p * np.log(p)).sum()) + 0.0
+
+
+def diversity(keys, labels, count):
+    """Per cluster of one line: its greater-unit entropy divided by the entropy of all the line's crossings pooled
+    (1 = as mixed as the whole front there; above 1 = more mixed). None when the pool has a single greater unit."""
+    pooled = shannon(count(keys))
+    out = []
+    for name in CLUSTERS4:
+        mine = [k for k, l in zip(keys, labels) if l == name]
+        h = shannon(count(mine))
+        out.append({"cluster": name, "divisions": len(mine), "formations": count(mine), "entropy": None if h is None else round(h, 3),
+                    "pooled": None if pooled is None else round(pooled, 3),
+                    "normalized": None if h is None or not pooled else round(h / pooled, 2)})
+    return out
 
 
 def date(day):
@@ -180,6 +220,26 @@ def main():
                            "formations": count(m.key), "entropy": entropy(count(m.key))})
         print(f"  phase {L}: {len(df)} crossings in {info[L]['k']} groups (silhouette {info[L]['silhouette']})")
 
+    div, spans = [], []
+    cr["cluster4"], cr["unit"] = None, [form(k) for k in cr.key]
+    for L in letters[1:]:
+        df = cr[cr.line == L].reset_index(drop=True)
+        if len(df) > 4:
+            labels = group4(df)
+            cr.loc[cr.line == L, "cluster4"] = labels
+            rows = diversity(list(df.key), labels, count)
+            div += [{"line": L, **r} for r in rows]
+            for i, r in enumerate(rows):  # the stretch of the phase line each cluster crossed, for the map
+                a = df.along[labels == r["cluster"]]
+                if len(a):
+                    seg = substring(LineString(lines[L]), a.min() + pc.FAR - SPAN_PAD_KM, a.max() + pc.FAR + SPAN_PAD_KM)
+                    seg = seg.offset_curve(-LANE_KM * (i + 1))  # own lane west of the line (it runs north to south), N nearest
+                    spans.append({"type": "Feature", "id": len(spans), "geometry": {"type": "LineString", "coordinates": [ll(x, y) for x, y in seg.coords]},
+                                  "properties": {"line": L, "cluster": r["cluster"], "ci": i, "divisions": r["divisions"], "normalized": r["normalized"],
+                                                 "label": f"{r['cluster']} · {'–' if r['normalized'] is None else format(r['normalized'], '.2f')}"}})
+    pd.DataFrame([{k: v for k, v in r.items() if k != "formations"} | {f: r["formations"].get(f, 0) for f in FORMATIONS + ["other"]}
+                  for r in div]).to_csv(OUT / "diversity.csv", index=False)
+
     flows, splits, ribbons = [], [], []
     done = [L for L in letters if L in info]
     for a, b in zip(done, done[1:]):
@@ -213,14 +273,17 @@ def main():
     pd.DataFrame(flows).to_csv(OUT / "flows.csv", index=False)
     pd.DataFrame(splits).to_csv(OUT / "breakaways.csv", index=False)
 
-    app = {"lines": done, "info": info, "groups": groups, "flows": flows, "splits": splits,
+    app = {"lines": done, "info": info, "groups": groups, "flows": flows, "splits": splits, "diversity": div,
+           "diversity_spans": {"type": "FeatureCollection", "features": spans},
            "ribbons": {"type": "FeatureCollection", "features": [{**f, "id": i} for i, f in enumerate(ribbons)]},
            "crossings": {"type": "FeatureCollection", "features": [
-               {"type": "Feature", "id": i, "properties": {"division": r.division, "line": r.line, "date": r.date, "group": int(r.group)},
+               {"type": "Feature", "id": i, "properties": {"division": r.division, "line": r.line, "date": r.date, "group": int(r.group),
+                                                                  "unit": r.unit, "cluster": r.cluster4},
                 "geometry": {"type": "Point", "coordinates": ll(r.x, r.y)}}
                for i, r in enumerate(cr.dropna(subset=["group"]).itertuples())]}}
     (ROOT / "app" / "src" / "data" / "phase_checkpoints.json").write_text(json.dumps(app, separators=(",", ":")), encoding="utf8")
     draw_maps(cr.dropna(subset=["group"]), lines, done)
+    draw_diversity(div)
     print(f"\n{len(splits)} breakaways; wrote {OUT}")
 
 
@@ -271,6 +334,27 @@ def draw_maps(cr, lines, done):
     fig.subplots_adjust(left=0.02, right=0.98, top=0.94, bottom=0.05, hspace=0.12, wspace=0.03)  # equal-aspect panels defeat tight_layout
     for ext in ("png", "pdf"):
         fig.savefig(OUT / f"phase_maps.{ext}", dpi=200)
+    plt.close(fig)
+
+
+def draw_diversity(div):
+    """Paper figure, black and white: normalized greater-unit entropy of each of the four clusters, phase line by phase line."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    df = pd.DataFrame(div)
+    lines = list(dict.fromkeys(df.line))
+    fig, ax = plt.subplots(figsize=(5.5, 3.6))
+    ax.axhline(1, color="0.6", lw=0.8, ls=":")
+    for (name, h), mk, ls in zip(df.groupby("cluster", sort=False), "os^D", ["-", "--", "-.", ":"]):
+        ax.plot([lines.index(L) for L in h.line], h.normalized, marker=mk, ls=ls, color="black", mfc="white", lw=1, label=name)
+    ax.set_xticks(range(len(lines)), [f"Phase {L}" for L in lines])
+    ax.set_ylabel("Greater-unit entropy / whole line's entropy")
+    ax.legend(fontsize=7, frameon=False, ncol=4, loc="upper center", bbox_to_anchor=(0.5, 1.12))
+    ax.spines[["top", "right"]].set_visible(False)
+    fig.tight_layout()
+    for ext in ("png", "pdf"):
+        fig.savefig(OUT / f"diversity.{ext}", dpi=200)
     plt.close(fig)
 
 

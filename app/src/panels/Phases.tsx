@@ -11,6 +11,7 @@ import { compass } from "./Vectors";
 import { FrontProfile, PlacesInLine } from "./AlongFront";
 import { NaturalBreaks } from "./NaturalBreaks";
 import { LineEditor } from "./LineEditor";
+import { Diversity } from "./Diversity";
 
 export const color = (cid: number) => CLUSTER_COLORS.find((c) => c.value === cid)?.color ?? "#888";
 export const Swatch = ({ cid }: { cid: number }) => (
@@ -31,8 +32,9 @@ export function Phases() {
   return (
     <div className="flex flex-col gap-2.5">
       <Segmented<Section> size="sm" value={section} onChange={open}
-        items={[{ value: "breaks", label: "Natural breaks" }, { value: "lines", label: "Edit lines" }, { value: "method", label: "Method check" }]} />
+        items={[{ value: "breaks", label: "Natural breaks" }, { value: "diversity", label: "Diversity" }, { value: "lines", label: "Edit lines" }, { value: "method", label: "Method check" }]} />
       {section === "breaks" && <NaturalBreaks />}
+      {section === "diversity" && <Diversity />}
       {section === "lines" && <LineEditor />}
       {section === "method" && (
         <div className="flex flex-col gap-2.5">

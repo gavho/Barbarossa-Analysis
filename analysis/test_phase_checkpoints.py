@@ -18,6 +18,20 @@ def test_entropy_is_0_for_one_formation_and_1_for_four_equal():
     assert ck.entropy({"other": 2}) is None
 
 
+def test_diversity_is_1_for_the_pool_mix_and_0_for_one_formation():
+    keys = list("abcdefgh")
+    form = dict(zip(keys, ["6A", "17A"] * 2 + ["6A"] * 2 + ["17A"] * 2))
+    count = lambda ks: {f: n for f in ck.FORMATIONS if (n := sum(form[k] == f for k in ks))}
+    rows = {r["cluster"]: r for r in ck.diversity(keys, ["N"] * 4 + ["Central"] * 2 + ["South"] * 2, count)}
+    assert rows["N"]["normalized"] == 1 and rows["Central"]["normalized"] == 0
+    assert rows["South Minor"]["divisions"] == 0 and rows["South Minor"]["normalized"] is None
+
+
+def test_group4_names_clusters_north_to_south():
+    df = pd.DataFrame({"along": [0, 2, 300, 302, 600, 602, 900, 902], "day": [1.0, 1.0, 2.0, 2.0, 3.0, 3.0, 4.0, 4.0]})
+    assert list(ck.group4(df)) == ["N", "N", "Central", "Central", "South", "South", "South Minor", "South Minor"]
+
+
 LINE = [(100, 500), (100, -500)]  # north to south at x = 100
 
 

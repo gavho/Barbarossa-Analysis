@@ -44,7 +44,7 @@ export function MapView() {
     });
     const unsub = useStore.subscribe((now, prev) => {
       if (!ready) return;
-      const keys = ["page", "mode", "date", "theme", "basemap", "styles", "filters", "showPlan", "unit", "userLayers", "data", "phase", "phaseStep", "clusters", "planFocus", "phaseDates", "lineEdits"] as const;
+      const keys = ["page", "mode", "date", "theme", "basemap", "styles", "filters", "showPlan", "unit", "userLayers", "data", "phase", "phaseStep", "clusters", "planFocus", "phaseDates", "lineEdits", "drawing", "drawCursor"] as const;
       if (keys.some((k) => now[k] !== prev[k])) syncLayers(map, now);
       if (now.page !== prev.page && !now.presenting) {
         markSelected(map, null);
@@ -69,6 +69,7 @@ export function MapView() {
     map.on("mousemove", (e) => {
       const n = map.queryRenderedFeatures(e.point, { layers: clickableLayers(map) }).length;
       map.getCanvas().style.cursor = get().drawing ? "crosshair" : n ? "pointer" : "";
+      if (get().drawing) set({ drawCursor: [e.lngLat.lng, e.lngLat.lat] });
     });
     map.on("moveend", () => {
       const c = map.getCenter();

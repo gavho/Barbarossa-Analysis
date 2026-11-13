@@ -3,7 +3,7 @@ import type { PageId } from "./regions";
 export type Mode = "instant" | "progressive";
 export type LayerKind = "circle" | "line" | "fill" | "heatmap";
 export type LayerId =
-  | "areas" | "ellipses" | "heat" | "geo" | "dv" | "geovec" | "dvvec" | "phaseavg" | "phasepieces" | "checklines" | "checkpaths" | "checkdots" | "spreadsurface" | "spreadgroups" | "breakdots" | "jenksdots" | "jenkslines" | "matchplan" | "matchreal" | "paths" | "points"
+  | "areas" | "ellipses" | "heat" | "geo" | "dv" | "geovec" | "dvvec" | "phaseavg" | "phasepieces" | "checklines" | "checkpaths" | "checkdots" | "spreadsurface" | "spreadgroups" | "breakdots" | "jenksdots" | "jenkslines" | "divspans" | "divdots" | "matchplan" | "matchreal" | "paths" | "points"
   | "plan_phase" | "plan_advance" | "plan_pocket";
 
 /** How the timeline filters a layer: by mode (day), always one day (exact), a start..end span, started-by, or not at all. */
@@ -83,6 +83,8 @@ export const PHASE_LAYERS: LayerDef[] = [
   { id: "spreadgroups", title: "Local Groups · Outlines", kind: "fill", time: "none", cluster: "none", fields: ["date", "group", "divisions", "dominant"] },
   { id: "jenksdots", title: "Natural Breaks · Divisions", kind: "circle", time: "none", cluster: "none", fields: ["division", "phase", "date", "bin", "class", "km"] },
   { id: "jenkslines", title: "Natural Breaks · Break Lines", kind: "line", time: "none", cluster: "none", fields: ["phase", "km"] },
+  { id: "divspans", title: "Diversity · Clusters on the Line", kind: "line", time: "none", cluster: "none", fields: ["line", "cluster", "divisions", "normalized"] },
+  { id: "divdots", title: "Diversity · Crossings by Greater Unit", kind: "circle", time: "none", cluster: "none", fields: ["division", "line", "date", "unit", "cluster"] },
   { id: "breakdots", title: "Local Groups · Divisions", kind: "circle", time: "none", cluster: "none",
     fields: ["division", "phase", "date", "group", "km", "formation"] },
 ];
@@ -92,7 +94,7 @@ export type LayerGroup = "units" | "clusters" | "phases" | "plan";
 export const groupOf = (id: string): LayerGroup =>
   id === "dv" || id === "geo" || id.endsWith("vec") ? "clusters"
     : id.startsWith("plan_") || id.startsWith("match") ? "plan"
-    : id.startsWith("phase") || id.startsWith("check") || id.startsWith("spread") || id.startsWith("jenks") || id === "breakdots" ? "phases" : "units";
+    : id.startsWith("phase") || id.startsWith("check") || id.startsWith("spread") || id.startsWith("jenks") || id.startsWith("div") || id === "breakdots" ? "phases" : "units";
 
 export const layersFor = (page: PageId, plan: boolean): LayerDef[] =>
   page === "home" ? HOME_LAYERS
@@ -202,6 +204,12 @@ export function preset(page: PageId, mode: Mode, id: LayerId): LayerStyle {
       return { ...base, colorMode: "category", colorField: "colour", categories: GROUP_COLORS, size: [5.5, 5.5], outline: "rgba(0,0,0,0.7)" };
     case "jenksdots":
       return { ...base, colorMode: "category", colorField: "bin", categories: GROUP_COLORS, size: [5.5, 5.5], outline: "rgba(0,0,0,0.7)" };
+    case "divspans":
+      // one neutral band, named by its label: on this map colour means greater unit (divdots), and the cluster palette would clash
+      return { ...base, opacity: 0.55, color: "#7d8899", size: [8, 8], labels: true };
+    case "divdots":
+      return { ...base, color: "#9aa3ad", colorMode: "category", colorField: "unit", size: [5, 5], outline: "rgba(0,0,0,0.7)",
+        categories: Object.entries(FORMATION_COLORS).map(([value, color]) => ({ value, color })) }; // grey = other
     case "jenkslines":
       return { ...base, color: "#7d8899", size: [2, 2], dash: true }; // mid grey-blue: visible on light and dark basemaps
     case "spreadsurface":

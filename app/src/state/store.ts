@@ -48,10 +48,11 @@ export interface State {
   data: Dataset;
   phase: PhaseView;
   phaseStep: string; // Phases tab stepper: "all", "Start" or a phase number
-  phaseSection: "breaks" | "lines" | "method"; // which Phases-tab view owns the map
+  phaseSection: "breaks" | "diversity" | "lines" | "method"; // which Phases-tab view owns the map
   phaseDates: Record<string, string>; // natural breaks: a phase's date when moved off its planned one
   lineEdits: Record<LineKind, Record<string, number[][]>>; // redrawn phase lines (by line_id) and advance lines (by unit), lon/lat
   drawing: { kind: LineKind; id: string } | null; // map clicks add points to this line
+  drawCursor: number[] | null; // the pointer while drawing, for the dashed segment from the last point
   groupsSection: "crossing" | "local"; // which Groups-tab view owns the map
   clusters: Partial<Record<RegionId, ClusterSettings>>; // live cluster settings per theatre; missing = published
   layerTab: string; // left bar: units / clusters / phases / plan / mine
@@ -90,6 +91,7 @@ export const initialState: State = {
   phaseDates: {},
   lineEdits: { phase: {}, advance: {} },
   drawing: null,
+  drawCursor: null,
   groupsSection: "crossing",
   clusters: {},
   layerTab: "units",

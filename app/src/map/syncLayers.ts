@@ -4,6 +4,7 @@ import { HEAT_RAMP, layersFor, type LayerDef, type LayerId, type LayerStyle } fr
 import { styleOf, type State } from "@/state/store";
 import { regionOf } from "@/state/clusters";
 import { breaksOf, linesOf } from "@/state/lines";
+import { TOWNS } from "@/config/towns";
 import { BASEMAPS, FONT } from "./basemaps";
 import { colorExpr, layerFilter, sizeExpr } from "./expressions";
 
@@ -26,8 +27,8 @@ function phaseData(s: State, id: "phaseavg" | "phasepieces"): FC {
   return phaseCache.get(key)!;
 }
 
-type StepLayer = "checklines" | "checkdots" | "checkpaths" | "jenksdots" | "jenkslines";
-const stepCache = new WeakMap<FC, Map<string, FC>>();
+type StepLayer = "checklines" | "checkdots" | "checkpaths" | "jenksdots" | "jenkslines" | "divspans" | "divdots";
+const stepCache = new WeakMap<FC, Map<string, FC>>(); // keyed by source FC: divdots shares the crossings, so their filters must agree
 const EMPTY: FC = { type: "FeatureCollection", features: [] };
 /** Layers for the Phases steppers ("all" = everything): the chosen phase line (as redrawn), its crossings, the group
  * arrows arriving at it, and the divisions on its chosen date. */
@@ -37,12 +38,13 @@ function stepData(s: State, id: StepLayer): FC {
     const b = step === "all" ? null : breaksOf(s, step);
     return b ? (id === "jenksdots" ? b.dots : b.breaklines) : EMPTY;
   }
-  const all = { checklines: linesOf(s.lineEdits, "phase"), checkdots: PHASE_CHECKS.crossings, checkpaths: PHASE_CHECKS.ribbons }[id];
+  const all = { checklines: linesOf(s.lineEdits, "phase"), checkdots: PHASE_CHECKS.crossings, checkpaths: PHASE_CHECKS.ribbons,
+    divspans: PHASE_CHECKS.diversity_spans, divdots: PHASE_CHECKS.crossings }[id];
   if (step === "all") return all;
   const memo = stepCache.get(all) ?? stepCache.set(all, new Map()).get(all)!;
   if (!memo.has(step)) {
     const keep = (p: Record<string, unknown>) =>
-      id === "checklines" ? String(p.line_id).toUpperCase() === step : id === "checkdots" ? p.line === step : p.to_line === step;
+      id === "checklines" ? String(p.line_id).toUpperCase() === step : id === "checkpaths" ? p.to_line === step : p.line === step;
     memo.set(step, { type: "FeatureCollection", features: all.features.filter((f) => keep(f.properties ?? {})) });
   }
   return memo.get(step)!;
@@ -79,7 +81,7 @@ export function sourceData(s: State, id: LayerId): FC | null {
   if (id === "matchplan" || id === "matchreal") return matchData(s, id);
   if (id === "phaseavg" || id === "phasepieces") return phaseData(s, id);
   if (id === "spreadsurface" || id === "spreadgroups" || id === "breakdots") return dailyData(s.date, id); // local groups follow the timeline
-  if (id === "checklines" || id === "checkdots" || id === "checkpaths" || id === "jenksdots" || id === "jenkslines") return stepData(s, id);
+  if (id === "checklines" || id === "checkdots" || id === "checkpaths" || id === "jenksdots" || id === "jenkslines" || id === "divspans" || id === "divdots") return stepData(s, id);
   if (id === "plan_phase") return linesOf(s.lineEdits, "phase");
   if (id === "plan_advance") return linesOf(s.lineEdits, "advance");
   if (id === "plan_pocket") return MILESTONES.AGS_SmallPocketCOA;
@@ -134,7 +136,7 @@ function specs(def: LayerDef, st: LayerStyle, s: State, src: string): LayerSpeci
   const label = labelText(def.id);
   if (label && st.labels !== false && (st.labels || def.id === "areas")) {
     out.push({ ...base, id: `${def.id}-labels`, type: "symbol",
-      layout: { ...layout, "symbol-placement": def.id === "spreadgroups" ? "point" : "line", "text-field": label as never, "text-font": FONT, "text-size": 11, "text-letter-spacing": 0.05,
+      layout: { ...layout, "symbol-placement": def.id === "spreadgroups" ? "point" : def.id === "divspans" ? "line-center" : "line", "text-field": label as never, "text-font": FONT, "text-size": 11, "text-letter-spacing": 0.05,
         ...(def.id.endsWith("vec") || def.id === "phaseavg" || def.id === "checkpaths" || def.id === "matchreal" ? { "text-size": 22, "symbol-spacing": 70, "text-keep-upright": false, "text-allow-overlap": true } : {}) },
       paint: { "text-color": cssVar("--foreground"), "text-halo-color": cssVar("--background"), "text-halo-width": 1.5 } });
   }
@@ -147,7 +149,7 @@ function labelText(id: LayerId): unknown {
   if (id === "dv" || id === "geo") return ["case", ["==", ["%", ["to-number", ["get", "Day_Index"], 0], 7], 1], ["slice", ["to-string", ["get", "Date"]], 5], ""];
   if (id === "plan_phase" || id === "checklines") return ["concat", "PHASE ", ["get", "line_id"]];
   if (id === "areas") return ["upcase", ["get", "Region"]];
-  if (id === "spreadgroups") return ["get", "label"];
+  if (id === "spreadgroups" || id === "divspans") return ["get", "label"];
   if (id === "dvvec" || id === "geovec" || id === "phaseavg" || id === "checkpaths" || id === "matchreal") return "›"; // arrowheads show the direction of travel
   return null;
 }
@@ -183,6 +185,24 @@ export function unitTrack(s: State): FC {
     .sort((a, b) => String(a.properties!.Date).localeCompare(String(b.properties!.Date)));
   const coords = pts.map((f) => (f.geometry as GeoJSON.Point).coordinates);
   return { type: "FeatureCollection", features: coords.length > 1 ? [{ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: coords } }] : [] };
+}
+
+const TOWN_DOTS: FC = { type: "FeatureCollection", features: TOWNS.map((t) => ({ type: "Feature", properties: { name: t.name }, geometry: { type: "Point", coordinates: t.ll } })) };
+/** While a line is being drawn: every gazetteer town as a clickable dot, and a dashed segment from the last point to the cursor. */
+function drawSpecs(map: MLMap, s: State): LayerSpecification[] {
+  if (!s.drawing) return [];
+  const last = s.lineEdits[s.drawing.kind][s.drawing.id]?.at(-1);
+  setSource(map, "edit-towns", TOWN_DOTS);
+  setSource(map, "edit-ghost", { type: "FeatureCollection", features: last && s.drawCursor
+    ? [{ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: [last, s.drawCursor] } }] : [] });
+  return [
+    { id: "edit-ghost", type: "line", source: "edit-ghost", paint: { "line-color": cssVar("--primary"), "line-width": 2, "line-dasharray": [2, 2] } },
+    { id: "edit-towns", type: "circle", source: "edit-towns",
+      paint: { "circle-radius": 4, "circle-color": cssVar("--background"), "circle-stroke-color": cssVar("--primary"), "circle-stroke-width": 1.5 } },
+    { id: "edit-town-labels", type: "symbol", source: "edit-towns",
+      layout: { "text-field": ["get", "name"], "text-font": FONT, "text-size": 11, "text-offset": [0, 1], "text-anchor": "top" },
+      paint: { "text-color": cssVar("--foreground"), "text-halo-color": cssVar("--background"), "text-halo-width": 1.2 } },
+  ];
 }
 
 const applied = new WeakMap<MLMap, Map<string, string>>();
@@ -239,6 +259,7 @@ export function syncLayers(map: MLMap, s: State) {
   setSource(map, "unit-track", unitTrack(s));
   wanted.push(...unitSpecs(s));
   for (const u of userSpecs(s)) { setSource(map, u.src, u.data); wanted.push(...u.layers); }
+  wanted.push(...drawSpecs(map, s));
   // Labels last so they sit above every data layer.
   wanted.sort((a, b) => Number(a.type === "symbol") - Number(b.type === "symbol"));
 
@@ -269,6 +290,6 @@ export function syncLayers(map: MLMap, s: State) {
 
 /** Layer ids that respond to clicks, top-most first. */
 export function clickableLayers(map: MLMap): string[] {
-  const ids = ["unit-points", "points", "paths", "matchreal", "matchplan", "jenksdots", "breakdots", "spreadgroups", "checkdots", "checkpaths", "checklines", "phaseavg", "phasepieces", "dvvec", "geovec", "dv", "geo", "ellipses", "plan_phase", "plan_advance", "plan_pocket", "areas"];
+  const ids = ["unit-points", "points", "paths", "matchreal", "matchplan", "jenksdots", "divdots", "divspans", "breakdots", "spreadgroups", "checkdots", "checkpaths", "checklines", "phaseavg", "phasepieces", "dvvec", "geovec", "dv", "geo", "ellipses", "plan_phase", "plan_advance", "plan_pocket", "areas"];
   return ids.filter((id) => map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== "none");
 }

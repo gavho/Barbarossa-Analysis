@@ -94,6 +94,9 @@ export const PHASE_CHECKS = phase_checkpoints as unknown as {
   lines: string[]; info: Record<string, { k: number; silhouette: number }>; groups: CheckGroup[]; flows: CheckFlow[];
   splits: { from_line: string; to_line: string; division: string; from_group: number; division_went_to: number }[];
   ribbons: FC; crossings: FC;
+  diversity: { line: string; cluster: string; divisions: number; formations: Record<string, number>; entropy: number | null;
+    pooled: number | null; normalized: number | null }[];
+  diversity_spans: FC; // each cluster's stretch of its phase line; crossings carry `unit` and `cluster` too
 };
 /** Where along the front (north-south km) the divisions were per stretch, with Jenks natural breaks (phase_distributions.py). */
 /** The same grouping on every day (phase_distributions.daily_groups): a group keeps its id while it holds together, so

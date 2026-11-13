@@ -173,9 +173,13 @@ export const HELP: Record<string, { title: string; body: string }> = {
     title: "Checkpoint group paths",
     body: "For a group that carries on from one line to the next, a straight arrow from where its divisions crossed the first line (their average crossing point) to where they crossed the next. It shows which way the group went, not its route.",
   },
+  diversity: {
+    title: "Greater-unit diversity",
+    body: "At each phase line the divisions that crossed it are grouped into exactly four clusters by where along the line and when they crossed (k-means, as for the crossing groups), named north to south: N, Central, South, South Minor. For each cluster, the Shannon entropy of its mix of the four greater units (6th Army, III Panzer Corps, Panzer Group 1 less III Corps, 17th Army; other divisions left out) is divided by the entropy of all the line's crossings together. 1 means the cluster is as mixed as the whole front at that line, 0 that it is one greater unit; above 1 would mean more mixed than the front as a whole.",
+  },
   editLines: {
     title: "Edit lines",
-    body: "Redraw a phase line or a line of advance to test another reading of the plan. Type the towns it runs through, in order (alternative spellings such as Kiev or Proskurov work), or press Draw on map and click its points; a click near a town snaps to the town. The redrawn line replaces the original on the map and in every analysis the app computes itself: natural breaks, phase-line crossings and planned vs actual. Original puts the published line back.",
+    body: "Redraw a phase line or a line of advance to test another reading of the plan. The line is a row of points, usually towns. Type a town to add it to the end (suggestions appear as you type; old spellings such as Kiev or Proskurov work, and you can paste a list like Kovel - Lutsk - Brody), or press Draw on map and click the town dots or anywhere else; a click near a town snaps to it. Arrows move a point, × removes it, and every change shows on the map at once. The redrawn line replaces the original on the map and in every analysis the app computes itself: natural breaks, phase-line crossings and planned vs actual. Original puts the published line back.",
   },
   naturalBreaks: {
     title: "Natural breaks",
@@ -184,6 +188,14 @@ export const HELP: Record<string, { title: string; body: string }> = {
   jenksdots: {
     title: "Natural breaks: divisions",
     body: "Each division where it stood on the selected phase's planned date, coloured by its natural-break bin (bin 1 = furthest along the advance). Click one for its bin and whether it was past the phase line.",
+  },
+  divspans: {
+    title: "Diversity: clusters on the line",
+    body: "For the selected phase line, the stretch of the line each of the four clusters (N, Central, South, South Minor) crossed, from its northernmost to its southernmost crossing, labelled with its greater-unit diversity. Clusters are grouped by day as well as place, so two can share part of the line.",
+  },
+  divdots: {
+    title: "Diversity: crossings by greater unit",
+    body: "Where each division crossed the selected phase line, coloured by its greater unit: 6th Army, III Panzer Corps, Panzer Group 1 (less III Corps), 17th Army; grey = other or unidentified, left out of the diversity measure. Click one for its cluster.",
   },
   jenkslines: {
     title: "Natural breaks: break lines",
