@@ -3,13 +3,15 @@
 Run from the repo root: `python analysis/phase_clusters.py` (checks: `python analysis/test_phase_clusters.py`).
 
 Sorin's idea (meeting 10-30-2026): the published clusters treat the whole advance as one flow, so re-cluster the division
-paths separately within each stretch between the AGS phase lines and connect the stretches to reconstruct the battle.
+paths separately within each stretch between the phase lines and connect the stretches to reconstruct the battle.
 
 ## Method
 1. Each Wehrmacht/SS division's path (the Frontier paths layer holds no Hungarian or Slovak paths) is resampled every 2 km.
-2. Phase lines a–e are extended straight north and south, so every position is either short of a line or past it. Each
-   path is cut into pieces: Frontier→A, A→B, B→C, C→D, D→E, from where it first entered a stretch to where it first entered
-   the next. Pieces shorter than 25 km are dropped (that's mostly the ~17 km position merging, not movement).
+2. The phase lines are the OKH 22 III 41 lines 1–4 (since 2026-11-20; the historian's a–e are rerun into
+   `../phase_clusters_ags/` with `PHASE_SET=ags`). Each is extended straight north and south, so every position is either
+   short of a line or past it; the west–east 4th line is extended east and south instead (past it = south of it). Each
+   path is cut into pieces: Frontier→1, 1→2, 2→3, 3→4, beyond 4, from where it first entered a stretch to where it first
+   entered the next. Pieces shorter than 25 km are dropped (that's mostly the ~17 km position merging, not movement).
 3. The pieces in each stretch are clustered into 4 groups, using the two methods of the original OP-Barbarossa scripts:
    - geometric: symmetric Hausdorff distance, average-linkage agglomerative clustering
    - directional vector (DV): k-means on end point + centroid, `random_state=42`

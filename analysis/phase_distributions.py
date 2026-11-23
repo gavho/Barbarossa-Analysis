@@ -104,7 +104,7 @@ def sentence(r):
     """One plain-language sentence for a pair of stretches, for readers who will not read the statistics.
     Shifts under compare_loa.NOISE_OFFSET_KM (20 km) are within mapping error; the r and rho bands are the usual
     strong / moderate / weak reading of a correlation."""
-    line = r["to"].split("-")[0]
+    line = r["from"].split("-")[-1]  # the line between the stretches: "3-4" then "Beyond 4" is line 4
     shape = ("kept the same shape" if r["hist_r"] >= 0.7 else "changed shape somewhat" if r["hist_r"] >= 0.4
              else "took a different shape")
     shift = (f"its centre of weight moved about {abs(r['shift_km'])} km {'north-north-east' if r['shift_km'] > 0 else 'south-south-west'}"

@@ -1,0 +1,5 @@
+from,to,divisions_a,divisions_b,divisions_in_both,shift_km,wasserstein_km,hist_r,ks_D,ks_p,order_rho,order_p,sentence
+Frontier-1,1-2,48,47,46,-17,17,0.86,0.18,0.405,0.81,0.0,"Past phase 1 the line-up of divisions kept the same shape, its centre of weight stayed put, and divisions kept their places in line."
+1-2,2-3,47,45,45,47,47,0.52,0.11,0.901,0.96,0.0,"Past phase 2 the line-up of divisions changed shape somewhat, its centre of weight moved about 47 km north-north-east, and divisions kept their places in line."
+2-3,3-4,45,42,39,-38,38,0.73,0.12,0.843,0.8,0.0,"Past phase 3 the line-up of divisions kept the same shape, its centre of weight moved about 38 km south-south-west, and divisions kept their places in line."
+3-4,Beyond 4,42,16,16,-118,118,-0.2,0.86,0.0,0.46,0.074,"Past phase Beyond 4 the line-up of divisions took a different shape, its centre of weight moved about 118 km south-south-west, and divisions changed places; 26 fewer divisions got past it."

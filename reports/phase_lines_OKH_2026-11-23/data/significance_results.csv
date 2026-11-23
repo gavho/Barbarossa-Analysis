@@ -1,0 +1,20 @@
+family,test,statistic,estimate,null_median,p,n,detail,p_holm
+A,Plan vs actual closer than random groups — Published 5 (DV),mean route gap (km),31.2,52.8,0.000999000999000999,51,bearing diff 5.7° vs null median 5.8° (p = 0.490); 1000 permutations,0.012987012987012988
+A,Plan vs actual closer than random groups — One per line 4 (DV4),mean route gap (km),25.2,51.0,0.000999000999000999,44,bearing diff 5.3° vs null median 7.1° (p = 0.076); 1000 permutations,0.012987012987012988
+B,Groups follow the planned formations — Published 5 (DV),Cramér's V,0.56,0.29,0.00039996000399960006,34,adjusted Rand 0.26 (p = 0.0001); exact test by 10000 permutations of the formation labels,0.005999400059994001
+B,Groups follow the planned formations — Published 5 (geometric),Cramér's V,0.47,0.29,0.027797220277972202,34,adjusted Rand 0.05 (p = 0.1589); exact test by 10000 permutations of the formation labels,0.22237776222377761
+B,Groups follow the planned formations — One per line 4 (DV4),Cramér's V,0.56,0.29,9.999000099990002e-05,34,adjusted Rand 0.25 (p = 0.0007); exact test by 10000 permutations of the formation labels,0.0018998100189981002
+C,"Clusters stronger than in structureless data — k = 5, all divisions",silhouette,0.45,0.26,0.000999000999000999,51,"gap statistic picks k = 6; bootstrap Jaccard per group 0.73, 0.74, 1.00, 0.79, 0.79 (>= 0.75 stable, 0.6-0.75 a pattern, < 0.5 dissolves); 300 resamples",0.012987012987012988
+C,"Clusters stronger than in structureless data — k = 4, moved >= 200 km",silhouette,0.39,0.26,0.000999000999000999,44,"gap statistic picks k = 5; bootstrap Jaccard per group 0.83, 0.84, 0.87, 0.72 (>= 0.75 stable, 0.6-0.75 a pattern, < 0.5 dissolves); 300 resamples",0.012987012987012988
+D,Front shifted across the advance at phase 1,"median shift per division (km, + NNE)",-16.7,0.0,0.002605431377816103,46,"Wilcoxon signed-rank, paired by division; 95% bootstrap CI -27.33 to -4.61 km",0.023448882400344928
+D,Divisions kept their order along the front at phase 1,Spearman rho,0.81,-0.0,9.999000099990002e-05,46,10000 permutations,0.0018998100189981002
+D,Front shifted across the advance at phase 2,"median shift per division (km, + NNE)",-1.6,0.0,0.8756638436483968,45,"Wilcoxon signed-rank, paired by division; 95% bootstrap CI -5.94 to 4.17 km",1.0
+D,Divisions kept their order along the front at phase 2,Spearman rho,0.96,-0.0,9.999000099990002e-05,45,10000 permutations,0.0018998100189981002
+D,Front shifted across the advance at phase 3,"median shift per division (km, + NNE)",2.9,0.0,0.30211415864687297,39,"Wilcoxon signed-rank, paired by division; 95% bootstrap CI -7.11 to 11.77 km",1.0
+D,Divisions kept their order along the front at phase 3,Spearman rho,0.8,0.0,9.999000099990002e-05,39,10000 permutations,0.0018998100189981002
+D,Front shifted across the advance at phase Beyond 4,"median shift per division (km, + NNE)",-29.6,0.0,0.000762939453125,16,"Wilcoxon signed-rank, paired by division; 95% bootstrap CI -55.19 to -20.18 km",0.01068115234375
+D,Divisions kept their order along the front at phase Beyond 4,Spearman rho,0.46,0.0,0.03899610038996101,16,10000 permutations,0.27297270272972707
+E,Natural breaks are real gaps on the phase 1 date,share of the stretch empty at the 3 breaks,0.14,0.2,0.916083916083916,40,"1941-06-30; 4 bins over 235 km, fit 0.91; 1000 random scatters; past 30%, on the line 38%, short 32% of divisions",1.0
+E,Natural breaks are real gaps on the phase 2 date,share of the stretch empty at the 3 breaks,0.19,0.19,0.5734265734265734,42,"1941-07-07; 4 bins over 367 km, fit 0.92; 1000 random scatters; past 55%, on the line 0%, short 45% of divisions",1.0
+E,Natural breaks are real gaps on the phase 3 date,share of the stretch empty at the 3 breaks,0.15,0.17,0.6533466533466533,48,"1941-07-22; 4 bins over 447 km, fit 0.92; 1000 random scatters; past 44%, on the line 48%, short 8% of divisions",1.0
+E,Natural breaks are real gaps on the phase 4 date,share of the stretch empty at the 2 breaks,0.1,0.11,0.5334665334665335,50,"1941-07-25; 3 bins over 285 km, fit 0.9; 1000 random scatters; past 0%, on the line 20%, short 80% of divisions",1.0

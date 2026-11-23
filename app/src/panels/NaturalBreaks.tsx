@@ -102,7 +102,9 @@ function Chart({ L, B, live }: { L: string; B: NonNullable<ReturnType<typeof bre
           ))}
         </p>
         <svg viewBox={`0 0 ${W} ${H}`} className="mt-1.5 w-full" role="img" aria-label="Divisions measured across the phase line">
-          <rect x={xOf(sum.line_from)} y={PAD} width={xOf(sum.line_to) - xOf(sum.line_from)} height={BASE - PAD} fill="#00c2a8" fillOpacity={0.15} />
+          {/* a straight line at right angles to this axis sits at one km: keep its band visible */}
+          <rect x={Math.min(xOf(sum.line_from), (xOf(sum.line_from) + xOf(sum.line_to)) / 2 - 1.5)} y={PAD}
+            width={Math.max(3, xOf(sum.line_to) - xOf(sum.line_from))} height={BASE - PAD} fill="#00c2a8" fillOpacity={0.15} />
           <text x={(xOf(sum.line_from) + xOf(sum.line_to)) / 2} y={PAD + 7} textAnchor="middle" fontSize={7} fill="#00c2a8">phase {L} line</text>
           {cuts.map((k) => <line key={k} x1={xOf(k)} x2={xOf(k)} y1={PAD} y2={BASE} stroke="var(--foreground)" strokeWidth={0.8} strokeDasharray="3 2" />)}
           {dots.map((f, i) => {

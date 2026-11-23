@@ -1,0 +1,11 @@
+from_line,to_line,division,from_group,division_went_to
+Start,1,213. Sicherungs-Division,0,2
+Start,1,444. Sicherungs-Division,1,3
+1,2,60. Infanterie-Division (mot.),1,0
+1,2,454. Sicherungs-Division,1,2
+2,3,132. Infanterie-Division,1,2
+2,3,296. Infanterie-Division,1,2
+2,3,68. Infanterie-Division,1,2
+2,3,71. Infanterie-Division,1,2
+3,4,24. Infanterie-Division,1,0
+3,4,295. Infanterie-Division,1,0

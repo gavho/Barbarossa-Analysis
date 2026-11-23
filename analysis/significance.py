@@ -206,7 +206,7 @@ def test_phases():
         d = y - x
         w = wilcoxon(d)
         boots = [np.median(rng.choice(d, len(d))) for _ in range(N_BOOT)]
-        line = stretches[b].split("-")[0]
+        line = stretches[a].split("-")[-1]  # the line between the two stretches: "3-4" then "Beyond 4" is line 4
         rows.append({"family": "D", "test": f"Front shifted across the advance at phase {line}", "statistic": "median shift per division (km, + NNE)",
                      "estimate": round(float(np.median(d)), 1), "null_median": 0.0, "p": float(w.pvalue), "n": len(d),
                      "detail": f"Wilcoxon signed-rank, paired by division; 95% bootstrap CI {ci(boots)} km"})
