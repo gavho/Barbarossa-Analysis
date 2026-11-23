@@ -1,12 +1,14 @@
-"""Black-and-white bar chart: share of divisions at or past each AGS phase line on its planned date.
+"""Black-and-white bar chart: share of divisions at or past each phase line on its planned date.
 
 Same rule and data as the app's Plan vs Actual tab (app/src/lib/crossing.ts share()), so the numbers match what the
-dashboard shows: of that day's Frontier points inside the phase line's latitude span, the share east of the line or no
-more than REACH_KM short of it. Planned dates as agreed with Sorin on 11-6-2026 (phase 3 "mid-July" = 22 Jul, the middle of
+dashboard shows: of that day's Frontier points inside the phase line's span (latitudes; longitudes for a west-east line),
+the share past the line (east of it; south of a west-east one) or no more than REACH_KM short of it. Lines: the OKH
+22 III 41 set, or the historian's a-e with PHASE_SET=ags (writes arrival_ags.*). Planned dates as agreed with Sorin on 11-6-2026 (phase 3 "mid-July" = 22 Jul, the middle of
 15-30 Jul). Writes figures/arrival/arrival_bars.{pdf,png} and arrival.csv. Usage: python figures/arrival_bars.py
 """
 import json
 import math
+import os
 from pathlib import Path
 
 import matplotlib
@@ -19,9 +21,10 @@ from matplotlib.path import Path as MplPath  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 APPDATA = ROOT / "app" / "src" / "data"
 OUT = ROOT / "figures" / "arrival"
+PHASE_SET = os.environ.get("PHASE_SET", "okh")  # as analysis/phase_clusters.py
 REACH_KM = 10
 PLANNED = {"1": "1941-06-30", "2": "1941-07-07", "3": "1941-07-22", "4": "1941-07-25", "5": "1941-07-30"}
-EAST = 60  # same polygon closure as the app
+EAST, SOUTH = 60, 40  # same polygon closures as the app
 
 plt.rcParams.update({"font.family": ["Arial", "DejaVu Sans"], "font.size": 8, "pdf.fonttype": 42, "axes.linewidth": 0.6})
 
@@ -39,10 +42,14 @@ def distance_km(p, line):
 
 
 def share(line, pts):
-    """Port of crossings().share: arrived = east of the line or within REACH_KM of it, among points in its latitude span."""
-    lo, hi = min(c[1] for c in line), max(c[1] for c in line)
-    poly = MplPath([*line, (EAST, line[-1][1]), (EAST, line[0][1]), line[0]])
-    pts = [p for p in pts if lo <= p[1] <= hi]
+    """Port of crossings().share (pastOf): arrived = past the line or within REACH_KM of it, among points in its span."""
+    (x0, y0), (x1, y1) = line[0], line[-1]
+    we = abs((x1 - x0) * math.cos(math.radians((y0 + y1) / 2)) * 111.32) > 2 * abs((y1 - y0) * 110.57)  # runsWestEast
+    k = 0 if we else 1
+    lo, hi = min(c[k] for c in line), max(c[k] for c in line)
+    close = [(x1, SOUTH), (x0, SOUTH)] if we else [(EAST, y1), (EAST, y0)]
+    poly = MplPath([*line, *close, line[0]])
+    pts = [p for p in pts if lo <= p[k] <= hi]
     if not pts:
         return None, 0
     hit = sum(poly.contains_point(p) or distance_km(p, line) <= REACH_KM for p in pts)
@@ -50,7 +57,7 @@ def share(line, pts):
 
 
 def arrival():
-    lines = json.loads((APPDATA / "milestones.json").read_text(encoding="utf8"))["AGS_PhaseLines"]["features"]
+    lines = json.loads((APPDATA / "milestones.json").read_text(encoding="utf8"))["OKH_PhaseLines" if PHASE_SET == "okh" else "AGS_PhaseLines"]["features"]
     points = json.loads((APPDATA / "frontier_points.json").read_text(encoding="utf8"))["features"]
     rows = []
     for f in sorted(lines, key=lambda f: f["properties"]["line_id"]):
@@ -81,11 +88,12 @@ def draw(df, stem):
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     df = arrival()
-    # Self-check against the dashboard as read in the 11-6 meeting (10 km reach): phase 1 61%, phase 2 49%.
     got = dict(zip(df.phase, df.arrived_pct))
-    assert abs(got["1"] - 61) <= 2 and abs(got["2"] - 49) <= 2, got
-    df.to_csv(OUT / "arrival.csv", index=False)
-    draw(df, OUT / "arrival_bars")
+    if PHASE_SET == "ags":  # self-check against the dashboard as read in the 11-6 meeting (10 km reach): phase 1 61%, phase 2 49%
+        assert abs(got["1"] - 61) <= 2 and abs(got["2"] - 49) <= 2, got
+    tag = "" if PHASE_SET == "okh" else f"_{PHASE_SET}"
+    df.to_csv(OUT / f"arrival{tag}.csv", index=False)
+    draw(df, OUT / f"arrival_bars{tag}")
     print(df.to_string(index=False))
 
 
