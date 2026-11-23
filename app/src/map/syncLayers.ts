@@ -1,5 +1,5 @@
 import type { GeoJSONSource, LayerSpecification, Map as MLMap } from "maplibre-gl";
-import { COUNTRIES, MILESTONES, PHASE_CHECKS, PHASES, PLAN_MATCH, LOCAL_GROUPS, type FC } from "@/data";
+import { ALT_PHASE_LINES, COUNTRIES, MILESTONES, PHASE_SET, PHASE_CHECKS, PHASES, PLAN_MATCH, LOCAL_GROUPS, type FC } from "@/data";
 import { HEAT_RAMP, layersFor, type LayerDef, type LayerId, type LayerStyle } from "@/config/presets";
 import { styleOf, type State } from "@/state/store";
 import { regionOf } from "@/state/clusters";
@@ -85,6 +85,7 @@ export function sourceData(s: State, id: LayerId): FC | null {
   if (id === "plan_phase") return linesOf(s.lineEdits, "phase");
   if (id === "plan_advance") return linesOf(s.lineEdits, "advance");
   if (id === "plan_pocket") return MILESTONES.AGS_SmallPocketCOA;
+  if (id === "plan_alt") return ALT_PHASE_LINES;
   if (s.page === "home") return id === "areas" ? s.data.areas : id === "heat" ? s.data.overview : null;
   const r = regionOf(s, s.page);
   return id === "heat" ? r.points : (r[id as "points" | "paths" | "dv" | "geo" | "dvvec" | "geovec" | "ellipses"] ?? null);
@@ -148,6 +149,7 @@ const HEAT_STOPS = HEAT_RAMP.flat();
 function labelText(id: LayerId): unknown {
   if (id === "dv" || id === "geo") return ["case", ["==", ["%", ["to-number", ["get", "Day_Index"], 0], 7], 1], ["slice", ["to-string", ["get", "Date"]], 5], ""];
   if (id === "plan_phase" || id === "checklines") return ["concat", "PHASE ", ["get", "line_id"]];
+  if (id === "plan_alt") return PHASE_SET === "okh" ? ["concat", "AGS ", ["upcase", ["get", "line_id"]]] : ["upcase", ["get", "name"]];
   if (id === "areas") return ["upcase", ["get", "Region"]];
   if (id === "spreadgroups" || id === "divspans") return ["get", "label"];
   if (id === "dvvec" || id === "geovec" || id === "phaseavg" || id === "checkpaths" || id === "matchreal") return "›"; // arrowheads show the direction of travel
@@ -205,6 +207,35 @@ function drawSpecs(map: MLMap, s: State): LayerSpecification[] {
   ];
 }
 
+/** The OKH slide's symbols: [corners, inner radius (star points), rotation]. Drawn per layer colour (the id carries it). */
+const OKH_SHAPES: Record<string, [number, number, number]> = {
+  star: [10, 0.45, -Math.PI / 2], diamond: [4, 1, -Math.PI / 2], pentagon: [5, 1, -Math.PI / 2], hexagon: [6, 1, 0],
+};
+function okhMarkerSpecs(map: MLMap, st: LayerStyle): LayerSpecification[] {
+  for (const [name, [n, inner, rot]] of Object.entries(OKH_SHAPES)) {
+    const id = `okh-${name}-${st.color}`;
+    if (map.hasImage(id)) continue;
+    const S = 48, c = document.createElement("canvas"), g = c.getContext("2d")!;
+    c.width = c.height = S;
+    g.beginPath();
+    for (let i = 0; i < n; i++) {
+      const r = (S / 2 - 4) * (i % 2 ? inner : 1), a = rot + (i * 2 * Math.PI) / n;
+      g.lineTo(S / 2 + r * Math.cos(a), S / 2 + r * Math.sin(a));
+    }
+    g.closePath();
+    g.fillStyle = st.color;
+    g.fill();
+    g.lineWidth = 2.5;
+    g.strokeStyle = "rgba(0,0,0,0.75)";
+    g.stroke();
+    map.addImage(id, g.getImageData(0, 0, S, S), { pixelRatio: 2 });
+  }
+  setSource(map, "okh-markers", MILESTONES.OKH_PhaseMarkers);
+  return [{ id: "okh-markers", type: "symbol", source: "okh-markers",
+    layout: { visibility: vis(st.visible), "icon-image": ["concat", "okh-", ["get", "marker"], `-${st.color}`], "icon-allow-overlap": true },
+    paint: { "icon-opacity": st.opacity } }];
+}
+
 const applied = new WeakMap<MLMap, Map<string, string>>();
 const sourceObj = new WeakMap<MLMap, Map<string, unknown>>();
 let basemapId: string | null = null;
@@ -255,6 +286,7 @@ export function syncLayers(map: MLMap, s: State) {
     const src = `src-${def.id === "heat" ? (s.page === "home" ? "overview" : "points") : def.id}`;
     setSource(map, src, data);
     wanted.push(...specs(def, styleOf(s, def.id), s, src));
+    if (def.id === (PHASE_SET === "okh" ? "plan_phase" : "plan_alt")) wanted.push(...okhMarkerSpecs(map, styleOf(s, def.id))); // OKH lines carry the slide's symbols
   }
   setSource(map, "unit-track", unitTrack(s));
   wanted.push(...unitSpecs(s));
@@ -290,6 +322,6 @@ export function syncLayers(map: MLMap, s: State) {
 
 /** Layer ids that respond to clicks, top-most first. */
 export function clickableLayers(map: MLMap): string[] {
-  const ids = ["unit-points", "points", "paths", "matchreal", "matchplan", "jenksdots", "divdots", "divspans", "breakdots", "spreadgroups", "checkdots", "checkpaths", "checklines", "phaseavg", "phasepieces", "dvvec", "geovec", "dv", "geo", "ellipses", "plan_phase", "plan_advance", "plan_pocket", "areas"];
+  const ids = ["unit-points", "points", "paths", "matchreal", "matchplan", "jenksdots", "divdots", "divspans", "breakdots", "spreadgroups", "checkdots", "checkpaths", "checklines", "phaseavg", "phasepieces", "dvvec", "geovec", "dv", "geo", "ellipses", "plan_phase", "plan_alt", "plan_advance", "plan_pocket", "areas"];
   return ids.filter((id) => map.getLayer(id) && map.getLayoutProperty(id, "visibility") !== "none");
 }

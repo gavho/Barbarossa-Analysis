@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { MILESTONES } from "@/data";
+import { MILESTONES, PHASE_SET } from "@/data";
 import { crossings, REACH_KM } from "@/lib/crossing";
 import { fmtShort } from "@/lib/dates";
 import { set, useStore } from "@/state/store";
@@ -31,8 +31,8 @@ export function PlanVsActual() {
         </button>
       )}
       <p className="text-[12px] leading-relaxed text-muted-foreground">
-        <Help id="planVsActual" className="mr-1" />Phase lines a–e and lines of advance are the pre-war plan for Army Group South. A division
-        point within a line's latitude band has <b>reached</b> it when it is beyond the line or no more than {reach} km short of it. <b>Lead</b> is the first day any
+        <Help id="planVsActual" className="mr-1" />{PHASE_SET === "okh" ? "The OKH 22 III 41 phase lines" : "The historian's phase lines a–e"} and the lines of advance are the pre-war plan for Army Group South. A division
+        point within a line's band (its latitudes; its longitudes for the west–east 4th line) has <b>reached</b> it when it is beyond the line or no more than {reach} km short of it. <b>Lead</b> is the first day any
         had reached it; <b>Main body</b> is the first day at least half had.
       </p>
       <label className="flex items-center gap-2 text-[12px]">

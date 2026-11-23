@@ -73,6 +73,15 @@ describe("phase-line crossings", () => {
     expect(crossings([line], near, "1941-06-28", 20)[0]).toMatchObject({ lead: "1941-06-28", main: "1941-06-28", shareToday: 0.5 });
     expect(crossings([line], near, "1941-06-28", 0)[0]).toMatchObject({ lead: null, main: null, shareToday: 0 });
   });
+  it("reads a west-east line (the OKH 4th line) as reached from the north: past = south of it, band = its longitudes", () => {
+    const we: Feature = { ...line, geometry: { type: "LineString", coordinates: [[28.5, 49.2], [32.8, 48.4]] } };
+    const pts = [
+      pt(30, 48.3, { Date: "1941-07-25" }), // south of the line: past
+      pt(30, 49.5, { Date: "1941-07-25" }), // north of it: short (east of it too, which a north-south reading would count)
+      pt(26, 47, { Date: "1941-07-25" }), // west of its longitudes: ignored
+    ];
+    expect(crossings([we], pts, "1941-07-25", 0)[0].shareToday).toBe(0.5);
+  });
 });
 
 describe("file import / export", () => {

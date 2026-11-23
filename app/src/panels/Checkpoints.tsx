@@ -4,7 +4,7 @@ import { ResponsiveContainer, Sankey, Tooltip } from "recharts";
 import type { Point } from "geojson";
 import { Segmented } from "@/ui/Segmented";
 import { FORMATION_COLORS } from "@/config/presets";
-import { PHASE_CHECKS, PHASE_SHIFTS, type CheckGroup } from "@/data";
+import { MILESTONES, PHASE_CHECKS, PHASE_SHIFTS, type CheckGroup } from "@/data";
 import { mapRef } from "@/map/MapView";
 import { set, setStyle, showOnly, styleOf, useStore } from "@/state/store";
 import { Help } from "@/ui/Help";
@@ -175,7 +175,8 @@ export function Checkpoints() {
           </section>
         );
       })}
-      <p className="text-[11px] text-muted-foreground">Start is the 22 June line-up (divisions first recorded later join at the first line they cross). Only one division had crossed phase 5 by 5 August, so the checkpoints stop at phase 4.</p>
+      <p className="text-[11px] text-muted-foreground">Start is the 22 June line-up (divisions first recorded later join at the first line they cross).{MILESTONES.AGS_PhaseLines.features.length > PHASE_CHECKS.lines.length - 1
+        && ` Too few divisions had crossed phase ${MILESTONES.AGS_PhaseLines.features.length} by 5 August, so the checkpoints stop at phase ${PHASE_CHECKS.lines.at(-1)}.`}</p>
     </div>
   );
 }

@@ -83,21 +83,57 @@ function axis(points: FC) {
   return cache.get(points)!;
 }
 
-/** Natural breaks of the divisions on `date`, read against `line` (lon/lat, any direction); null if under 5 divisions. */
+/** A line at least twice as far east as north (the OKH 4th line), as analysis/phase_clusters.west_east. */
+const westEast = (a: Pt, b: Pt) => Math.abs(b[0] - a[0]) > 2 * Math.abs(b[1] - a[1]);
+
+/** A phase line (km) ordered and extended so every position is short of it or past it, the region past it, and the unit
+ * vector at right angles to it pointing past it (as phase_clusters.phase_lines, east_polygon and line_normal).
+ * North-south lines: north end first, extended north and south, past = east. West-east lines: east end first, extended
+ * east and south, past = south of it and east of its west end. */
+export function pastSide(km: Pt[]) {
+  let c = km;
+  let ext: Pt[];
+  if (westEast(c[0], c[c.length - 1])) {
+    if (c[0][0] < c[c.length - 1][0]) c = [...c].reverse();
+    const e = c[0], w = c[c.length - 1];
+    ext = [[e[0] + FAR, e[1]], ...c, [w[0], w[1] - FAR]];
+  } else {
+    if (c[0][1] < c[c.length - 1][1]) c = [...c].reverse();
+    const n = c[0], s = c[c.length - 1];
+    ext = [[n[0], n[1] + FAR], ...c, [s[0], s[1] - FAR]];
+  }
+  const a = ext[0], b = ext[ext.length - 1];
+  const poly = { type: "Polygon" as const, coordinates: [[...ext, [b[0] + FAR, b[1]], [a[0] + FAR, a[1]], a]] };
+  const [p0, p1] = [c[0], c[c.length - 1]], L = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]);
+  const nrm: Pt = [-(p1[1] - p0[1]) / L, (p1[0] - p0[0]) / L];
+  const mid = halfway(c);
+  const u: Pt = booleanPointInPolygon([mid[0] + 20 * nrm[0], mid[1] + 20 * nrm[1]], poly) ? nrm : [-nrm[0], -nrm[1]];
+  return { drawn: c, poly, u };
+}
+
+/** The point halfway along a polyline. */
+function halfway(c: Pt[]): Pt {
+  const seg = c.slice(1).map((p, i) => Math.hypot(p[0] - c[i][0], p[1] - c[i][1]));
+  let left = seg.reduce((a, b) => a + b, 0) / 2;
+  for (let i = 0; i < seg.length; i++) {
+    if (left <= seg[i]) { const t = seg[i] ? left / seg[i] : 0; return [c[i][0] + t * (c[i + 1][0] - c[i][0]), c[i][1] + t * (c[i + 1][1] - c[i][1])]; }
+    left -= seg[i];
+  }
+  return c[c.length - 1];
+}
+
+/** Natural breaks of the divisions on `date`, read against `line` (lon/lat, any direction); null if under 5 divisions.
+ * Positions are measured at right angles to the line (from the mean 22 June position), so a west-east line is
+ * measured southward: the whole advance's ~101 deg heading runs almost along the OKH 4th line. */
 export function breaksOnDate(points: FC, line: number[][], date: string, phase: string): Breaks | null {
-  const { tracks, first, u } = axis(points), across: Pt = [-u[1], u[0]];
+  const { tracks, first } = axis(points);
   const keys = [...tracks.keys()].filter((k) => tracks.get(k)!.has(date));
   if (keys.length < MIN_DIVISIONS || line.length < 2) return null;
+  const { drawn: km, poly, u } = pastSide(line.map(proj.to)), across: Pt = [-u[1], u[0]];
   const xy = keys.map((k) => tracks.get(k)!.get(date)!);
   const dot = (p: Pt, v: Pt) => (p[0] - first[0]) * v[0] + (p[1] - first[1]) * v[1];
   const along = xy.map((p) => dot(p, u));
-
-  let km = line.map(proj.to);
-  if (km[0][1] < km[km.length - 1][1]) km = km.reverse(); // north end first
-  const n = km[0], s = km[km.length - 1];
-  const ext = [[n[0], n[1] + FAR], ...km, [s[0], s[1] - FAR]];
-  const east = { type: "Polygon" as const, coordinates: [[...ext, [s[0] + FAR, s[1] - FAR], [n[0] + FAR, n[1] + FAR], ext[0]]] };
-  const past = xy.map((p) => booleanPointInPolygon(p, east));
+  const past = xy.map((p) => booleanPointInPolygon(p, poly));
 
   const { k, breaks, gvf } = naturalBreaks(along);
   const bins = along.map((a) => k - breaks.filter((b) => b <= a).length); // 1 = furthest along the advance
@@ -115,7 +151,7 @@ export function breaksOnDate(points: FC, line: number[][], date: string, phase: 
   const lineAlong = km.map((p) => dot(p, u)), side = xy.map((p) => dot(p, across));
   const ll = (p: Pt) => proj.from(p).map((v) => Math.round(v * 1e5) / 1e5);
   return {
-    summary: { phase, date, divisions: along.length, bins: k, gvf: Math.round(gvf * 100) / 100, past: share("past"),
+    summary: { phase, date, heading: Math.round(((Math.atan2(u[0], u[1]) / RAD) + 360) % 360), divisions: along.length, bins: k, gvf: Math.round(gvf * 100) / 100, past: share("past"),
       straddling: share("straddling"), behind: share("behind"), line_from: Math.round(Math.min(...lineAlong)), line_to: Math.round(Math.max(...lineAlong)) },
     bins: rows,
     breaklines: fc(breaks.map((b) => ({ type: "Feature", properties: { phase, km: Math.round(b) }, geometry: { type: "LineString",

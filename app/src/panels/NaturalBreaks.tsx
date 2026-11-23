@@ -14,7 +14,8 @@ const J = PHASE_PROFILES.jenks;
 const PHASES = J.summary.map((x) => x.phase);
 const binColour = (b: number) => GROUP_COLORS.find((c) => c.value === b)?.color ?? GROUP_COLORS[0].color;
 
-// One km axis along the general direction of advance for every phase, so the strips can be compared.
+// Each phase is measured at right angles to its own line (summary.heading), in km from the mean 22 June position: the
+// whole advance's ~101° heading runs almost along the west-east OKH 4th line, which the divisions crossed moving south.
 // Dots on top, a histogram of the same divisions on the same axis below (STEP km per bar), then the axis labels.
 const W = 320, PAD = 6, DOT_B = 58, HIST_T = 64, BASE = 100, H = BASE + 26, STEP = 25;
 const kms = J.dots.features.map((f) => Number(f.properties?.km));
@@ -35,7 +36,7 @@ const MAXC = Math.max(...PHASES.flatMap((p) => [...tally(J.dots.features.filter(
   .map(total)));
 const WIN = timeWindow("frontier");
 
-/** Natural breaks: on a phase's planned date, the divisions on one line along the direction of the whole advance,
+/** Natural breaks: on a phase's planned date, the divisions on one axis at right angles to that phase line,
  * cut by Jenks where they clump; only then is each bin read against the phase line (past / on the line / short). */
 export function NaturalBreaks() {
   const step = useStore((s) => s.phaseStep);
@@ -100,7 +101,7 @@ function Chart({ L, B, live }: { L: string; B: NonNullable<ReturnType<typeof bre
             </span>
           ))}
         </p>
-        <svg viewBox={`0 0 ${W} ${H}`} className="mt-1.5 w-full" role="img" aria-label="Divisions along the direction of advance">
+        <svg viewBox={`0 0 ${W} ${H}`} className="mt-1.5 w-full" role="img" aria-label="Divisions measured across the phase line">
           <rect x={xOf(sum.line_from)} y={PAD} width={xOf(sum.line_to) - xOf(sum.line_from)} height={BASE - PAD} fill="#00c2a8" fillOpacity={0.15} />
           <text x={(xOf(sum.line_from) + xOf(sum.line_to)) / 2} y={PAD + 7} textAnchor="middle" fontSize={7} fill="#00c2a8">phase {L} line</text>
           {cuts.map((k) => <line key={k} x1={xOf(k)} x2={xOf(k)} y1={PAD} y2={BASE} stroke="var(--foreground)" strokeWidth={0.8} strokeDasharray="3 2" />)}
@@ -122,11 +123,11 @@ function Chart({ L, B, live }: { L: string; B: NonNullable<ReturnType<typeof bre
           })}
           <line x1={PAD} x2={W - PAD} y1={BASE} y2={BASE} stroke="var(--border)" />
           {[0, 200, 400, 600].map((t) => <text key={t} x={xOf(t)} y={BASE + 10} textAnchor="middle" fontSize={9} fill="var(--muted-foreground)">{t} km</text>)}
-          <text x={PAD} y={H - 2} fontSize={9} fill="var(--muted-foreground)">← rear (west)</text>
-          <text x={W / 2} y={H - 2} textAnchor="middle" fontSize={9} fill="var(--muted-foreground)">along the advance ({J.heading}°)</text>
-          <text x={W - PAD} y={H - 2} textAnchor="end" fontSize={9} fill="var(--muted-foreground)">front (east) →</text>
+          <text x={PAD} y={H - 2} fontSize={9} fill="var(--muted-foreground)">← rear</text>
+          <text x={W / 2} y={H - 2} textAnchor="middle" fontSize={9} fill="var(--muted-foreground)">toward phase {L} (bearing {sum.heading}°)</text>
+          <text x={W - PAD} y={H - 2} textAnchor="end" fontSize={9} fill="var(--muted-foreground)">front →</text>
         </svg>
-        <p className="text-[10px] text-muted-foreground">Top: each circle is a division, filled = past the phase line, open = short of it. Bottom: the same divisions counted every {STEP} km, stacked by bin. Colour = bin · dashed = natural break · teal band = where the phase line falls on this axis (it is slanted, so it spans a range)</p>
+        <p className="text-[10px] text-muted-foreground">Top: each circle is a division, filled = past the phase line, open = short of it. Bottom: the same divisions counted every {STEP} km, stacked by bin. Colour = bin · dashed = natural break · teal band = where the phase line falls on this axis (a curved line spans a range)</p>
 
         <ul className="mt-1.5 flex flex-col gap-0.5 text-[12px]">
           {bins.map((b) => (

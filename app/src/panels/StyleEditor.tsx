@@ -149,7 +149,7 @@ export function StyleEditor({ def, style, features, onChange, onReset }: {
       {def.kind === "line" && (
         <label className="flex items-center gap-2 text-[12px]">
           <input type="checkbox" checked={!!style.dash} onChange={(e) => onChange({ dash: e.target.checked })} /> Dashed
-          {["dv", "geo", "plan_phase", "areas"].includes(def.id) && (
+          {["dv", "geo", "plan_phase", "plan_alt", "areas"].includes(def.id) && (
             <><input type="checkbox" className="ml-3" checked={style.labels !== false && (!!style.labels || def.id === "areas")} onChange={(e) => onChange({ labels: e.target.checked })} /> Labels</>
           )}
         </label>

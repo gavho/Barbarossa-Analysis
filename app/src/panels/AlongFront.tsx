@@ -2,7 +2,8 @@ import { PHASE_CHECKS, PHASE_PROFILES } from "@/data";
 import { ChartCard } from "./Charts";
 import { color } from "./Phases";
 
-// Both charts share one north-south axis: km north of 50N, top = north.
+// Both charts share one front axis: km across the whole advance (~101°), so it runs SSW-NNE; top = north-north-east.
+// North-south km would misread the front past the west-east OKH 4th line.
 const { profiles, positions, towns, bin_km, bins_from_km } = PHASE_PROFILES;
 const W = 360, H = 230, LEFT = 30, TOP = 16, BOTTOM = 6;
 const lo = bins_from_km, hi = bins_from_km + bin_km * profiles[0].share.length;
@@ -24,7 +25,7 @@ function Axis() {
   );
 }
 const TownsNote = () => (
-  <p className="mt-1 text-[10px] text-muted-foreground">{towns.filter((t) => t.name.includes("(")).map((t) => t.name).join(" · ")}</p>
+  <p className="mt-1 text-[10px] text-muted-foreground">Towns mark their place across the advance only: Lviv and Kyiv are far apart along it.</p>
 );
 
 /** One panel per stretch: where the division-days were along the front, the previous stretch dashed. */
@@ -35,7 +36,7 @@ export function FrontProfile() {
     return `${x0},${yOf(lo + bin_km * 0.5)} ${pts.join(" ")} ${x0},${yOf(lo + bin_km * (share.length - 0.5))}`;
   };
   return (
-    <ChartCard title="Where along the front" note="Share of division-days, north at top" help="frontProfile" name="front_profile">
+    <ChartCard title="Where along the front" note="Share of division-days across the advance, NNE at top" help="frontProfile" name="front_profile">
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Front profile per stretch between phase lines">
         <Axis />
         {profiles.map((p, i) => {
@@ -54,7 +55,7 @@ export function FrontProfile() {
   );
 }
 
-/** Each division's average north-south place per stretch, joined; coloured by the group it crossed the phase line with. */
+/** Each division's average place along the front (across the advance) per stretch, joined; coloured by the group it crossed the phase line with. */
 export function PlacesInLine() {
   const stretches = profiles.map((p) => p.stretch);
   const groupAt = new Map(PHASE_CHECKS.crossings.features.map((f) => [`${f.properties?.division}|${f.properties?.line}`, f.properties?.group as number]));
