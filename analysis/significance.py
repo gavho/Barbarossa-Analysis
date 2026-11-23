@@ -197,7 +197,7 @@ def test_phases():
     rows = []
     p, stretches = pdist.load_points()
     zs = sorted(z for z, g in p.groupby("zone") if g.division.nunique() >= pdist.MIN_DIVISIONS)
-    means = {z: p[p.zone == z].groupby("division").y.mean() for z in zs}
+    means = {z: p[p.zone == z].groupby("division").f.mean() for z in zs}  # km across the advance (pdist.advance_axis)
     for a, b in zip(zs, zs[1:]):
         if b != a + 1:
             continue
@@ -207,12 +207,12 @@ def test_phases():
         w = wilcoxon(d)
         boots = [np.median(rng.choice(d, len(d))) for _ in range(N_BOOT)]
         line = stretches[b].split("-")[0]
-        rows.append({"family": "D", "test": f"Front shifted north-south at phase {line}", "statistic": "median shift per division (km, + north)",
+        rows.append({"family": "D", "test": f"Front shifted across the advance at phase {line}", "statistic": "median shift per division (km, + NNE)",
                      "estimate": round(float(np.median(d)), 1), "null_median": 0.0, "p": float(w.pvalue), "n": len(d),
                      "detail": f"Wilcoxon signed-rank, paired by division; 95% bootstrap CI {ci(boots)} km"})
         rho = spearmanr(x, y).statistic
         null = [spearmanr(x, rng.permutation(y)).statistic for _ in range(N_PERM)]
-        rows.append({"family": "D", "test": f"Divisions kept their north-south order at phase {line}", "statistic": "Spearman rho",
+        rows.append({"family": "D", "test": f"Divisions kept their order along the front at phase {line}", "statistic": "Spearman rho",
                      "estimate": round(float(rho), 2), "null_median": round(float(np.median(null)), 2),
                      "p": perm_p(rho, null, smaller_is_extreme=False), "n": len(d), "detail": f"{N_PERM} permutations"})
         print(f"  D phase {line}: shift {np.median(d):.0f} km p={w.pvalue:.4f}; rho {rho:.2f}")
@@ -305,7 +305,7 @@ def write_md(res, gaps, notes, f):
                        f"({'strong' if r.estimate >= 0.5 else 'moderate' if r.estimate >= 0.3 else 'weak'}), {sig(r)}.")
     shifts = ph[ph.test.str.startswith("Front")]
     orders = ph[ph.test.str.startswith("Divisions")]
-    summary.append(f"- **Phase lines**: the front's north–south position shifted significantly at "
+    summary.append(f"- **Phase lines**: the front's position along itself (km across the ~101° advance) shifted significantly at "
                    f"{', '.join(r.test[-1] for r in shifts.itertuples() if r.p_holm < 0.05) or 'no line'}; divisions kept their order at "
                    f"{', '.join(r.test[-1] for r in orders.itertuples() if r.p_holm < 0.05) or 'no line'} (ρ {', '.join(str(r.estimate) for r in orders.itertuples())}).")
     gap_lines = "\n".join(f"**{name}**\n\n| k | gap | s.e. | silhouette | silhouette, structureless data | p |\n|---|---|---|---|---|---|\n" + "\n".join(
@@ -368,7 +368,7 @@ overlap of each group with its best match after resampling the divisions {N_BOOT
 {gap_lines}
 
 ## D. Phase lines
-**Shift.** Each division's average north–south position in the stretch before a phase line and in the stretch after it,
+**Shift.** Each division's average position along the front (km across the general direction of the advance, about 101°, so SSW to NNE) in the stretch before a phase line and in the stretch after it,
 paired by division; Wilcoxon signed-rank test of the paired differences (median shift with a 95% bootstrap interval).
 This replaces the two-sample Kolmogorov–Smirnov p-values shown earlier, which assumed independent samples.
 **Order.** Spearman rank correlation of the same paired positions; permutation p ({N_PERM} shuffles). ρ near 1 = divisions

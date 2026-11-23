@@ -72,10 +72,10 @@ def shift_chart(rows):
     hi_all = max(max(v[3] for v in vals), 0) + 10
     W, H, left, right = 560, 34 * len(vals) + 34, 70, 20
     x = lambda v: left + (v - lo_all) / (hi_all - lo_all) * (W - left - right)
-    out = [f'<svg viewBox="0 0 {W} {H}" class="chart" role="img" aria-label="Median north-south shift at each phase line with 95% intervals">',
+    out = [f'<svg viewBox="0 0 {W} {H}" class="chart" role="img" aria-label="Median shift along the front at each phase line with 95% intervals">',
            f'<line x1="{x(0):.1f}" x2="{x(0):.1f}" y1="6" y2="{H - 24}" class="zero"/>',
            f'<text x="{x(0):.1f}" y="{H - 8}" class="tick" text-anchor="middle">no shift</text>',
-           f'<text x="{x(lo_all + 5):.1f}" y="{H - 8}" class="tick">← further south</text>']
+           f'<text x="{x(lo_all + 5):.1f}" y="{H - 8}" class="tick">← further south-south-west</text>']
     for i, (line, est, lo, hi, sig) in enumerate(vals):
         y = 22 + 34 * i
         cls = "sig" if sig else "nosig"
@@ -171,14 +171,14 @@ def build(res, gaps, meta, nb, extra):
     for r in shifts:
         lo, hi = (float(v) for v in re.search(r"CI (-?[\d.]+) to (-?[\d.]+)", r.detail).groups())
         D_shift.append({"line": r.test[-1], "est": r.estimate, "lo": lo, "hi": hi, "sig": sig(r), "p": r.p_holm, "n": r.n})
-    D_rows = [[f"Phase {d['line']}", f"<b>{abs(d['est']):.0f} km {'south' if d['est'] < 0 else 'north'}</b>",
+    D_rows = [[f"Phase {d['line']}", f"<b>{abs(d['est']):.0f} km {'SSW' if d['est'] < 0 else 'NNE'}</b>",
                f"{abs(d['hi']):.0f}–{abs(d['lo']):.0f} km" if d["hi"] < 0 else f"{d['lo']:.0f} to {d['hi']:.0f} km",
                d["n"], p_text(d["p"]), chip(d["sig"])] for d in D_shift]
     O_rows = [[f"Phase {r.test[-1]}", f"<b>{r.estimate:g}</b> ({strength_rho(r.estimate)})", r.n, p_text(r.p_holm), chip(sig(r))] for r in orders]
     sig_lines = [d["line"] for d in D_shift if d["sig"]]
     unclear = [d for d in D_shift if not d["sig"]]
     unclear_txt = "".join(
-        f" At phase {d['line']} most divisions did move south (median {abs(d['est']):.0f} km), but a minority moved a long way north, "
+        f" At phase {d['line']} the median division moved {abs(d['est']):.0f} km {'south-south-west' if d['est'] < 0 else 'north-north-east'}, but others moved a long way the other way, "
         "so the test, which weighs how far each division moved, cannot rule out chance." for d in unclear)
 
     # natural breaks
@@ -212,9 +212,9 @@ def build(res, gaps, meta, nb, extra):
          "Yes for the directional-vector groups; not clear for the geometric groups.", "formations"),
         ("Are the groups real, and how many are there?", "Yes — the number is a choice", None,
          "Tighter than made-up data with no groups; different yardsticks favour 2–3 or 5–6 groups.", "clusters"),
-        ("Did the front shift north or south at each phase line?",
+        ("Did the front shift along itself at each phase line?",
          "Yes at " + ", ".join(sig_lines) if sig_lines else "No clear shift", bool(sig_lines) and not unclear,
-         "Southward at every phase; " + (f"not clear enough at phase {', '.join(d['line'] for d in unclear)}." if unclear else "all clear."), "shift"),
+         ("Toward the south-south-west at every phase; " if all(d["est"] < 0 for d in D_shift) else "Direction varies by phase; ") + (f"not clear enough at phase {', '.join(d['line'] for d in unclear)}." if unclear else "all clear."), "shift"),
         ("Did divisions keep their places in the line?", "Yes" if all(sig(r) for r in orders) else "Mostly", all(sig(r) for r in orders),
          f"Order kept at every line (ρ {min(r.estimate for r in orders):g}–{max(r.estimate for r in orders):g}).", "order"),
         ("Where did divisions bunch between phase lines?", "Described, not tested", None,
@@ -253,8 +253,8 @@ def build(res, gaps, meta, nb, extra):
                               "0.75 or more = stable; 0.6–0.75 = a real pattern but less sharp; below 0.5 = falls apart."),
         ("Wilcoxon signed-rank test", "Compares each division's position before and after a line, one pair per division, and asks whether the "
                                       "moves lean one way more than chance would allow. Bigger moves count for more."),
-        ("Median shift", "The middle value of the divisions' north–south moves at a line: half moved more, half less."),
-        ("Spearman's ρ (rho)", "Whether divisions kept their order from north to south, from −1 (completely reversed) to 1 (same order). "
+        ("Median shift", "The middle value of the divisions' moves along the front (km across the general direction of the advance) at a line: half moved more, half less."),
+        ("Spearman's ρ (rho)", "Whether divisions kept their order along the front, from −1 (completely reversed) to 1 (same order). "
                                "Above 0.8 = very strong."),
         ("Jenks natural breaks", "Splits values into groups so each group is as tight as possible. Here the breaks fall where few division-days "
                                  "were spent, i.e. ground the divisions crossed quickly."),
@@ -341,21 +341,21 @@ lines of advance much more closely than the same divisions put into random group
 
 <section id="shift"><h2><span class="tag">D</span>Did the front shift at each phase line?</h2>
 <p class="answer"><b>{"Yes at line" + ("s " if len(sig_lines) > 1 else " ") + ", ".join(sig_lines) if sig_lines else "No clear shift"}.</b>
-After crossing each line, the weight of the advance sat further south than before.{unclear_txt}</p>
+Positions are km along the front, measured across the general direction of the whole advance (about 101°), so SSW to NNE.{unclear_txt}</p>
 <div class="card wide">{shift_chart(D_shift)}<p class="chart-note">Dot = median shift of the divisions; line = 95% range.
 Blue = significant; grey = not clear enough to rule out chance.</p></div>
 {table(["Line", "Median shift", "95% range", "Divisions", "p (corrected)", ""], D_rows)}
-{how("For each division, its average north–south position in the stretch before a phase line and in the stretch after it. One pair per "
+{how("For each division, its average position along the front in the stretch before a phase line and in the stretch after it. One pair per "
      "division, so the same division is compared with itself.",
-     f"<b>Null hypothesis:</b> no consistent north–south shift. <b>Test:</b> Wilcoxon signed-rank test on the paired differences; the 95% range "
+     f"<b>Null hypothesis:</b> no consistent shift along the front. <b>Test:</b> Wilcoxon signed-rank test on the paired differences; the 95% range "
      f"of the median shift is a bootstrap interval ({n_boot} resamples).")}
 </section>
 
 <section id="order"><h2><span class="tag">D</span>Did divisions keep their places in the line?</h2>
-<p class="answer"><b>{"Yes, at every line." if all(sig(r) for r in orders) else "Mostly."}</b> A division in the north of the line before a phase
-line was still in the north after it, and so on down the line, even as the whole front shifted.</p>
+<p class="answer"><b>{"Yes, at every line." if all(sig(r) for r in orders) else "Mostly."}</b> A division at the north-north-east end of the line before a phase
+line was still there after it, and so on down the line, even as the whole front shifted.</p>
 {table(["Line", "Spearman's ρ", "Divisions", "p (corrected)", ""], O_rows)}
-{how("The same paired positions as above, ranked north to south before and after each line.",
+{how("The same paired positions as above, ranked along the front before and after each line.",
      f"<b>Null hypothesis:</b> the order after a line is unrelated to the order before it. <b>Test:</b> Spearman rank correlation with a "
      f"permutation p-value ({n_perm:,} shuffles).")}
 </section>

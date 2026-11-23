@@ -9,8 +9,8 @@ sys.path.insert(0, str(Path(__file__).parent))
 import phase_distributions as pd_  # noqa: E402
 
 
-def frame(ys):
-    return pd.DataFrame({"y": ys, "w": 1.0, "division": [f"d{i}" for i in range(len(ys))]})
+def frame(fs):  # f = km along the front (across the advance, + = NNE)
+    return pd.DataFrame({"f": fs, "w": 1.0, "division": [f"d{i}" for i in range(len(fs))]})
 
 
 def test_same_distribution():
@@ -19,16 +19,16 @@ def test_same_distribution():
     assert s["shift_km"] == 0 and s["wasserstein_km"] == 0 and s["hist_r"] == 1 and s["order_rho"] == 1
 
 
-def test_whole_front_moves_south_in_order():
+def test_whole_front_moves_ssw_in_order():
     a = frame([0, 40, 80, 120, 160, 200])
-    s = pd_.compare(a, frame([y - 100 for y in a.y]))
+    s = pd_.compare(a, frame([f - 100 for f in a.f]))
     assert s["shift_km"] == -100 and s["wasserstein_km"] == 100 and s["order_rho"] == 1
 
 
 def test_sentence_reads_the_numbers():
     r = {"from": "2-3", "to": "3-4", "hist_r": 0.2, "shift_km": -56, "order_rho": 0.9, "divisions_a": 43, "divisions_b": 42}
     assert pd_.sentence(r) == ("Past phase 3 the line-up of divisions took a different shape, its centre of weight moved "
-                               "about 56 km south, and divisions kept their places in line.")
+                               "about 56 km south-south-west, and divisions kept their places in line.")
 
 
 def test_jenks_finds_the_gap():

@@ -13,6 +13,7 @@ Usage: python analysis/phase_clusters.py        (writes analysis/phase_clusters/
 """
 import json
 import math
+import os
 import sys
 import warnings
 from pathlib import Path
@@ -31,7 +32,18 @@ import compare_loa as c  # noqa: E402
 
 warnings.filterwarnings("ignore")
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "analysis" / "phase_clusters"
+# The phase lines are the OKH 22 III 41 ones (milestones/build_okh_lines.py, author's decision 2026-11-20).
+# PHASE_SET=ags reruns every phase analysis on the historian's lines a-e into *_ags outputs, for reference.
+PHASE_SET = os.environ.get("PHASE_SET", "okh")
+LAYER = {"ags": "AGS_PhaseLines", "okh": "OKH_PhaseLines"}[PHASE_SET]
+
+
+def sfx(name):
+    """An output name for the current phase set: unchanged for the OKH lines, name_ags for the historian's."""
+    return name if PHASE_SET == "okh" else f"{name}_{PHASE_SET}"
+
+
+OUT = ROOT / "analysis" / sfx("phase_clusters")
 K = 4
 NATIONS = {"Wehrmacht", "SS"}
 MIN_PIECE_KM = 25  # shorter pieces are mostly the ~17 km position merging, not movement
@@ -45,17 +57,46 @@ PHASE_NO = {l: str(i + 1) for i, l in enumerate("ABCDE")}  # the source layer's 
 
 
 def phase_lines():
-    """Phase lines 1-5 in km, each extended straight north and south so every position is either short of it or past it."""
-    gdf = c.gpd.read_file(ROOT / "milestones" / "AGS_Milestones.gdb", layer="AGS_PhaseLines").sort_values("line_id")
+    """Phase lines in km, each extended straight north and south so every position is either short of it or past it.
+    A line that runs more west-east than north-south (the OKH 4th line) is extended east from its east end and south
+    from its west end instead, so past it is south of it and east of its west end; east_polygon() works unchanged."""
+    gdf = c.gpd.read_file(ROOT / "milestones" / "AGS_Milestones.gdb", layer=LAYER).sort_values("line_id")
     out = {}
     for r in gdf.itertuples():
         line = c.merge_line(c.to_km(r.geometry))
         coords = list(line.coords)
+        if west_east(coords[0], coords[-1]):
+            if coords[0][0] < coords[-1][0]:
+                coords = coords[::-1]  # east end first
+            (ex, ey), (wx, wy) = coords[0], coords[-1]
+            out[PHASE_NO[str(r.line_id).upper()]] = [(ex + FAR, ey), *coords, (wx, wy - FAR)]
+            continue
         if coords[0][1] < coords[-1][1]:
             coords = coords[::-1]  # north end first
         (nx, ny), (sx, sy) = coords[0], coords[-1]
         out[PHASE_NO[str(r.line_id).upper()]] = [(nx, ny + FAR), *coords, (sx, sy - FAR)]
     return out
+
+
+def west_east(a, b):
+    """A line from a to b runs west-east: at least twice as far east as north. The slanted Zhytomyr-Proskurov line
+    (about 1.3:1) stays a north-south line; the OKH 4th line (about 3:1) does not."""
+    return abs(b[0] - a[0]) > 2 * abs(b[1] - a[1])
+
+
+def runs_west_east(line):
+    """True for an extended line from phase_lines() whose drawn part runs west-east."""
+    return west_east(line[1], line[-2])
+
+
+def line_normal(line):
+    """Unit vector at right angles to an extended line's drawn part (end to end), pointing to the side past it: about
+    east for a north-south line, about south for the west-east OKH 4th line. Progress toward a line is measured on it."""
+    a, b = np.array(line[1], float), np.array(line[-2], float)
+    d = (b - a) / np.linalg.norm(b - a)
+    n = np.array([-d[1], d[0]])
+    mid = np.array(LineString(line[1:-1]).interpolate(0.5, normalized=True).coords[0])
+    return n if east_polygon(line).contains(Point(mid + 20 * n)) else -n
 
 
 def east_polygon(line):
@@ -276,7 +317,7 @@ def main():
                {**f, "id": i, "properties": {**f["properties"], "members": r["members"]}} for i, (f, r) in enumerate(zip(avg_feats, cluster_rows))]},
            "pieces": {"type": "FeatureCollection", "features": [{**f, "id": i} for i, f in enumerate(piece_feats)]},
            "splits": json.loads(sp[sp.in_both_methods].to_json(orient="records")) if len(sp) else []}
-    (ROOT / "app" / "src" / "data" / "phase_clusters.json").write_text(json.dumps(app, separators=(",", ":")), encoding="utf8")
+    (ROOT / "app" / "src" / "data" / f"{sfx('phase_clusters')}.json").write_text(json.dumps(app, separators=(",", ":")), encoding="utf8")
     draw(pieces, assign, stretches, lines, avg_feats)
     print(f"\nWrote {OUT}")
 
