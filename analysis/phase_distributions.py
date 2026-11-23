@@ -1,10 +1,11 @@
 """Compare where the divisions were along the front in each stretch between AGS phase lines with the next stretch.
 
 Every Wehrmacht/SS division location (Frontier_Points) is put in the stretch it lies in (same extended phase lines as
-phase_clusters.py). Within a stretch, a location's position along the front is its north-south coordinate (km north of
-50N in the equidistant projection; the phase lines run roughly north-south). Each consecutive pair of stretches is then
-compared:
-  shift_km        weighted mean position, later minus earlier (+ = the weight of the advance moved north)
+phase_clusters.py). Within a stretch, a location's position along the front is its km ACROSS the general direction of
+the whole advance (advance_axis: ~101 deg, so the front axis runs south-south-west to north-north-east, + = NNE), from the
+mean 22 June position. Plain north-south km would misread the front past the west-east OKH 4th line. Each consecutive
+pair of stretches is then compared:
+  shift_km        weighted mean position, later minus earlier (+ = the weight of the advance moved north-north-east)
   wasserstein_km  how far, on average, the distribution had to move to become the next one (0 = identical)
   hist_r          Pearson correlation of the two weighted histograms (BIN_KM bins): same shape and place -> near 1
   ks_D, ks_p      two-sample Kolmogorov-Smirnov test on one mean position per division, so samples are independent
@@ -20,6 +21,7 @@ divisions bunched, and each break is a north-south curve that follows the two ph
 
 Usage: python analysis/phase_distributions.py   (writes analysis/phase_distributions/*)
 """
+import functools
 import json
 import sys
 from pathlib import Path
@@ -30,7 +32,7 @@ import numpy as np
 import pandas as pd
 from pyproj import Transformer
 from scipy.stats import ks_2samp, pearsonr, spearmanr, wasserstein_distance
-from shapely.geometry import Point, Polygon
+from shapely.geometry import LineString, Point, Polygon
 from shapely.ops import unary_union
 
 matplotlib.use("Agg")
@@ -41,7 +43,7 @@ import compare_loa as c  # noqa: E402
 import phase_clusters as pc  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "analysis" / "phase_distributions"
+OUT = ROOT / "analysis" / pc.sfx("phase_distributions")
 NATION_CODES = {1: "Wehrmacht", 2: "SS"}  # domain_Nation: 1 DE (Wehrmacht), 2 SS
 BIN_KM = 25  # about the ~17 km position merging plus georeferencing error; finer bins would chart noise
 MIN_DIVISIONS = 5  # below this a stretch has too few divisions to compare
@@ -49,6 +51,18 @@ GVF_MIN = 0.8  # Jenks: the fewest classes explaining at least 80% of the varian
 BANDS = {2: ["near {w}", "near {e}"], 3: ["near {w}", "midway", "near {e}"],
          4: ["near {w}", "west of midway", "east of midway", "near {e}"],
          5: ["near {w}", "west of midway", "midway", "east of midway", "near {e}"]}  # west to east
+
+
+@functools.cache
+def advance_axis():
+    """The whole advance's general direction: mean 22 June position -> mean last position of the Wehrmacht/SS daily
+    tracks. Returns (origin, unit vector along the advance, unit vector across it = the front axis, + = north-north-east)."""
+    import phase_checkpoints as ck
+    tracks = ck.daily_tracks()
+    first = np.mean([t.iloc[0][["x", "y"]].to_numpy(float) for t in tracks.values()], axis=0)
+    last = np.mean([t.iloc[-1][["x", "y"]].to_numpy(float) for t in tracks.values()], axis=0)
+    u = (last - first) / np.linalg.norm(last - first)
+    return first, u, np.array([-u[1], u[0]])
 
 
 def load_points():
@@ -59,25 +73,27 @@ def load_points():
     p["x"], p["y"] = [q.x for q in km], [q.y for q in km]
     lines = pc.phase_lines()
     p["zone"] = pc.zones(p[["x", "y"]].values, [pc.east_polygon(lines[l]) for l in lines])
+    first, _, front = advance_axis()
+    p["f"] = (p[["x", "y"]].to_numpy(float) - first) @ front  # km along the front, + = NNE
     p["division"] = list(zip(p.Nation, p.Branch_Type, p.Num_Name))
     p["w"] = p.Frac_Unit.fillna(1.0)
     return p, pc.stretch_names(list(lines))
 
 
 def compare(a, b):
-    """Statistics for two stretches' locations (DataFrames with y, w, division)."""
-    lo, hi = min(a.y.min(), b.y.min()), max(a.y.max(), b.y.max())
+    """Statistics for two stretches' locations (DataFrames with f, w, division)."""
+    lo, hi = min(a.f.min(), b.f.min()), max(a.f.max(), b.f.max())
     bins = np.arange(lo - BIN_KM, hi + 2 * BIN_KM, BIN_KM)
-    ha, _ = np.histogram(a.y, bins, weights=a.w)
-    hb, _ = np.histogram(b.y, bins, weights=b.w)
-    ma, mb = a.groupby("division").y.mean(), b.groupby("division").y.mean()
+    ha, _ = np.histogram(a.f, bins, weights=a.w)
+    hb, _ = np.histogram(b.f, bins, weights=b.w)
+    ma, mb = a.groupby("division").f.mean(), b.groupby("division").f.mean()
     both = ma.index.intersection(mb.index)
     ks = ks_2samp(ma, mb)
     rho = spearmanr(ma[both], mb[both]) if len(both) >= 3 else (np.nan, np.nan)
     return {
         "divisions_a": len(ma), "divisions_b": len(mb), "divisions_in_both": len(both),
-        "shift_km": round(np.average(b.y, weights=b.w) - np.average(a.y, weights=a.w)),
-        "wasserstein_km": round(wasserstein_distance(a.y, b.y, a.w, b.w)),
+        "shift_km": round(np.average(b.f, weights=b.w) - np.average(a.f, weights=a.w)),
+        "wasserstein_km": round(wasserstein_distance(a.f, b.f, a.w, b.w)),
         "hist_r": round(pearsonr(ha, hb)[0], 2),
         "ks_D": round(ks.statistic, 2), "ks_p": round(ks.pvalue, 3),
         "order_rho": round(rho[0], 2), "order_p": round(rho[1], 3),
@@ -91,7 +107,7 @@ def sentence(r):
     line = r["to"].split("-")[0]
     shape = ("kept the same shape" if r["hist_r"] >= 0.7 else "changed shape somewhat" if r["hist_r"] >= 0.4
              else "took a different shape")
-    shift = (f"its centre of weight moved about {abs(r['shift_km'])} km {'north' if r['shift_km'] > 0 else 'south'}"
+    shift = (f"its centre of weight moved about {abs(r['shift_km'])} km {'north-north-east' if r['shift_km'] > 0 else 'south-south-west'}"
              if abs(r["shift_km"]) >= c.NOISE_OFFSET_KM else "its centre of weight stayed put")
     order = ("divisions kept their places in line" if r["order_rho"] >= 0.8 else "divisions mostly kept their places"
              if r["order_rho"] >= 0.5 else "divisions changed places")
@@ -149,6 +165,17 @@ def position(x, ys, z, lines, t=None):
     """Position across stretch z: 0..1 from its western to its eastern phase line at the same latitude; in the outer
     stretches, km from their one line (negative = west). With t given, the inverse: the east coordinate of position t."""
     L = list(lines)
+    bound = [lines[L[i]] for i in (z - 1, z) if 0 <= i < len(L)]
+    if any(pc.runs_west_east(b) for b in bound):
+        # A west-east line has no single crossing per latitude: measure by distance to the lines instead (same 0..1 /
+        # signed-km meaning). Its inverse has no per-latitude answer, so callers asking for one get None (no outline).
+        if t is not None:
+            return None
+        pts = [Point(q) for q in zip(x, ys)]
+        d = [np.array([LineString(b).distance(q) for q in pts]) for b in bound]
+        if len(d) == 2:
+            return d[0] / (d[0] + d[1])
+        return -d[0] if z == 0 else d[0]
     w = line_x(lines[L[z - 1]], ys) if z > 0 else None
     e = line_x(lines[L[z]], ys) if z < len(L) else None
     if w is not None and e is not None:
@@ -177,7 +204,10 @@ def stretch_bands(g, z, lines, stretch):
         band = {"band": BANDS[k][i].format(w=w, e=e), "share": round(100 * m.w.sum() / g.w.sum()), "divisions": m.division.nunique(),
                 "from": round(edges[i] * scale), "to": round(edges[i + 1] * scale), "unit": "%" if interior else "km"}
         bands.append(band)
-        ring = [*zip(position(None, ys, z, lines, edges[i]), ys), *zip(position(None, ys[::-1], z, lines, edges[i + 1]), ys[::-1])]
+        a, b = position(None, ys, z, lines, edges[i]), position(None, ys[::-1], z, lines, edges[i + 1])
+        if a is None:
+            continue  # bounded by a west-east line: no per-latitude outline to draw
+        ring = [*zip(a, ys), *zip(b, ys[::-1])]
         ring.append(ring[0])
         props = {"stretch": stretch, **band}
         km.append({"type": "Feature", "properties": props, "geometry": {"type": "Polygon", "coordinates": [[[float(x), float(y)] for x, y in ring]]}})
@@ -186,14 +216,12 @@ def stretch_bands(g, z, lines, stretch):
     return bands, [round(b * scale) for b in breaks], gvf, ll, km
 
 
-def latitude_ticks():
-    """Axis ticks at whole degrees of latitude (km north at 29E, the projection's centre), each naming the towns at about
-    that latitude. Towns alone would mislead: the axis is north-south only, and Kyiv is 400 km east of Lviv."""
-    out = []
-    for lat in range(48, 52):
-        near = [n for n, (la, _) in c.CITIES.items() if round(la) == lat]
-        out.append({"name": f"{lat}°N" + (f" ({', '.join(near)})" if near else ""), "km": round(c.to_km(Point(29, lat)).y)})
-    return out
+def front_ticks():
+    """Axis ticks for the front axis: each reference town at its km across the advance. Only that one coordinate is
+    shown, so towns far apart along the advance (Lviv and Kyiv) can share a tick height."""
+    first, _, front = advance_axis()
+    return sorted(({"name": n, "km": round(float((np.array(c.to_km(Point(lon, lat)).coords[0]) - first) @ front))}
+                   for n, (lat, lon) in c.CITIES.items()), key=lambda t: t["km"])
 
 
 def draw(profiles, positions, bins, towns):
@@ -209,7 +237,7 @@ def draw(profiles, positions, bins, towns):
         ax.set_xticks([])
     axes[0].set_yticks([t["km"] for t in towns], [t["name"] for t in towns], fontsize=8)
     axes[1].legend(fontsize=7, loc="lower right", frameon=False)
-    fig.suptitle("Where along the front the divisions were (solid line: centre of weight)", fontsize=10)
+    fig.suptitle("Where along the front the divisions were, across the advance with NNE up (solid line: centre of weight)", fontsize=10)
     fig.tight_layout()
     for ext in ("png", "pdf"):
         fig.savefig(OUT / f"front_profile.{ext}", dpi=200)
@@ -279,27 +307,28 @@ def surface_bands(xy, h=SURFACE_KM):
 
 
 def jenks_on_date():
-    """Sorin's natural breaks (11-6): on each phase's planned date, the divisions on one line along the general direction of
-    the whole advance (mean 22 June position -> mean last position), cut by Jenks at the fewest classes explaining
-    JENKS_GVF of the spread. Only then is each bin read against the phase line: past (all its divisions), straddling
-    (some) or behind (none). Bins are numbered from the front (1 = furthest along). Returns (bins table, per-phase
-    summary, plot data, app dots, app break lines, heading)."""
+    """Sorin's natural breaks (11-6): on each phase's planned date, the divisions on one axis, cut by Jenks at the fewest
+    classes explaining JENKS_GVF of the spread. Only then is each bin read against the phase line: past (all its
+    divisions), straddling (some) or behind (none). Bins are numbered from the front (1 = furthest along).
+    The axis is at right angles to that phase's own line (pc.line_normal, row `heading`), measured from the mean 22 June
+    position: the whole advance's general direction (`heading` returned, ~101 deg) runs almost parallel to the west-east
+    OKH 4th line, which the divisions crossed moving south (author's decision 2026-11-20).
+    Returns (bins table, per-phase summary, plot data, app dots, app break lines, overall heading)."""
     import phase_checkpoints as ck
     tracks, lines, names = ck.daily_tracks(), pc.phase_lines(), pc.unit_names()
     inv = Transformer.from_crs(c.AEQD, 4326, always_xy=True)
-    first = np.mean([t.iloc[0][["x", "y"]].to_numpy(float) for t in tracks.values()], axis=0)
-    last = np.mean([t.iloc[-1][["x", "y"]].to_numpy(float) for t in tracks.values()], axis=0)
-    u = (last - first) / np.linalg.norm(last - first)
-    across = np.array([-u[1], u[0]])
-    heading = round(c.bearing(first, last))
+    first, u0, _ = advance_axis()
+    heading = round(c.bearing((0, 0), u0))
     lonlat = lambda q: [round(v, 5) for v in inv.transform(*q)]
     rows, summary, plots, dots, breaklines = [], [], [], [], []
-    for L, day in PLANNED.items():
+    for L, day in ((L, d) for L, d in PLANNED.items() if L in lines):  # the OKH set has lines 1-4 only
         d = (pd.Timestamp(day, tz=ck.DAY0.tz) - ck.DAY0).days
         keys = [k for k, t in tracks.items() if (t.day == d).any()]
         xy = np.array([tracks[k].loc[tracks[k].day == d, ["x", "y"]].iloc[0].to_numpy(float) for k in keys])
         if len(xy) < MIN_DIVISIONS:
             continue
+        u = pc.line_normal(lines[L])
+        across = np.array([-u[1], u[0]])
         along = (xy - first) @ u
         poly = pc.east_polygon(lines[L])
         past = np.array([poly.contains(Point(q)) for q in xy])
@@ -312,10 +341,10 @@ def jenks_on_date():
                          "divisions": int(m.sum()), "past": int(past[m].sum()), "class": kind})
         share = {kind: round(100 * sum((bins == b).sum() for b, x in cls.items() if x == kind) / len(along)) for kind in ("past", "straddling", "behind")}
         line_along = (np.array(lines[L][1:-1]) - first) @ u  # the drawn phase line, without its extensions
-        summary.append({"phase": L, "date": day, "divisions": len(along), "bins": k, "gvf": round(gvf, 2), **share,
+        summary.append({"phase": L, "date": day, "heading": round(c.bearing((0, 0), u)), "divisions": len(along), "bins": k, "gvf": round(gvf, 2), **share,
                         "line_from": round(float(line_along.min())), "line_to": round(float(line_along.max()))})
         side = (xy - first) @ across
-        for b in breaks:  # each break as a straight line across the front, at right angles to the advance
+        for b in breaks:  # each break as a straight line parallel to the phase line
             ends = [first + b * u + w * across for w in (side.min() - 30, side.max() + 30)]
             breaklines.append({"type": "Feature", "properties": {"phase": L, "km": round(b)},
                                "geometry": {"type": "LineString", "coordinates": [lonlat(e) for e in ends]}})
@@ -323,17 +352,20 @@ def jenks_on_date():
             dots.append({"type": "Feature", "properties": {"division": pc.label(key, names), "phase": L, "date": day, "bin": int(b),
                                                            "class": cls[int(b)], "km": round(float(a)), "past": bool(on)},
                          "geometry": {"type": "Point", "coordinates": lonlat(q)}})
-        plots.append((L, day, along, past, breaks, bins, (line_along.min(), line_along.max()), k, gvf))
+        plots.append((L, day, along, past, breaks, bins, (line_along.min(), line_along.max()), k, gvf, summary[-1]["heading"]))
     return pd.DataFrame(rows), pd.DataFrame(summary), plots, dots, breaklines, heading
 
 
-def draw_jenks(plots, heading):
-    """One strip per phase: the divisions along the general direction of advance (filled = past the phase line, open =
+def draw_jenks(plots):
+    """One strip per phase: the divisions at right angles to that phase line (filled = past the phase line, open =
     short of it), the natural breaks dashed with bin numbers from the front, the phase line's span shaded."""
     plt.rcParams.update({"font.size": 7, "pdf.fonttype": 42})
-    fig, axes = plt.subplots(len(plots), 1, figsize=(129 / 25.4, 0.8 * len(plots) + 0.6), sharex=True)
-    for ax, (L, day, along, past, breaks, bins, (lo, hi), k, gvf) in zip(np.atleast_1d(axes), plots):
-        ax.axvspan(lo, hi, color="0.88", lw=0)
+    fig, axes = plt.subplots(len(plots), 1, figsize=(129 / 25.4, 0.8 * len(plots) + 0.6))  # each phase has its own axis
+    for ax, (L, day, along, past, breaks, bins, (lo, hi), k, gvf, hd) in zip(np.atleast_1d(axes), plots):
+        if hi - lo < 4:  # a straight line at right angles to this axis sits at one km: a band would vanish
+            ax.axvline(lo, color="0.82", lw=4)
+        else:
+            ax.axvspan(lo, hi, color="0.88", lw=0)
         jitter = np.random.default_rng(0).uniform(-0.3, 0.3, len(along))
         ax.scatter(along[past], jitter[past], s=9, c="black", lw=0)
         ax.scatter(along[~past], jitter[~past], s=9, facecolors="white", edgecolors="black", lw=0.5)
@@ -343,9 +375,9 @@ def draw_jenks(plots, heading):
             ax.text(along[bins == b].mean(), 0.42, str(b), ha="center", fontsize=7, fontweight="bold")
         ax.set_yticks([])
         ax.set_ylim(-0.5, 0.55)
-        ax.set_ylabel(f"Phase {L}\n{pd.Timestamp(day):%d %b}\n{k} bins, {gvf:.0%}", rotation=0, ha="right", va="center", fontsize=7)
+        ax.set_ylabel(f"Phase {L} → {hd}°\n{pd.Timestamp(day):%d %b}\n{k} bins, {gvf:.0%}", rotation=0, ha="right", va="center", fontsize=7)
         ax.spines[["top", "right", "left"]].set_visible(False)
-    np.atleast_1d(axes)[-1].set_xlabel(f"km along the general direction of advance (bearing {heading}°) from the 22 June average position")
+    np.atleast_1d(axes)[-1].set_xlabel("km from the 22 June average position, at right angles to each phase line\n(the bearing is beside each phase)")
     fig.text(0.01, 0.005, "Filled = past the phase line · open = short · dashed = natural break · grey = phase line", fontsize=7)
     fig.tight_layout(rect=(0, 0.03, 1, 1))
     for ext in ("pdf", "png"):
@@ -483,8 +515,8 @@ def main():
           + ", ".join(f"{stretches[z]} {g.division.nunique()}" for z, g in groups.items()))
 
     summary = pd.DataFrame([{"stretch": stretches[z], "locations": len(g), "divisions": g.division.nunique(),
-                             "mean_km_north": round(np.average(g.y, weights=g.w)),
-                             "sd_km": round(np.sqrt(np.cov(g.y, aweights=g.w))),
+                             "mean_km_front": round(np.average(g.f, weights=g.w)),
+                             "sd_km": round(np.sqrt(np.cov(g.f, aweights=g.w))),
                              "first_day": g.Date.min().date(), "last_day": g.Date.max().date()} for z, g in groups.items()])
     zs = sorted(groups)
     pairs = pd.DataFrame([{"from": stretches[a], "to": stretches[b], **compare(groups[a], groups[b])}
@@ -495,19 +527,19 @@ def main():
     print("\n" + summary.to_string(index=False) + "\n\n" + pairs.to_string(index=False))
 
     lines = pc.phase_lines()
-    bins = np.arange(np.floor(p.y.min() / BIN_KM) * BIN_KM, p.y.max() + BIN_KM, BIN_KM)
+    bins = np.arange(np.floor(p.f.min() / BIN_KM) * BIN_KM, p.f.max() + BIN_KM, BIN_KM)
     profiles, positions, zones_km = [], [], []
     names, branch = pc.unit_names(), pd.read_csv(c.DATA / "domain_Branch_Type.csv").set_index("Code").Label.to_dict()
     for z in zs:
         g = groups[z]
         bands, breaks, gvf, ll, km = stretch_bands(g, z, lines, stretches[z])
         zones_km += km
-        h, _ = np.histogram(g.y, bins, weights=g.w)
+        h, _ = np.histogram(g.f, bins, weights=g.w)
         profiles.append({"stretch": stretches[z], "share": [round(float(v), 4) for v in h / h.sum()],
-                         "mean_km": round(np.average(g.y, weights=g.w)), "breaks": breaks, "gvf": round(gvf, 2), "bands": bands})
-        for key, y in g.groupby("division").y.mean().items():
-            positions.append({"division": pc.label(label_key(key, branch), names), "stretch": stretches[z], "km": round(y)})
-    towns = latitude_ticks()
+                         "mean_km": round(np.average(g.f, weights=g.w)), "breaks": breaks, "gvf": round(gvf, 2), "bands": bands})
+        for key, f in g.groupby("division").f.mean().items():
+            positions.append({"division": pc.label(label_key(key, branch), names), "stretch": stretches[z], "km": round(f)})
+    towns = front_ticks()
     pd.DataFrame([{"stretch": r["stretch"], "classes": len(r["bands"]), "gvf": r["gvf"], **b} for r in profiles for b in r["bands"]]) \
         .to_csv(OUT / "natural_breaks.csv", index=False)
     draw(profiles, positions, bins, towns)
@@ -515,10 +547,10 @@ def main():
     jenks_t, by_phase, plots, jdots, jlines, heading = jenks_on_date()
     jenks_t.to_csv(OUT / "jenks_by_phase.csv", index=False)
     by_phase.to_csv(OUT / "jenks_by_phase_summary.csv", index=False)
-    draw_jenks(plots, heading)
+    draw_jenks(plots)
     # The app's Phases tab shows the sentence, with the numbers on request.
-    (ROOT / "app" / "src" / "data" / "phase_distributions.json").write_text(pairs.to_json(orient="records"), encoding="utf8")
-    (ROOT / "app" / "src" / "data" / "phase_profiles.json").write_text(json.dumps({
+    (ROOT / "app" / "src" / "data" / f"{pc.sfx('phase_distributions')}.json").write_text(pairs.to_json(orient="records"), encoding="utf8")
+    (ROOT / "app" / "src" / "data" / f"{pc.sfx('phase_profiles')}.json").write_text(json.dumps({
         "bin_km": BIN_KM, "bins_from_km": float(bins[0]), "towns": towns, "profiles": profiles, "positions": positions,
         "jenks": {"heading": heading, "gvf_min": JENKS_GVF, "summary": by_phase.to_dict("records"), "bins": jenks_t.to_dict("records"),
                   **{name: {"type": "FeatureCollection", "features": [{**f, "id": i} for i, f in enumerate(fc)]}
@@ -527,6 +559,8 @@ def main():
     print("\n" + "\n".join(pairs.sentence))
     print(f"\nNatural breaks on each planned date (bearing {heading} deg, fewest bins explaining {JENKS_GVF:.0%}):\n"
           + by_phase.to_string(index=False) + "\n\n" + jenks_t.to_string(index=False))
+    if pc.PHASE_SET != "okh":  # daily groups do not use the phase lines: made once, with the default set
+        return print(f"\nwrote {OUT}")
     daily, daily_links, ddots, doutlines, dsurface = daily_groups()
     daily.to_csv(OUT / "groups_daily.csv", index=False)
     daily_links.to_csv(OUT / "groups_daily_links.csv", index=False)
