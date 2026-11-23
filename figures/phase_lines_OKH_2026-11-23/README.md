@@ -41,11 +41,14 @@ The historian-line versions of everything here are kept for comparison: `analysi
 | `loa_substretch.csv` | In-depth line-of-advance fits between lines 2–3 (6A) and 3–4 (III PzKo) |
 | `significance_results.csv` | All significance tests (`Statistics.html` at the repo root shows them as a page) |
 
-## Not updated here
-- `reports/Barbarossa Analysis Report 2026-11-09.docx` and the brief built by `analysis/brief.py` still describe lines
-  a–e. The brief's text hard-codes "phase 5", the 101° method and "north/south" wording.
-- Dashboard screenshots in `reports/screens/` that show phase results were taken on the old lines:
-  `natural_breaks_strips.png`, `natural_breaks_phase3.png`, `flow_chart_app.png`. They need recapturing from the
-  current `Barbarossa.html`. The others (local groups, plan cards) don't depend on the phase lines.
+## Report
+`reports/Barbarossa Analysis Report 2026-11-23.docx` is the 2026-11-09 report updated for the new lines: the same
+document and layout, with every phase-line number, table, method description and figure redone. Its three new dashboard
+views are in `screens/` here (`natural_breaks_strips`, `natural_breaks_phase3`, `flow_chart_app`), captured from the
+current `Barbarossa.html`. The 2026-11-09 report and `reports/screens/` are left as they were.
+
+## Not updated
+- `analysis/brief.py`, which generated the first draft of the report, still writes the old wording ("phase 5", the 101°
+  method). The report was edited by hand after it, so the update was made to the report itself.
 - Lines-of-advance figures (`analysis/loa_frontier/`) and posture charts (`figures/posture/`) don't use the phase
   lines, so they don't change.
