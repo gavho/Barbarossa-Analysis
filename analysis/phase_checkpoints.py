@@ -36,7 +36,7 @@ import compare_loa as c  # noqa: E402
 import phase_clusters as pc  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "analysis" / "phase_checkpoints"
+OUT = ROOT / "analysis" / pc.sfx("phase_checkpoints")
 NATION_CODES = {1: "Wehrmacht", 2: "SS"}  # domain_Nation: 1 DE (Wehrmacht), 2 SS
 K_RANGE = range(2, 6)  # the app has five group colours
 DAY0 = pd.Timestamp("1941-06-22", tz="UTC")
@@ -233,7 +233,7 @@ def main():
                 a = df.along[labels == r["cluster"]]
                 if len(a):
                     seg = substring(LineString(lines[L]), a.min() + pc.FAR - SPAN_PAD_KM, a.max() + pc.FAR + SPAN_PAD_KM)
-                    seg = seg.offset_curve(-LANE_KM * (i + 1))  # own lane west of the line (it runs north to south), N nearest
+                    seg = c.merge_line(seg.offset_curve(-LANE_KM * (i + 1)))  # own lane west of the line (it runs north to south), N nearest; a tight curve can split it
                     spans.append({"type": "Feature", "id": len(spans), "geometry": {"type": "LineString", "coordinates": [ll(x, y) for x, y in seg.coords]},
                                   "properties": {"line": L, "cluster": r["cluster"], "ci": i, "divisions": r["divisions"], "normalized": r["normalized"],
                                                  "label": f"{r['cluster']} · {'–' if r['normalized'] is None else format(r['normalized'], '.2f')}"}})
@@ -281,7 +281,7 @@ def main():
                                                                   "unit": r.unit, "cluster": r.cluster4},
                 "geometry": {"type": "Point", "coordinates": ll(r.x, r.y)}}
                for i, r in enumerate(cr.dropna(subset=["group"]).itertuples())]}}
-    (ROOT / "app" / "src" / "data" / "phase_checkpoints.json").write_text(json.dumps(app, separators=(",", ":")), encoding="utf8")
+    (ROOT / "app" / "src" / "data" / f"{pc.sfx('phase_checkpoints')}.json").write_text(json.dumps(app, separators=(",", ":")), encoding="utf8")
     draw_maps(cr.dropna(subset=["group"]), lines, done)
     draw_diversity(div)
     print(f"\n{len(splits)} breakaways; wrote {OUT}")
@@ -299,10 +299,12 @@ def draw_maps(cr, lines, done):
     from matplotlib.lines import Line2D
     from matplotlib.patches import Patch
 
-    zones = json.loads((ROOT / "analysis" / "phase_distributions" / "natural_zones.geojson").read_text(encoding="utf8"))["features"]
+    zones = json.loads((ROOT / "analysis" / pc.sfx("phase_distributions") / "natural_zones.geojson").read_text(encoding="utf8"))["features"]
     grey = lambda share: str(round(0.93 - (min(max(share, 20), 50) - 20) / 30 * 0.4, 2))  # 20% light .. 50% dark
     marks = "os^Dv"
-    (xlo, xhi), (ylo, yhi) = (cr.x.min() - 80, cr.x.max() + 80), (cr.y.min() - 60, cr.y.max() + 60)
+    drawn = np.array([q for ln in lines.values() for q in ln[1:-1]])  # every line's own length, without its extensions
+    (xlo, xhi) = min(cr.x.min() - 80, drawn[:, 0].min() - 30), max(cr.x.max() + 80, drawn[:, 0].max() + 30)
+    (ylo, yhi) = min(cr.y.min() - 60, drawn[:, 1].min() - 30), max(cr.y.max() + 60, drawn[:, 1].max() + 30)
     fig, axes = plt.subplots(3, 2, figsize=(10, 12.6), sharex=True, sharey=True)
     for ax in axes.flat[len(done):]:
         ax.axis("off")
@@ -313,7 +315,9 @@ def draw_maps(cr, lines, done):
         for M, ln in lines.items():
             ax.plot(*zip(*ln), color="black" if M == L else "0.55", lw=2 if M == L else 0.7, ls="-" if M == L else "--")
             top = LineString(ln).intersection(LineString([(xlo, yhi - 25), (xhi, yhi - 25)]))
-            if not top.is_empty:
+            if pc.runs_west_east(ln):  # never reaches the top edge: label it at its east end
+                ax.text(ln[1][0] - 6, ln[1][1] + 8, M, ha="right", fontsize=9 if M == L else 7, weight="bold" if M == L else "normal")
+            elif not top.is_empty:
                 pt = top.geoms[0] if hasattr(top, "geoms") else top
                 ax.text(pt.x + 6, pt.y, M, fontsize=9 if M == L else 7, weight="bold" if M == L else "normal")
         m = cr[cr.line == L]
