@@ -21,10 +21,23 @@ export function distanceToLineKm(p: number[], line: number[][]): number {
   return best;
 }
 
-/** The region east of a roughly north–south phase line, within the line's own latitude span. */
-export function eastOf(line: number[][]): Feature<Polygon> {
+const SOUTH = 40; // far enough south to close the polygon below the theater
+
+/** A line at least twice as far east as north on the ground (the OKH 4th line), as analysis/phase_clusters.west_east. */
+export function runsWestEast(line: number[][]): boolean {
+  const a = line[0], b = line[line.length - 1], kx = Math.cos((((a[1] + b[1]) / 2) * Math.PI) / 180) * 111.32;
+  return Math.abs((b[0] - a[0]) * kx) > 2 * Math.abs((b[1] - a[1]) * 110.57);
+}
+
+/** Past a phase line, within its own span: east of a roughly north–south line (within its latitudes), or south of a
+ * west–east one (within its longitudes), which the divisions crossed moving south. */
+export function pastOf(line: number[][]): { poly: Feature<Polygon>; inBand: (c: number[]) => boolean } {
+  const we = runsWestEast(line), k = we ? 0 : 1;
   const first = line[0], last = line[line.length - 1];
-  return { type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: [[...line, [EAST, last[1]], [EAST, first[1]], first]] } };
+  const close = we ? [[last[0], SOUTH], [first[0], SOUTH]] : [[EAST, last[1]], [EAST, first[1]]];
+  const vals = line.map((c) => c[k]), lo = Math.min(...vals), hi = Math.max(...vals);
+  return { poly: { type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: [[...line, ...close, first]] } },
+    inBand: (c) => c[k] >= lo && c[k] <= hi };
 }
 
 export interface Crossing {
@@ -32,7 +45,7 @@ export interface Crossing {
   name: string;
   planned: string;
   plannedEnd: string | null;
-  lead: string | null; // first day any unit in the line's latitude band had reached it (east of it or within reach)
+  lead: string | null; // first day any unit in the line's band (latitudes, or longitudes for a west-east line) had reached it (past it or within reach)
   main: string | null; // first day at least half of that day's units in the band had reached it
   shareToday: number | null; // share of the selected day's units in the band that had reached it
   delay: number | null; // main-body day minus planned end, in days (+ = late)
@@ -51,11 +64,9 @@ export function crossings(phaseLines: Feature[], points: Feature[], today: strin
   return phaseLines.map((pl) => {
     const g = pl.geometry as LineString | MultiLineString;
     const line = g.type === "LineString" ? g.coordinates : g.coordinates.flat();
-    const poly = eastOf(line);
-    const lats = line.map((c) => c[1]);
-    const [lo, hi] = [Math.min(...lats), Math.max(...lats)];
+    const { poly, inBand } = pastOf(line);
     const share = (d: string) => {
-      const pts = (byDay.get(d) ?? []).filter((c) => c[1] >= lo && c[1] <= hi);
+      const pts = (byDay.get(d) ?? []).filter(inBand);
       if (!pts.length) return null;
       return pts.filter((c) => booleanPointInPolygon(c, poly) || distanceToLineKm(c, line) <= reachKm).length / pts.length;
     };
