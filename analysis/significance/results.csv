@@ -12,8 +12,8 @@ D,Front shifted across the advance at phase 2,"median shift per division (km, + 
 D,Divisions kept their order along the front at phase 2,Spearman rho,0.96,-0.0,9.999000099990002e-05,45,10000 permutations,0.0018998100189981002
 D,Front shifted across the advance at phase 3,"median shift per division (km, + NNE)",2.9,0.0,0.30211415864687297,39,"Wilcoxon signed-rank, paired by division; 95% bootstrap CI -7.11 to 11.77 km",1.0
 D,Divisions kept their order along the front at phase 3,Spearman rho,0.8,0.0,9.999000099990002e-05,39,10000 permutations,0.0018998100189981002
-D,Front shifted across the advance at phase Beyond 4,"median shift per division (km, + NNE)",-29.6,0.0,0.000762939453125,16,"Wilcoxon signed-rank, paired by division; 95% bootstrap CI -55.19 to -20.18 km",0.01068115234375
-D,Divisions kept their order along the front at phase Beyond 4,Spearman rho,0.46,0.0,0.03899610038996101,16,10000 permutations,0.27297270272972707
+D,Front shifted across the advance at phase 4,"median shift per division (km, + NNE)",-29.6,0.0,0.000762939453125,16,"Wilcoxon signed-rank, paired by division; 95% bootstrap CI -55.19 to -20.18 km",0.01068115234375
+D,Divisions kept their order along the front at phase 4,Spearman rho,0.46,0.0,0.03899610038996101,16,10000 permutations,0.27297270272972707
 E,Natural breaks are real gaps on the phase 1 date,share of the stretch empty at the 3 breaks,0.14,0.2,0.916083916083916,40,"1941-06-30; 4 bins over 235 km, fit 0.91; 1000 random scatters; past 30%, on the line 38%, short 32% of divisions",1.0
 E,Natural breaks are real gaps on the phase 2 date,share of the stretch empty at the 3 breaks,0.19,0.19,0.5734265734265734,42,"1941-07-07; 4 bins over 367 km, fit 0.92; 1000 random scatters; past 55%, on the line 0%, short 45% of divisions",1.0
 E,Natural breaks are real gaps on the phase 3 date,share of the stretch empty at the 3 breaks,0.15,0.17,0.6533466533466533,48,"1941-07-22; 4 bins over 447 km, fit 0.92; 1000 random scatters; past 44%, on the line 48%, short 8% of divisions",1.0

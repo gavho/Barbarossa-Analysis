@@ -101,8 +101,8 @@ kept their places along the front.
 | Divisions kept their order along the front at phase 2 | Spearman rho | 0.96 | -0.0 | < 0.001 | 0.002 | 45 |
 | Front shifted across the advance at phase 3 | median shift per division (km, + NNE) | 2.9 | 0.0 | 0.302 | 1.000 | 39 |
 | Divisions kept their order along the front at phase 3 | Spearman rho | 0.8 | 0.0 | < 0.001 | 0.002 | 39 |
-| Front shifted across the advance at phase Beyond 4 | median shift per division (km, + NNE) | -29.6 | 0.0 | < 0.001 | 0.011 | 16 |
-| Divisions kept their order along the front at phase Beyond 4 | Spearman rho | 0.46 | 0.0 | 0.039 | 0.273 | 16 |
+| Front shifted across the advance at phase 4 | median shift per division (km, + NNE) | -29.6 | 0.0 | < 0.001 | 0.011 | 16 |
+| Divisions kept their order along the front at phase 4 | Spearman rho | 0.46 | 0.0 | 0.039 | 0.273 | 16 |
 
 - Front shifted across the advance at phase 1: Wilcoxon signed-rank, paired by division; 95% bootstrap CI -27.33 to -4.61 km
 - Divisions kept their order along the front at phase 1: 10000 permutations
@@ -110,8 +110,8 @@ kept their places along the front.
 - Divisions kept their order along the front at phase 2: 10000 permutations
 - Front shifted across the advance at phase 3: Wilcoxon signed-rank, paired by division; 95% bootstrap CI -7.11 to 11.77 km
 - Divisions kept their order along the front at phase 3: 10000 permutations
-- Front shifted across the advance at phase Beyond 4: Wilcoxon signed-rank, paired by division; 95% bootstrap CI -55.19 to -20.18 km
-- Divisions kept their order along the front at phase Beyond 4: 10000 permutations
+- Front shifted across the advance at phase 4: Wilcoxon signed-rank, paired by division; 95% bootstrap CI -55.19 to -20.18 km
+- Divisions kept their order along the front at phase 4: 10000 permutations
 
 **Natural breaks between the phase lines.** In each stretch, every division location's position across it (% of the way
 from the western phase line to the eastern one, at its latitude; km west of phase 1 in the first stretch) is split by
