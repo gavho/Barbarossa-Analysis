@@ -143,11 +143,11 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   frontProfile: {
     title: "Front profile",
-    body: "One panel per stretch between phase lines, north at the top. The shape is where the divisions spent their days along the front (share of division-days, weighted by strength); the dashed outline is the stretch before, for comparison. Solid line: the centre of weight. The axis is latitude only, so a town named beside it marks how far north, not that the front was there.",
+    body: "One panel per stretch between phase lines. The axis runs along the front: km across the general direction of the whole advance (about 101°), so south-south-west at the bottom and north-north-east at the top. Plain north–south km would misread the front past the 4th phase line, which runs west–east. The shape is where the divisions spent their days along the front (share of division-days, weighted by strength); the dashed outline is the stretch before, for comparison. Solid line: the centre of weight. A town beside the axis marks only its place across the advance, not that the front was there.",
   },
   placesInLine: {
     title: "Places in line",
-    body: "Each line is one division: its average north–south position in each stretch between phase lines. Lines running side by side mean divisions kept their order along the front; crossing lines mean they swapped places. Colour = the checkpoint group the division crossed the phase line with; thick lines are breakaways. Hover a line for the division.",
+    body: "Each line is one division: its average place along the front (km across the advance, north-north-east up) in each stretch between phase lines. Lines running side by side mean divisions kept their order along the front; crossing lines mean they swapped places. Colour = the checkpoint group the division crossed the phase line with; thick lines are breakaways. Hover a line for the division.",
   },
   checkpoints: {
     title: "Phase lines as checkpoints",
@@ -183,11 +183,11 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   naturalBreaks: {
     title: "Natural breaks",
-    body: "On the day a phase line was meant to be reached, how were the divisions spread around it? Three steps. 1) Put every division on one line: its distance along the general direction of the whole advance (the bearing from the divisions' average 22 June position to their average last position), not along the phase line, whose shape plays no part here. 2) Jenks natural breaks cut that line where the divisions clump, as for a GIS colour ramp: the fewest bins that explain at least 90% of the spread. Bins are numbered from the front. 3) Only then read each bin against the phase line: past (every division in it had crossed), on the line (some had, some had not) or short (none had). The percentages are shares of divisions. The phase lines run at an angle to the advance, so a bin can be on the line with its southern divisions past it and its northern ones short.",
+    body: "On the day a phase line was meant to be reached, how were the divisions spread around it? Three steps. 1) Put every division on one line: its distance from the divisions' average 22 June position, measured at right angles to that phase line, toward it (about east for lines 1–3, about south for the 4th line, which runs west–east and was crossed moving south; the bearing is shown under the chart). 2) Jenks natural breaks cut that line where the divisions clump, as for a GIS colour ramp: the fewest bins that explain at least 90% of the spread. Bins are numbered from the front. 3) Only then read each bin against the phase line: past (every division in it had crossed), on the line (some had, some had not) or short (none had). The percentages are shares of divisions. A curved phase line covers a range on this axis, so a bin can be on the line with some divisions past it and others short.",
   },
   jenksdots: {
     title: "Natural breaks: divisions",
-    body: "Each division where it stood on the selected phase's planned date, coloured by its natural-break bin (bin 1 = furthest along the advance). Click one for its bin and whether it was past the phase line.",
+    body: "Each division where it stood on the selected phase's planned date, coloured by its natural-break bin (bin 1 = furthest toward and past the phase line). Click one for its bin and whether it was past the phase line.",
   },
   divspans: {
     title: "Diversity: clusters on the line",
@@ -239,7 +239,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   frontShape: {
     title: "How the front changed at the line",
-    body: "Compares where along the front (north to south) the divisions were in this stretch with the next one, using every daily division location, weighted by strength. Shape: whether the divisions bunched in the same places (correlation of the two north-south spreads; 0.7+ = same shape). Centre of weight: how far the average position moved; under 20 km is within mapping error. Places in line: whether a division further north stayed further north (rank correlation; 0.8+ = kept their places). On the map (pick the line above), the shaded bands either side of the line show the same thing: bright bands continuing across the line at the same latitudes = same shape; bands jumping south = the weight moved. The numbers are in Method check. A stretch is a place, not a time, so divisions still behind the line count in the earlier stretch.",
+    body: "Compares where along the front (km across the general direction of the advance, north-north-east to south-south-west) the divisions were in this stretch with the next one, using every daily division location, weighted by strength. Shape: whether the divisions bunched in the same places (correlation of the two spreads; 0.7+ = same shape). Centre of weight: how far the average position moved; under 20 km is within mapping error. Places in line: whether a division further along the front stayed further along (rank correlation; 0.8+ = kept their places). On the map (pick the line above), the shaded bands either side of the line show the same thing: bright bands continuing across the line at the same latitudes = same shape; bands jumping south = the weight moved. The numbers are in Method check. A stretch is a place, not a time, so divisions still behind the line count in the earlier stretch.",
   },
   silhouette: {
     title: "Silhouette",
@@ -251,7 +251,7 @@ export const HELP: Record<string, { title: string; body: string }> = {
   },
   planVsActual: {
     title: "Phase-line crossings",
-    body: "For each planned phase line, only division points within the line's north–south extent are used. A point has reached the line when it lies east of it or no more than the reach distance (default 20 km) short of it. Lead = first day any of them had reached it; main body = first day at least half of that day's points had. Late/early compares the main-body day with the end of the planned window.",
+    body: "For each planned phase line, only division points within the line's own extent are used: its latitudes, or its longitudes for a line running west–east (the 4th line). A point has reached the line when it lies past it (east of it; south of a west–east line) or no more than the reach distance (default 20 km) short of it. Lead = first day any of them had reached it; main body = first day at least half of that day's points had. Late/early compares the main-body day with the end of the planned window.",
   },
   reach: {
     title: "Reach distance",

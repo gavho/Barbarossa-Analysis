@@ -73,10 +73,16 @@ const INDEX = new Map(TOWNS.flatMap((t) => [t.name, ...(t.aka ?? [])].map((n) =>
 /** A town by any of its names; "Kiev / Kyiv" tries each part. */
 export const findTown = (text: string) => text.split("/").map((p) => INDEX.get(norm(p))).find(Boolean) ?? null;
 
+/** "48.51N 30.78E", as lines.townNames() writes a point that is on no town, back to a point. */
+const coordTown = (text: string) => {
+  const m = /^(\d+(?:\.\d+)?)N\s+(\d+(?:\.\d+)?)E$/.exec(text);
+  return m ? { name: text, ll: [Number(m[2]), Number(m[1])] as [number, number] } : null;
+};
+
 /** "Kovel - Lutsk, Brody" → the towns in order, or the names it does not know. */
 export function parseTowns(text: string): { towns: typeof TOWNS; unknown: string[] } {
   const parts = text.split(/\s+[-–—]\s+|,|;|\n/).map((p) => p.trim()).filter(Boolean);
-  const towns = parts.map(findTown);
+  const towns = parts.map((p) => findTown(p) ?? coordTown(p));
   return { towns: towns.filter((t) => t !== null), unknown: parts.filter((_, i) => !towns[i]) };
 }
 

@@ -98,7 +98,7 @@ export const PHASE_CHECKS = phase_checkpoints as unknown as {
     pooled: number | null; normalized: number | null }[];
   diversity_spans: FC; // each cluster's stretch of its phase line; crossings carry `unit` and `cluster` too
 };
-/** Where along the front (north-south km) the divisions were per stretch, with Jenks natural breaks (phase_distributions.py). */
+/** Where along the front (km across the ~101° advance, + = NNE) the divisions were per stretch, with Jenks natural breaks (phase_distributions.py). */
 /** The same grouping on every day (phase_distributions.daily_groups): a group keeps its id while it holds together, so
  * splits, merges and new groups show as id changes; links count the divisions shared by groups on consecutive days. */
 export interface DailyGroup { date: string; id: number; divisions: number; dominant: string; formations: string; y: number }
@@ -112,10 +112,10 @@ export const PHASE_PROFILES = phase_profiles as unknown as {
   profiles: { stretch: string; share: number[]; mean_km: number; breaks: number[]; gvf: number;
     bands: { band: string; share: number; divisions: number; from: number; to: number; unit: "%" | "km" }[] }[];
   positions: { division: string; stretch: string; km: number }[];
-  /** Natural breaks on each planned date: Jenks on positions along the general direction of advance, the bins
+  /** Natural breaks on each planned date: Jenks on positions at right angles to that phase line (summary `heading`), the bins
    * read against the phase line afterwards (phase_distributions.jenks_on_date). */
   jenks: { heading: number; gvf_min: number; dots: FC; breaklines: FC;
-    summary: { phase: string; date: string; divisions: number; bins: number; gvf: number; past: number; straddling: number; behind: number;
+    summary: { phase: string; date: string; heading: number; divisions: number; bins: number; gvf: number; past: number; straddling: number; behind: number;
       line_from: number; line_to: number }[];
     bins: { phase: string; date: string; bin: number; from_km: number; to_km: number; divisions: number; past: number;
       class: "past" | "straddling" | "behind" }[] };
@@ -132,7 +132,13 @@ export const PLAN_MATCH = plan_match as unknown as Record<PlanClustering, { pair
   planned: Record<string, [number, number][]>; planned_names: Record<string, string>;
   roster: Record<string, string>; names: Record<string, string>; // division key "Nation|Branch|Number" -> planned unit / name
 };
-export const MILESTONES = milestones as unknown as Record<"AGS_PhaseLines" | "AGS_AdvanceLines" | "AGS_SmallPocketCOA", FC>;
+const ms = milestones as unknown as Record<"AGS_PhaseLines" | "AGS_AdvanceLines" | "AGS_SmallPocketCOA" | "OKH_PhaseLines" | "OKH_PhaseMarkers", FC>;
+/** The phase lines are the OKH 22 III 41 ones (author's decision 2026-11-20). `npm run build:ags` (mode ags) puts the
+ * historian's a-e back, and vite.config swaps the phase analyses to match. MILESTONES.AGS_PhaseLines is always the
+ * active set (every panel reads it); ALT_PHASE_LINES is the other one, shown as its own layer. */
+export const PHASE_SET: "okh" | "ags" = import.meta.env.MODE === "ags" ? "ags" : "okh";
+export const MILESTONES = PHASE_SET === "okh" ? { ...ms, AGS_PhaseLines: ms.OKH_PhaseLines } : ms;
+export const ALT_PHASE_LINES = PHASE_SET === "okh" ? ms.AGS_PhaseLines : ms.OKH_PhaseLines;
 
 const fc = (x: unknown) => x as FC;
 const days = (x: unknown) => x as DivisionDays[];

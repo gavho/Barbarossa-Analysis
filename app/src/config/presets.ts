@@ -1,10 +1,11 @@
 import type { PageId } from "./regions";
+import { PHASE_SET } from "@/data";
 
 export type Mode = "instant" | "progressive";
 export type LayerKind = "circle" | "line" | "fill" | "heatmap";
 export type LayerId =
   | "areas" | "ellipses" | "heat" | "geo" | "dv" | "geovec" | "dvvec" | "phaseavg" | "phasepieces" | "checklines" | "checkpaths" | "checkdots" | "spreadsurface" | "spreadgroups" | "breakdots" | "jenksdots" | "jenkslines" | "divspans" | "divdots" | "matchplan" | "matchreal" | "paths" | "points"
-  | "plan_phase" | "plan_advance" | "plan_pocket";
+  | "plan_phase" | "plan_advance" | "plan_pocket" | "plan_alt";
 
 /** How the timeline filters a layer: by mode (day), always one day (exact), a start..end span, started-by, or not at all. */
 export type TimeKind = "day" | "exact" | "span" | "start" | "none";
@@ -68,6 +69,8 @@ export const PLAN_LAYERS: LayerDef[] = [
   { id: "plan_advance", title: "Plan · Lines of Advance", kind: "line", time: "none", cluster: "none", fields: ["unit", "color", "notes"] },
   { id: "plan_phase", title: "Plan · Phase Lines", kind: "line", time: "none", cluster: "none",
     fields: ["line_id", "name", "towns", "planned_date", "date_start", "date_end", "units", "notes"] },
+  { id: "plan_alt", title: PHASE_SET === "okh" ? "Plan · Historian Phase Lines (a–e)" : "Plan · OKH 22 III 41 Phase Lines", kind: "line", time: "none", cluster: "none",
+    fields: ["line_id", "name", "towns", "planned_date", "date_start", "date_end", "notes", "marker", "source"] },
 ];
 
 export const PHASE_LAYERS: LayerDef[] = [
@@ -179,8 +182,10 @@ export function preset(page: PageId, mode: Mode, id: LayerId): LayerStyle {
             sizeField: "CID_div_total", sizeDomain: [1, 42], size: [1.5, 7], labels: id === "dv" }
         : { ...base, colorMode: "category", colorField: "Cluster_ID", categories: CLUSTER_COLORS,
             sizeField: "CID_div_total", sizeDomain: [1, 42], size: [1.5, 7], labels: id === "dv" };
-    case "plan_phase":
-      return { ...base, visible: true, color: "#00c2a8", size: [2.5, 2.5], labels: true }; // teal: distinct from every unit color
+    case "plan_phase": // OKH lines in the slide's red (its star/diamond/pentagon/hexagon markers ride along, syncLayers); historian's teal
+      return { ...base, visible: true, color: PHASE_SET === "okh" ? "#e5241b" : "#00c2a8", size: [2.5, 2.5], labels: true };
+    case "plan_alt": // the other line set, for comparison: the historian's teal, dashed (or the OKH red in the ags build)
+      return { ...base, color: PHASE_SET === "okh" ? "#00c2a8" : "#e5241b", size: [2, 2], labels: true, dash: PHASE_SET === "okh" };
     case "plan_advance":
       return { ...base, visible: true, colorMode: "category", colorField: "color", categories: ADVANCE_COLORS, size: [3.5, 3.5] };
     case "geovec":

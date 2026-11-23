@@ -174,7 +174,7 @@ def main():
         put(f"{region}_days", days.astype(object).map(clean).to_dict("records"))
 
     ms = {}
-    for layer in ("AGS_PhaseLines", "AGS_AdvanceLines", "AGS_SmallPocketCOA"):
+    for layer in ("AGS_PhaseLines", "AGS_AdvanceLines", "AGS_SmallPocketCOA", "OKH_PhaseLines", "OKH_PhaseMarkers"):
         df = read(layer, gdb=MILESTONES)
         if "line_id" in df:  # phase lines are numbered 1-5 in everything we show (Sorin, 11-6); the source layer has a-e
             df["line_id"] = df.line_id.str.upper().map(lambda l: str("ABCDE".index(l) + 1))

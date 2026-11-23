@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build && node scripts/copy-dist.mjs",
+    "build:ags": "tsc --noEmit && vite build --mode ags && node scripts/copy-dist.mjs \"Barbarossa AGS.html\"",
     "test": "vitest run",
     "data": "python scripts/export_data.py",
     "preview": "vite preview --port 4173 --strictPort"
