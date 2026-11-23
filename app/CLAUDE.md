@@ -10,6 +10,13 @@ self-contained file: `npm run build` → `../Barbarossa.html` (open by double-cl
 - `python analysis/compare_loa.py` then `python analysis/export_vectors.py` — cluster vectors and their statistics
   (`src/data/<region>_vectors.json`, shown in the Vectors tab). Explanations behind every "?" live in `src/config/help.ts`.
 - `npm run build` — type-check, build, copy to repo root. `npm test` — vitest. `npm run preview` — serve `dist/` on :4173.
+- Phase lines are the OKH 22 III 41 set (author's decision 2026-11-20): `python milestones/build_okh_lines.py "milestones/AGS DD Planning Map 15II41.pptx"`
+  digitizes them; `analysis/phase_clusters.py`, `phase_distributions.py`, `phase_checkpoints.py`, `figures/arrival_bars.py` use them.
+  The historian's a–e stay for reference: the same scripts with `PHASE_SET=ags` write `*_ags` outputs, `npm run build:ags` →
+  `../Barbarossa AGS.html`, and the default app shows them as the "Plan · Historian Phase Lines (a–e)" layer (`ALT_PHASE_LINES`).
+- The OKH 4th line runs west–east, so nothing may assume north–south lines: past-the-line tests use `pastSide` (`lib/naturalBreaks.ts`)
+  / `pastOf` (`lib/crossing.ts`), mirroring `phase_clusters.phase_lines` + `west_east`. Natural breaks measure each phase at right
+  angles to its own line (`line_normal`; ~195° for line 4); front profiles use km across the whole ~101° advance (`advance_axis`).
 
 ## Rules
 - All state lives in the zustand store (`src/state/store.ts`); change it with `set()` / helpers there.
